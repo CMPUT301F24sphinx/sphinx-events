@@ -11,13 +11,13 @@ import android.widget.TextView;
 import java.util.List;
 import java.util.Map;
 
-public class ExListAdapter extends BaseExpandableListAdapter {
+public abstract class ExListAdapter<C> extends BaseExpandableListAdapter {
 
     Context context;
     List<String> parents;
-    Map<String, List<String>> children;
+    Map<String, List<C>> children;
 
-    ExListAdapter(Context context, List<String> parents, Map<String, List<String>> children) {
+    ExListAdapter(Context context, List<String> parents, Map<String, List<C>> children) {
         this.context = context;
         this.parents = parents;
         this.children = children;
@@ -78,23 +78,7 @@ public class ExListAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public View getChildView(int i, int i1, boolean b, View convertView, ViewGroup viewGroup) {
-        View view;
-        String child = (String) getChild(i, i1);
-
-        if (convertView == null) {
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
-            view = inflater.inflate(R.layout.ex_list_event, null);
-        }
-        else {
-            view = convertView;
-        }
-
-        TextView eventTextView = view.findViewById(R.id.event_text_view);
-        eventTextView.setText(child);
-
-        return view;
-    }
+    public abstract View getChildView(int i, int i1, boolean b, View convertView, ViewGroup viewGroup);
 
     @Override
     public boolean isChildSelectable(int i, int i1) {
