@@ -2,4 +2,9 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="screen_background_color">#DCDCDC</color>
+    <color name="header_color">#757575</color>
+    <color name="scan_QR_code_button_color">#FFFFFF</color>
+    <color name="create_event_button_color">#2ED5FF</color>
+    <color name="ex_list_parent_color">#D9D9D9</color>
 </resources>
