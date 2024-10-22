@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "297396878071",
-    "project_id": "sphinxevents-94e7d",
-    "storage_bucket": "sphinxevents-94e7d.appspot.com"
+    "project_number": "181639745404",
+    "project_id": "sphinxevents-39afc",
+    "storage_bucket": "sphinxevents-39afc.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:297396878071:android:c0f34e786fda449338b1f2",
+        "mobilesdk_app_id": "1:181639745404:android:0c361b8885a7f6e4c25ef9",
         "android_client_info": {
           "package_name": "com.example.sphinxevents"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBY7ZutmTTfYVUBQtWvrTynZC-z2KrLCt0"
+          "current_key": "AIzaSyBbMIob87lYCpAkXChOOnJbG5bAAecY3FE"
         }
       ],
       "services": {
