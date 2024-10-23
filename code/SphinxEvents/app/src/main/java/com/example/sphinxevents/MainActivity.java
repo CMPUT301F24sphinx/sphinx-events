@@ -1,15 +1,20 @@
 package com.example.sphinxevents;
 
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.View;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
+import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -23,6 +28,11 @@ public class MainActivity extends AppCompatActivity {
     private List<String> headers;
     private HashMap<String, List<Event>> events;
     private ExpandableListAdapter listAdapter;
+
+    private ImageButton profilePicButton;
+    private DrawerLayout drawerLayout;
+    private ImageButton closeDrawerButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +59,24 @@ public class MainActivity extends AppCompatActivity {
 
             return true; // Indicating the event is handled
         });
+
+        // Drawer stuff
+        profilePicButton = findViewById(R.id.profile_pic_button);
+        closeDrawerButton = findViewById(R.id.close_drawer_button);
+        drawerLayout = findViewById(R.id.drawer_layout);
+
+        profilePicButton.setOnClickListener(v -> {
+            if (!drawerLayout.isDrawerOpen(GravityCompat.END)) {
+                drawerLayout.openDrawer(GravityCompat.END);
+            }
+        });
+
+        closeDrawerButton.setOnClickListener(v -> {
+            if (drawerLayout.isDrawerOpen(GravityCompat.END)) {
+                drawerLayout.closeDrawer(GravityCompat.END);
+            }
+        });
+
     }
 
 

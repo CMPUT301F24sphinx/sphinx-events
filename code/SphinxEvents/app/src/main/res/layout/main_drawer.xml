@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_drawer"
+    android:layout_width="280dp"
+    android:layout_height="match_parent"
+    android:layout_gravity="end"
+    android:orientation="vertical"
+    android:background="@color/screen_background_color"
+    android:padding="8dp">
+
+    <ImageButton
+        android:id="@+id/close_drawer_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/baseline_close_24"
+        android:contentDescription="@string/close_drawer_speakable_text"
+        android:layout_gravity="start" />
+
+    <!--
+    TODO: Get profile image from database and make it circular
+    TODO: Fix the margin depending on how pic looks like after
+          we implement the pic display fully
+    -->
+    <ImageView
+        android:id="@+id/drawer_profile_pic"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_gravity="center"
+        android:padding="2dp"
+        android:layout_margin="16dp"
+        android:contentDescription="@string/profile_pic_speakable_text"
+        android:src="@drawable/baseline_person_24"
+        android:background="@drawable/square_border"/>
+
+    <!-- TODO: Load user name from database -->
+    <TextView
+        android:id="@+id/drawer_user_name_display"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="18sp"
+        android:text="Test Name"
+        android:textStyle="bold"
+        />
+
+    <!--
+    TODO: Load user email from database
+    TODO: Figure out how to deal with really long emails or names
+    -->
+    <TextView
+        android:id="@+id/drawer_user_email_display"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="18sp"
+        android:text="testEmail@gmail.com"
+        android:textStyle="bold"/>
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/black"
+        android:layout_margin="16dp"
+        android:layout_gravity="center"/>
+    
+    <Button
+        android:id="@+id/drawer_manage_profile_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_marginBottom="8dp"
+        android:padding="8dp"
+        android:text="@string/drawer_manage_profile"
+        android:textSize="24sp"
+        app:cornerRadius="0dp"
+        android:backgroundTint="@color/drawer_manage_profile_color"
+        />
+
+    <Button
+        android:id="@+id/drawer_manage_facility_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_marginBottom="8dp"
+        android:padding="8dp"
+        android:text="@string/drawer_manage_facility"
+        android:textSize="24sp"
+        app:cornerRadius="0dp"
+        android:backgroundTint="@color/drawer_manage_facility_color"
+        />
+
+    <Button
+        android:id="@+id/drawer_notifications_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_marginBottom="8dp"
+        android:padding="8dp"
+        android:text="@string/drawer_notifications"
+        android:textSize="24sp"
+        app:cornerRadius="0dp"
+        android:backgroundTint="@color/drawer_notifications_color"
+        />
+
+
+
+</LinearLayout>

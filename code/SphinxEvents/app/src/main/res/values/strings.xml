@@ -3,4 +3,12 @@
     <string name="scan_qr_code">Scan QR Code</string>
     <string name="create_event">Create Event</string>
     <string name="view_profile">View Profile</string>
+
+    <!--Drawer strings-->
+    <string name="close_drawer_speakable_text">Close side drawer button</string>
+    <string name="profile_pic_speakable_text">Profile picture</string>
+    <string name="drawer_manage_profile">Manage Profile</string>
+    <string name="drawer_manage_facility">Manage Facility</string>
+    <string name="drawer_notifications">Notifications</string>
+
 </resources>
