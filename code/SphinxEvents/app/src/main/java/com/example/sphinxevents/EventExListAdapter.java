@@ -16,14 +16,25 @@ public class EventExListAdapter extends ExListAdapter {
         super(context, headers, events);
     }
 
+
+    /**
+     * Displays the events within ex-list
+     *
+     * @param groupPosition index of group
+     * @param childPosition index of event within group
+     * @param isExpanded boolean of whether list is expanded
+     * @param convertView reference to existing view if exists
+     * @param parent parent view
+     * @return view of event
+     */
     @Override
-    public View getChildView(int i, int i1, boolean b, View convertView, ViewGroup viewGroup) {
+    public View getChildView(int groupPosition, int childPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         View view;
-        Event event = (Event) getChild(i, i1);
+        Event event = (Event) getChild(groupPosition, childPosition);
 
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
-            view = inflater.inflate(R.layout.ex_list_event, null);
+            view = inflater.inflate(R.layout.ex_list_event, parent, false);
         }
         else {
             view = convertView;
