@@ -4,42 +4,34 @@ public class User {
     private final String deviceId;
     private String name;  // Default empty
     private String email;  // Default empty
-    private String profilePicture;  // Default
+    private String phoneNumber; // Default empty
+    private String profilePicture;  // Default pfp
 
 
     // Constructor
-    public User(String name, String email, String profilePicture, String deviceId) {
-        this.name = name;
-        this.email = email;
-        this.profilePicture = profilePicture;
+    public User(String deviceId, String name, String email, String phoneNumber, String profilePicture) {
         this.deviceId = deviceId;
-    }
-
-    public void setName(String name) {
         this.name = name;
-    }
-
-    public void setEmail(String email) {
         this.email = email;
-    }
-
-    public void setProfilePicture(String profilePicture) {
+        this.phoneNumber = phoneNumber;
         this.profilePicture = profilePicture;
     }
 
-    public String getName() {
-        return this.name;
-    }
+    public void setName(String name) { this.name = name;}
 
-    public String getEmail() {
-        return this.email;
-    }
+    public void setEmail(String email) { this.email = email;}
 
-    public String getProfilePicture() {
-        return this.profilePicture;
-    }
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber;}
 
-    public String getDeviceId() {
-        return this.deviceId;
-    }
+    public void setProfilePicture(String profilePicture) { this.profilePicture = profilePicture;}
+
+    public String getName() { return this.name;}
+
+    public String getEmail() { return this.email;}
+
+    public String getPhoneNumber() { return this.phoneNumber;}
+
+    public String getProfilePicture() { return this.profilePicture;}
+
+    public String getDeviceId() { return this.deviceId;}
 }

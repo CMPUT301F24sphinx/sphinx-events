@@ -7,6 +7,7 @@ public class Event {
 
     private String name;
     private String description;
+    private String poster;
     private Date lotteryEndDate;
 
     Event(String name, String description, Date lotteryEndDate) {
@@ -23,6 +24,8 @@ public class Event {
         return description;
     }
 
+    public String getPoster() {return poster;}
+
     public Date getLotteryEndDate() {
         return lotteryEndDate;
     }
@@ -38,5 +41,7 @@ public class Event {
     public void setLotteryEndDate(Date lotteryEndDate) {
         this.lotteryEndDate = lotteryEndDate;
     }
+
+    public void setPoster(String poster) {this.poster = poster;}
 }
 

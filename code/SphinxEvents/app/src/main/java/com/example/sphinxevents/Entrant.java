@@ -7,10 +7,11 @@ public class Entrant extends User {
     private ArrayList<String> pendingEvents;
 
     // Constructor
-    public Entrant(String deviceId, String name, String email, String profilePicture) {
-        super(name, email, profilePicture, deviceId);  // Call the User constructor
-        this.joinedEvents = new ArrayList<>();  // Initialize the ArrayLists
-        this.pendingEvents = new ArrayList<>();
+    public Entrant(String deviceId, String name, String email, String phoneNumber, String profilePicture,
+                   ArrayList<String> joinedEvents, ArrayList<String> pendingEvents) {
+        super(name, email, phoneNumber, profilePicture, deviceId);  // Call the User constructor
+        this.joinedEvents = joinedEvents;  // Initialize the ArrayLists
+        this.pendingEvents = pendingEvents;
     }
 
     // Getters and Setters for joinedEvents and pendingEvents

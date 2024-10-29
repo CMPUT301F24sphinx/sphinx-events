@@ -5,6 +5,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,6 +47,7 @@ public class DatabaseManager {
         Map<String, Object> eventData = new HashMap<>();
         eventData.put("name", event.getName());
         eventData.put("description", event.getDescription());
+        eventData.put("poster", event.getPoster());
         eventData.put("lotteryEndDate", event.getLotteryEndDate());
 
         // Add the event to Firestore under the "events" collection
@@ -83,6 +85,7 @@ public class DatabaseManager {
         Map<String, Object> userData = new HashMap<>();
         userData.put("name", user.getName());
         userData.put("email", user.getEmail());
+        userData.put("phoneNumber", user.getPhoneNumber());
         userData.put("role", "User");
         userData.put("profilePicture", "default_profile_pic");
 
@@ -105,6 +108,46 @@ public class DatabaseManager {
     }
 
     public void getUser(String deviceId, UserRetrievalCallback callback) {
-
+        database.collection("users")
+                .document(deviceId)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            String name = document.getString("name");
+                            String email = document.getString("email");
+                            String phoneNumber = document.getString("phoneNumber");
+                            String profilePicture = document.getString("profilePicture");
+                            String role = document.getString("role");
+                            User user;
+                            switch (role) {
+//                                case "Administrator":
+//                                    // user = new Administrator(deviceId, name, email, profilePicture);
+//                                    // TODO: put administrator data in database
+//                                    break;
+                                case "Organizer":
+                                    // Retrieve joinedEvents, pendingEvents, and createdEvents for Organizer
+                                    ArrayList<String> joinedEvents = (ArrayList<String>) document.get("joinedEvents");
+                                    ArrayList<String> pendingEvents = (ArrayList<String>) document.get("pendingEvents");
+                                    ArrayList<String> createdEvents = (ArrayList<String>) document.get("createdEvents");
+                                    user = new Organizer(deviceId, name, email, phoneNumber, profilePicture, joinedEvents, pendingEvents, createdEvents);
+                                    break;
+                                case "Entrant":
+                                default:
+                                    // Retrieve joinedEvents and pendingEvents for Entrant
+                                    ArrayList<String> joinedEventsEntrant = (ArrayList<String>) document.get("joinedEvents");
+                                    ArrayList<String> pendingEventsEntrant = (ArrayList<String>) document.get("pendingEvents");
+                                    user = new Entrant(deviceId, name, email, phoneNumber, profilePicture, joinedEventsEntrant, pendingEventsEntrant);
+                                    break;
+                            }
+                            callback.onSuccess(user);
+                        } else {
+                            callback.onFailure(new Exception("User does not exist."));
+                        }
+                    } else {
+                        callback.onFailure(task.getException());
+                    }
+                });
     }
 }

@@ -46,10 +46,10 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        initializeDrawer();
-
         databaseManager = new DatabaseManager();
         currentUserId = getDeviceId(this);
+
+        initializeDrawer();
 
         expandableListView = findViewById(R.id.main_screen_expandable_listview);
         initializeExpandableLists();
@@ -64,9 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
             return true; // Indicating the event is handled
         });
-
-
-
+        
     }
 
     /**
