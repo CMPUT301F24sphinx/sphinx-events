@@ -10,9 +10,10 @@ public class Event {
     private String poster;
     private Date lotteryEndDate;
 
-    Event(String name, String description, Date lotteryEndDate) {
+    Event(String name, String description, String poster, Date lotteryEndDate) {
         this.name = name;
         this.description = description;
+        this.poster = poster;
         this.lotteryEndDate = lotteryEndDate;
     }
 

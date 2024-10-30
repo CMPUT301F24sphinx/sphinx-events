@@ -1,6 +1,7 @@
 package com.example.sphinxevents;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
@@ -26,8 +27,8 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private DatabaseManager databaseManager;
-    private String currentUserId;
-    private User currentUser;
+    private String deviceId;
+    private Entrant currentUser;
 
     private ExpandableListView expandableListView;  // expandable list of events
     private List<String> headers;  // headers/parents/group names
@@ -46,25 +47,44 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        databaseManager = new DatabaseManager();
-        currentUserId = getDeviceId(this);
+        databaseManager = DatabaseManager.getInstance();
+        deviceId = getDeviceId(this);
 
-        initializeDrawer();
+
+        /*
+        TODO: Any onClick listeners and UI initialization stuff should go in the onSuccess method
+              below. We can clean the code up a bit by putting that stuff in functions. I will
+              make the initialLoginActivity look better and add profile pic stuff to it as well. -Adam
+         */
 
         expandableListView = findViewById(R.id.main_screen_expandable_listview);
-        initializeExpandableLists();
 
-        listAdapter = new EventExListAdapter(this, headers, events);
-        expandableListView.setAdapter(listAdapter);
+        // Attempt to get the user from the database
+        databaseManager.getUser(deviceId, new DatabaseManager.UserRetrievalCallback() {
+            // If user found, continue with MainActivity screen.
+            @Override
+            public void onSuccess(Entrant user) {
+                currentUser = user;
+                initializeDrawer();
+                initializeExpandableLists();
+                listAdapter = new EventExListAdapter(MainActivity.this, headers, events);
+                expandableListView.setAdapter(listAdapter);
+                // Clicking event in main screen -> allows user to view event details
+                expandableListView.setOnChildClickListener((parent, view, groupPosition, childPosition, id) -> {
+                    // Code for new activity that views events goes here
 
-
-        // Clicking event in main screen -> allows user to view event details
-        expandableListView.setOnChildClickListener((parent, view, groupPosition, childPosition, id) -> {
-            // Code for new activity that views events goes here
-
-            return true; // Indicating the event is handled
+                    return true; // Indicating the event is handled
+                });
+            }
+            // If user not in database, direct to initialLoginActivity.
+            @Override
+            public void onFailure(Exception e) {
+                Intent intent = new Intent(MainActivity.this, InitialLoginActivity.class);
+                intent.putExtra("DEVICE_ID", deviceId); // Pass the deviceId
+                startActivity(intent);
+                finish();
+            }
         });
-        
     }
 
     /**
