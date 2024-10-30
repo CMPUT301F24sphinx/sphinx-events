@@ -13,6 +13,10 @@
     <color name="drawer_manage_facility_color">#FF2C2C</color>
     <color name="drawer_notifications_color">#8F00FF</color>
 
+    <!-- Initial Login colors -->
+    <color name="initial_login_header">#FFB74D</color>
+    <color name="initial_login_create_profile_button">#000</color>
+
     <!-- Managing Facility Colors -->
     <color name="add_facility_button_color">#CE6262</color>
     <color name="remove_facility_button_color">#FF9696</color>

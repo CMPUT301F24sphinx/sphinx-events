@@ -10,6 +10,8 @@
     <string name="drawer_manage_profile">Manage Profile</string>
     <string name="drawer_manage_facility">Manage Facility</string>
     <string name="drawer_notifications">Notifications</string>
+
+    <!-- Facility Strings -->
     <string name="managing_facility">Managing Facility</string>
     <string name="you_have_no_facility">You have no facility.</string>
     <string name="go_back">Go Back</string>
@@ -17,5 +19,12 @@
     <string name="your_facility">Your Facility:</string>
     <string name="edit">Edit</string>
     <string name="remove">Remove</string>
+
+    <!-- Profile Strings -->
+    <string name="create_your_profile">Create Your Profile</string>
+    <string name="name_hint">Name</string>
+    <string name="email_hint">Email</string>
+    <string name="phone_number_hint">Phone Number (Optional)</string>
+    <string name="create_profile_button_txt">Create Profile</string>
 
 </resources>

@@ -28,8 +28,8 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private DatabaseManager databaseManager;
-    private String currentUserId;
-    private User currentUser;
+    private String deviceId;
+    private Entrant currentUser;
 
     private ExpandableListView expandableListView;  // expandable list of events
     private List<String> headers;  // headers/parents/group names
@@ -48,8 +48,21 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        databaseManager = new DatabaseManager();
-        currentUserId = getDeviceId(this);
+        databaseManager = DatabaseManager.getInstance();
+        deviceId = getDeviceId(this);
+
+        // TODO: get the user from the splashScreen activity, not get it from database again
+        databaseManager.getUser(deviceId, new DatabaseManager.UserRetrievalCallback() {
+            @Override
+            public void onSuccess(Entrant user) {
+                currentUser = user;
+            }
+            @Override
+            public void onFailure(Exception e) {
+                // Handle failure
+                Log.e("DatabaseError", "Failed to retrieve user from database: " + e.getMessage(), e);
+            }
+        });
 
         initializeDrawer();
 
@@ -71,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         Button manageFacilityButton = findViewById(R.id.drawer_manage_facility_btn);
         manageFacilityButton.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, ManageFacilityActivity.class);
-            intent.putExtra("user_id", currentUserId);
+            intent.putExtra("user_id", deviceId);
             startActivity(intent);
         });
         

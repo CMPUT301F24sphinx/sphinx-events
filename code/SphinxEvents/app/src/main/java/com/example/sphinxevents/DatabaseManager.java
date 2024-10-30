@@ -5,19 +5,26 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
 public class DatabaseManager {
-    private final FirebaseFirestore database;
+    private static DatabaseManager instance;
+    private FirebaseFirestore database;
 
     /**
      * Initializes a new DatabaseManager instance with a Firestore database connection.
      */
     public DatabaseManager() {
         database = FirebaseFirestore.getInstance();
+    }
+
+    /**
+     * Returns the singleton instance of DatabaseManager
+     * @return the DatabaseManager instance
+     */
+    public static synchronized DatabaseManager getInstance() {
+        if (instance == null) {
+            instance = new DatabaseManager();
+        }
+        return instance;
     }
 
     /**
@@ -44,16 +51,9 @@ public class DatabaseManager {
      */
     // TODO: Include all other fields an event should have
     public void createEvent(Event event, EventCreationCallback callback) {
-        // Create a map of event details
-        Map<String, Object> eventData = new HashMap<>();
-        eventData.put("name", event.getName());
-        eventData.put("description", event.getDescription());
-        eventData.put("poster", event.getPoster());
-        eventData.put("lotteryEndDate", event.getLotteryEndDate());
-
         // Add the event to Firestore under the "events" collection
         database.collection("events")
-                .add(eventData)
+                .add(event)
                 .addOnSuccessListener(callback::onSuccess)
                 .addOnFailureListener(callback::onFailure);
     }
@@ -80,31 +80,33 @@ public class DatabaseManager {
      * @param user The User object containing user details.
      * @param callback Callback to handle success or failure of the user creation.
      */
-    public void addUser(User user, UserCreationCallback callback) {
+    public void saveUser(Entrant user, UserCreationCallback callback) {
         String deviceId = user.getDeviceId();
-        // Create a map of user details
-        Map<String, Object> userData = new HashMap<>();
-        userData.put("name", user.getName());
-        userData.put("email", user.getEmail());
-        userData.put("phoneNumber", user.getPhoneNumber());
-        userData.put("role", "User");
-        userData.put("profilePicture", "default_profile_pic");
 
         // Add the user to Firestore database under the "users" collection
         database.collection("users")
                 .document(deviceId)  // Use the deviceId as the document Id
-                .set(userData)
+                .set(user)
                 .addOnSuccessListener(aVoid -> {
                     callback.onSuccess(deviceId);
                 })
                 .addOnFailureListener(callback::onFailure);
     }
 
-
-    // TODO: Implement the following interface and function
-
+    /**
+     * Callback interface for user retrieval operations.
+     */
     public interface UserRetrievalCallback {
-        void onSuccess(User user);
+        /**
+         * Called when user is successfully retrieved.
+         * @param user The retrieved user object.
+         */
+        void onSuccess(Entrant user);
+
+        /**
+         * Called when error occurs during user retrieval.
+         * @param e The exception that occurred
+         */
         void onFailure(Exception e);
     }
 
@@ -116,33 +118,25 @@ public class DatabaseManager {
                     if (task.isSuccessful() && task.getResult() != null) {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
-                            String name = document.getString("name");
-                            String email = document.getString("email");
-                            String phoneNumber = document.getString("phoneNumber");
-                            String profilePicture = document.getString("profilePicture");
-                            String role = document.getString("role");
-                            User user;
-                            switch (role) {
-//                                case "Administrator":
-//                                    // user = new Administrator(deviceId, name, email, profilePicture);
-//                                    // TODO: put administrator data in database
-//                                    break;
-                                case "Organizer":
-                                    // Retrieve joinedEvents, pendingEvents, and createdEvents for Organizer
-                                    ArrayList<String> joinedEvents = (ArrayList<String>) document.get("joinedEvents");
-                                    ArrayList<String> pendingEvents = (ArrayList<String>) document.get("pendingEvents");
-                                    ArrayList<String> createdEvents = (ArrayList<String>) document.get("createdEvents");
-                                    user = new Organizer(deviceId, name, email, phoneNumber, profilePicture, joinedEvents, pendingEvents, createdEvents);
-                                    break;
-                                case "Entrant":
-                                default:
-                                    // Retrieve joinedEvents and pendingEvents for Entrant
-                                    ArrayList<String> joinedEventsEntrant = (ArrayList<String>) document.get("joinedEvents");
-                                    ArrayList<String> pendingEventsEntrant = (ArrayList<String>) document.get("pendingEvents");
-                                    user = new Entrant(deviceId, name, email, phoneNumber, profilePicture, joinedEventsEntrant, pendingEventsEntrant);
-                                    break;
+
+                            Entrant user = document.toObject(Entrant.class);
+
+                            if (user != null) {
+
+                                String role = document.getString("role");
+                                // TODO: Admin role as well if needed
+                                switch (role) {
+                                    case "Organizer":
+                                        // If needed, you can cast to Organizer or handle it here
+                                        user = document.toObject(Organizer.class);
+                                        break;
+                                    case "Entrant":
+                                    default:
+                                        // No action needed, user is already of type Entrant
+                                        break;
+                                }
+                                callback.onSuccess(user);
                             }
-                            callback.onSuccess(user);
                         } else {
                             callback.onFailure(new Exception("User does not exist."));
                         }
@@ -160,15 +154,11 @@ public class DatabaseManager {
     }
 
     public void addFacility(String deviceId, Facility facility, FacilityCreationCallback callback) {
-        Map<String, Object> facilityData = new HashMap<>();
-        facilityData.put("name", facility.getName());
-        facilityData.put("location", facility.getLocation());
-        facilityData.put("phoneNumber", facility.getPhoneNumber());
 
         // Add the event to Firestore under the "facilities" collection
         database.collection("facilities")
                 .document(deviceId)
-                .set(facilityData)
+                .set(facility)
                 .addOnSuccessListener(aVoid -> {
                     callback.onSuccess(deviceId);
                 })
@@ -202,4 +192,5 @@ public class DatabaseManager {
                 });
     }
     //---------------------------------------------------------------------------------------------
+
 }
