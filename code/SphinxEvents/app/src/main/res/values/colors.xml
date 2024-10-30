@@ -12,4 +12,9 @@
     <color name="drawer_manage_profile_color">#0096C7</color>
     <color name="drawer_manage_facility_color">#FF2C2C</color>
     <color name="drawer_notifications_color">#8F00FF</color>
+
+    <!-- Managing Facility Colors -->
+    <color name="add_facility_button_color">#CE6262</color>
+    <color name="remove_facility_button_color">#FF9696</color>
+    <color name="edit_facility_button_color">#C1FF78</color>
 </resources>

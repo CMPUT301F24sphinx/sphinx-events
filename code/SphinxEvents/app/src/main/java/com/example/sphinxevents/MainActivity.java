@@ -1,9 +1,11 @@
 package com.example.sphinxevents;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
@@ -63,6 +65,14 @@ public class MainActivity extends AppCompatActivity {
             // Code for new activity that views events goes here
 
             return true; // Indicating the event is handled
+        });
+
+
+        Button manageFacilityButton = findViewById(R.id.drawer_manage_facility_btn);
+        manageFacilityButton.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, ManageFacilityActivity.class);
+            intent.putExtra("user_id", currentUserId);
+            startActivity(intent);
         });
         
     }

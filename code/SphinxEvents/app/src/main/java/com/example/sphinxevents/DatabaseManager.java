@@ -5,6 +5,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -150,4 +151,55 @@ public class DatabaseManager {
                     }
                 });
     }
+
+
+    //---------------------------------------------------------------------------------------------
+    public interface FacilityCreationCallback {
+        void onSuccess(String deviceId);
+        void onFailure(Exception e);
+    }
+
+    public void addFacility(String deviceId, Facility facility, FacilityCreationCallback callback) {
+        Map<String, Object> facilityData = new HashMap<>();
+        facilityData.put("name", facility.getName());
+        facilityData.put("location", facility.getLocation());
+        facilityData.put("phoneNumber", facility.getPhoneNumber());
+
+        // Add the event to Firestore under the "facilities" collection
+        database.collection("facilities")
+                .document(deviceId)
+                .set(facilityData)
+                .addOnSuccessListener(aVoid -> {
+                    callback.onSuccess(deviceId);
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+    //---------------------------------------------------------------------------------------------
+    public interface facilityRetrievalCallback {
+        void onSuccess(Facility facility);
+        void onFailure(Exception e);
+    }
+
+    public void getFacility(String deviceId, facilityRetrievalCallback callback) {
+        database.collection("facilities")
+                .document(deviceId)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            String name = document.getString("name");
+                            String location = document.getString("location");
+                            String phoneNumber = document.getString("phoneNumber");
+                            Facility facility = new Facility(name, location, phoneNumber);
+                            callback.onSuccess(facility);
+                        } else {
+                            callback.onFailure(new Exception("Facility does not exist."));
+                        }
+                    } else {
+                        callback.onFailure(task.getException());
+                    }
+                });
+    }
+    //---------------------------------------------------------------------------------------------
 }
