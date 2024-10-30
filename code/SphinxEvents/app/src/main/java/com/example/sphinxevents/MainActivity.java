@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
@@ -67,14 +68,26 @@ public class MainActivity extends AppCompatActivity {
 
         expandableListView = findViewById(R.id.main_screen_expandable_listview);
         initializeExpandableLists();
-        listAdapter = new EventExListAdapter(MainActivity.this, headers, events);
+
+        listAdapter = new EventExListAdapter(this, headers, events);
         expandableListView.setAdapter(listAdapter);
+
+
         // Clicking event in main screen -> allows user to view event details
         expandableListView.setOnChildClickListener((parent, view, groupPosition, childPosition, id) -> {
             // Code for new activity that views events goes here
 
             return true; // Indicating the event is handled
         });
+
+
+        Button manageFacilityButton = findViewById(R.id.drawer_manage_facility_btn);
+        manageFacilityButton.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, ManageFacilityActivity.class);
+            intent.putExtra("user_id", deviceId);
+            startActivity(intent);
+        });
+        
     }
 
     /**
