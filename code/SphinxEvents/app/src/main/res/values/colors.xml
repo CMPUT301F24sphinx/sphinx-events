@@ -16,4 +16,11 @@
     <!-- Initial Login colors -->
     <color name="initial_login_header">#FFB74D</color>
     <color name="initial_login_create_profile_button">#000</color>
+
+    <!-- Manage Profile colors -->
+    <color name="change_pfp">#D4D4D4</color>
+    <color name="delete_pfp">#D4D4D4</color>
+    <color name="cancel">#F48FB1</color>
+    <color name="save">#A5D6A7</color>
+
 </resources>
