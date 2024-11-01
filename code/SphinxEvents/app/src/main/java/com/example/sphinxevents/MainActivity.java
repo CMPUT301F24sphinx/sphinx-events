@@ -83,9 +83,8 @@ public class MainActivity extends AppCompatActivity {
 
         Button manageFacilityButton = findViewById(R.id.drawer_manage_facility_btn);
         manageFacilityButton.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, ManageFacilityActivity.class);
-            intent.putExtra("user_id", deviceId);
-            startActivity(intent);
+            Intent manageFacilityIntent = new Intent(MainActivity.this, ManageFacilityActivity.class);
+            startActivity(manageFacilityIntent);
         });
         
     }

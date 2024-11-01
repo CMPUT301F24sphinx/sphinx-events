@@ -19,6 +19,14 @@
     <string name="your_facility">Your Facility:</string>
     <string name="edit">Edit</string>
     <string name="remove">Remove</string>
+    <string name="facility_name">Name: %s</string>
+    <string name="facility_location">Location: %s</string>
+    <string name="facility_phone_number">Phone Number: %s</string>
+    <string name="add">Add</string>
+    <string name="adding_facility">Adding Facility</string>
+    <string name="cancel">Cancel</string>
+    <string name="editing_facility">Editing Facility</string>
+    <string name="save">Save</string>
 
     <!-- Profile Strings -->
     <string name="create_your_profile">Create Your Profile</string>
@@ -26,5 +34,6 @@
     <string name="email_hint">Email</string>
     <string name="phone_number_hint">Phone Number (Optional)</string>
     <string name="create_profile_button_txt">Create Profile</string>
+
 
 </resources>

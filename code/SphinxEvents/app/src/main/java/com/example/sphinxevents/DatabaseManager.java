@@ -149,18 +149,17 @@ public class DatabaseManager {
 
     //---------------------------------------------------------------------------------------------
     public interface FacilityCreationCallback {
-        void onSuccess(String deviceId);
+        void onSuccess(Facility facility);
         void onFailure(Exception e);
     }
 
     public void addFacility(String deviceId, Facility facility, FacilityCreationCallback callback) {
-
         // Add the event to Firestore under the "facilities" collection
         database.collection("facilities")
                 .document(deviceId)
                 .set(facility)
                 .addOnSuccessListener(aVoid -> {
-                    callback.onSuccess(deviceId);
+                    callback.onSuccess(facility);
                 })
                 .addOnFailureListener(callback::onFailure);
     }
@@ -192,5 +191,20 @@ public class DatabaseManager {
                 });
     }
     //---------------------------------------------------------------------------------------------
+    public interface FacilityRemovalCallback {
+        void onSuccess();
+        void onFailure(Exception e);
+    }
 
+    public void removeFacility(String deviceId, FacilityRemovalCallback callback) {
+        // Remove the facility document from the Firestore collection
+        database.collection("facilities")
+                .document(deviceId)
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    callback.onSuccess();  // Notify success
+                })
+                .addOnFailureListener(callback::onFailure);  // Notify failure
+    }
+    //---------------------------------------------------------------------------------------------
 }
