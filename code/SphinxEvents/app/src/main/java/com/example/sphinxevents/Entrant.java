@@ -1,8 +1,9 @@
 package com.example.sphinxevents;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Entrant {
+public class Entrant implements Serializable {
     private String deviceId;
     private String role;
     private String name;
