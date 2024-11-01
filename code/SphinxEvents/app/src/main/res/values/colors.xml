@@ -23,4 +23,8 @@
     <color name="cancel">#F48FB1</color>
     <color name="save">#A5D6A7</color>
 
+    <!-- Managing Facility Colors -->
+    <color name="facility_positive_button_color">#9ED78C</color>
+    <color name="facility_negative_button_color">#F88080</color>
+    <color name="facility_input_color">#EDC0C0</color>
 </resources>

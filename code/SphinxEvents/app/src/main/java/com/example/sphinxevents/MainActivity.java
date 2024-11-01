@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
@@ -74,7 +73,8 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         initializeDrawer();
 
         initializeExpandableLists();
-        listAdapter = new EventExListAdapter(MainActivity.this, headers, events);
+
+        listAdapter = new EventExListAdapter(this, headers, events);
         expandableListView.setAdapter(listAdapter);
 
         // Clicking event in main screen -> allows user to view event details
@@ -82,6 +82,14 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
             // Code for new activity that views events goes here
             return true; // Indicating the event is handled
         });
+
+
+        Button manageFacilityButton = findViewById(R.id.drawer_manage_facility_btn);
+        manageFacilityButton.setOnClickListener(v -> {
+            Intent manageFacilityIntent = new Intent(MainActivity.this, ManageFacilityActivity.class);
+            startActivity(manageFacilityIntent);
+        });
+
     }
 
     /**
