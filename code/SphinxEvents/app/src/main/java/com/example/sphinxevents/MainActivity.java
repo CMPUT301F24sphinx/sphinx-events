@@ -4,79 +4,82 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
+import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
+import androidx.core.splashscreen.SplashScreen;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import com.google.firebase.firestore.DocumentReference;
-
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements UserManager.UserUpdateListener {
 
     private DatabaseManager databaseManager;
     private String deviceId;
-    private Entrant currentUser;
 
     private ExpandableListView expandableListView;  // expandable list of events
     private List<String> headers;  // headers/parents/group names
     private HashMap<String, List<Event>> events;  // map each group name to list of Event objects
     private ExpandableListAdapter listAdapter;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SplashScreen.installSplashScreen(this);
+
+        View content = findViewById(android.R.id.content);
+        content.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                if (UserManager.getInstance().getCurrentUser() != null) {
+                    content.getViewTreeObserver().removeOnPreDrawListener(this);
+                    return true;
+                }
+                return false;
+            }
+        });
+
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
+        // Register as a listener for currentUser updates
+        UserManager.getInstance().addUserUpdateListener(this);
+
         databaseManager = DatabaseManager.getInstance();
-        deviceId = getDeviceId(this);
+        retrieveUser();
 
-        // TODO: get the user from the splashScreen activity, not get it from database again
-        databaseManager.getUser(deviceId, new DatabaseManager.UserRetrievalCallback() {
-            @Override
-            public void onSuccess(Entrant user) {
-                currentUser = user;
-            }
-            @Override
-            public void onFailure(Exception e) {
-                // Handle failure
-                Log.e("DatabaseError", "Failed to retrieve user from database: " + e.getMessage(), e);
-            }
-        });
-
+        // Initialize UI Elements
         initializeDrawer();
 
-        expandableListView = findViewById(R.id.main_screen_expandable_listview);
         initializeExpandableLists();
 
         listAdapter = new EventExListAdapter(this, headers, events);
         expandableListView.setAdapter(listAdapter);
 
-
         // Clicking event in main screen -> allows user to view event details
         expandableListView.setOnChildClickListener((parent, view, groupPosition, childPosition, id) -> {
             // Code for new activity that views events goes here
-
             return true; // Indicating the event is handled
         });
 
@@ -86,7 +89,35 @@ public class MainActivity extends AppCompatActivity {
             Intent manageFacilityIntent = new Intent(MainActivity.this, ManageFacilityActivity.class);
             startActivity(manageFacilityIntent);
         });
-        
+
+    }
+
+    /**
+     * Retrieves the user from the Firestore database
+     */
+    public void retrieveUser() {
+        deviceId = getDeviceId(this);
+
+        databaseManager.getUser(deviceId, new DatabaseManager.UserRetrievalCallback() {
+            @Override
+            public void onSuccess(Entrant user) {
+                UserManager.getInstance().setCurrentUser(user);  // Set user in UserManager
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                if (Objects.requireNonNull(e.getMessage()).contains("User does not exist")) {
+                    Intent loginIntent = new Intent(MainActivity.this,
+                            InitialLoginActivity.class);
+                    loginIntent.putExtra("DEVICE_ID", deviceId);
+                    startActivity(loginIntent);
+                } else {
+                    // Handle other errors, like network issues
+                    Toast.makeText(MainActivity.this, "Error loading user data: " +
+                            e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     /**
@@ -98,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
         ImageButton profilePicButton = findViewById(R.id.profile_pic_button);
         ImageButton closeDrawerButton = findViewById(R.id.close_drawer_button);
         DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
+        Button manageProfileBtn = findViewById(R.id.drawer_manage_profile_btn);
 
         // Set profile picture button to trigger drawer
         profilePicButton.setOnClickListener(v -> {
@@ -112,6 +144,29 @@ public class MainActivity extends AppCompatActivity {
                 drawerLayout.closeDrawer(GravityCompat.END);
             }
         });
+
+        // Set the Manage Profile button to trigger ManageProfile activity
+        manageProfileBtn.setOnClickListener(v -> {
+            Intent manageProfileIntent = new Intent(this,
+                    ManageProfileActivity.class);
+            startActivity(manageProfileIntent);
+        });
+    }
+
+    /**
+     * Updates the user information displayed in the drawer
+     */
+    // TODO: Update the profile picture
+    public void updateDrawer() {
+        Entrant currentUser = UserManager.getInstance().getCurrentUser();
+
+        TextView userName = findViewById(R.id.drawer_user_name_display);
+        TextView userEmail = findViewById(R.id.drawer_user_email_display);
+        TextView userRole = findViewById(R.id.drawer_role_display);
+
+        userName.setText(currentUser.getName());
+        userEmail.setText(currentUser.getEmail());
+        userRole.setText(currentUser.getRole());
     }
 
     /**
@@ -123,9 +178,14 @@ public class MainActivity extends AppCompatActivity {
         return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 
-    // Just playing around with the expandable lists
-    // TODO: Obtain events from database
+    /**
+     * Initializes expandable lists with headers and event data.
+     */
     public void initializeExpandableLists() {
+        Entrant currentUser = UserManager.getInstance().getCurrentUser();
+
+        expandableListView = findViewById(R.id.main_screen_expandable_listview);
+
         headers = new ArrayList<>();
         events = new HashMap<>();
 
@@ -135,17 +195,32 @@ public class MainActivity extends AppCompatActivity {
         List<Event> joinedEvents = new ArrayList<>();
         List<Event> pendingEvents = new ArrayList<>();
 
-        /*
-        joinedEvents.add(new Event("Event #1", ""));
-        joinedEvents.add(new Event("Event #2", ""));
-        joinedEvents.add(new Event("Event #3", ""));
-
-        pendingEvents.add(new Event("Event #4", ""));
-        pendingEvents.add(new Event("Event #5", ""));
-        pendingEvents.add(new Event("Event #6", ""));
-         */
-
         events.put(headers.get(0), joinedEvents);
         events.put(headers.get(1), pendingEvents);
+
+        // Add organizer stuff if needed
+        if (currentUser instanceof Organizer) {
+            headers.add("Created Events");
+            List<Event> createdEvents = new ArrayList<>();
+            events.put(headers.get(2), createdEvents);
+        }
+
+    }
+
+    /**
+     * Listener method for user updates from UserManager
+     */
+    @Override
+    public void onUserUpdated(Entrant updatedUser) {
+        // Update UI elements based on the new currentUser data
+        updateDrawer();
+        initializeExpandableLists();
+        // updateProfilePicture();
+    }
+
+    @Override
+    protected void onDestroy() {
+        UserManager.getInstance().removeUserUpdateListener(this);
+        super.onDestroy();
     }
 }

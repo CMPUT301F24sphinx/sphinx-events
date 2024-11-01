@@ -33,6 +33,14 @@
         android:src="@drawable/baseline_person_24"
         android:background="@drawable/square_border"/>
 
+    <TextView
+        android:id="@+id/drawer_role_display"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="18sp"
+        android:textStyle="bold"/>
+
     <!-- TODO: Load user name from database -->
     <TextView
         android:id="@+id/drawer_user_name_display"
@@ -40,7 +48,6 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textSize="18sp"
-        android:text="Test Name"
         android:textStyle="bold"
         />
 
@@ -54,7 +61,6 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textSize="18sp"
-        android:text="testEmail@gmail.com"
         android:textStyle="bold"/>
 
     <!-- Divider -->

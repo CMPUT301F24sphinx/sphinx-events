@@ -77,7 +77,7 @@ public class DatabaseManager {
 
     /**
      * Adds a new user to the Firestore database.
-     * @param user The User object containing user details.
+     * @param user The Entrant object containing user details.
      * @param callback Callback to handle success or failure of the user creation.
      */
     public void saveUser(Entrant user, UserCreationCallback callback) {
