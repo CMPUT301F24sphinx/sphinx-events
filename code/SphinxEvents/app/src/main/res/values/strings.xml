@@ -19,9 +19,9 @@
     <string name="your_facility">Your Facility:</string>
     <string name="edit">Edit</string>
     <string name="remove">Remove</string>
-    <string name="facility_name">Name: %s</string>
-    <string name="facility_location">Location: %s</string>
-    <string name="facility_phone_number">Phone Number: %s</string>
+    <string name="facility_name_label">Name:</string>
+    <string name="facility_location_label">Location:</string>
+    <string name="facility_phone_number_label">Phone Number:</string>
     <string name="add">Add</string>
     <string name="adding_facility">Adding Facility</string>
     <string name="editing_facility">Editing Facility</string>

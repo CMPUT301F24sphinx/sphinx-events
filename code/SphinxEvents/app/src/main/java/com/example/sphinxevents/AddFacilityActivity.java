@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,6 +21,8 @@ public class AddFacilityActivity extends AppCompatActivity {
     private UserManager userManager;
     private DatabaseManager databaseManager;
     private Entrant user;
+
+    private String context;
 
     // XML elements
     private TextView headerTextView;
@@ -53,10 +56,11 @@ public class AddFacilityActivity extends AppCompatActivity {
         addButton = findViewById(R.id.add_button);
         Button cancelButton = findViewById(R.id.cancel_button);
 
-        // Obtains extra context of activity if present
+        // Obtains extra context of activity and changes display if editing facility
         Intent intent = getIntent();
         if (intent.hasExtra("Context")) {
-            if (intent.getStringExtra("Context").equals("Edit Facility")) {
+            context = intent.getStringExtra("Context");
+            if (context.equals("Edit Facility")) {
                 setEditingDisplay((Organizer) user);
             }
         }
@@ -95,10 +99,13 @@ public class AddFacilityActivity extends AppCompatActivity {
         }
 
         // Ensures phone number is entered
-        // TODO: other phone number verifications
         String facilityPhoneNumber = phoneNumberEditText.getText().toString();
         if (facilityPhoneNumber.isEmpty()) {
             phoneNumberEditText.setError("Phone number is required");
+            return;
+        }
+        else if (!InputValidator.isValidPhone(facilityPhoneNumber)) {
+            phoneNumberEditText.setError("Invalid phone number");
             return;
         }
 
@@ -115,11 +122,18 @@ public class AddFacilityActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(String deviceId) {
                         userManager.setCurrentUser(user);
+                        if (context.equals("Add Facility")) {
+                            Toast.makeText(getApplicationContext(), "Facility added!", Toast.LENGTH_SHORT).show();
+                        }
+                        else if (context.equals("Edit Facility")) {
+                            Toast.makeText(getApplicationContext(), "Changes saved!", Toast.LENGTH_SHORT).show();
+                        }
                         finish();
                     }
 
                     @Override
                     public void onFailure(Exception e) {
+                        Toast.makeText(getApplicationContext(), "Error adding facility. Please try again.", Toast.LENGTH_SHORT).show();
                         finish();
                     }
                 });
@@ -127,6 +141,7 @@ public class AddFacilityActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Exception e) {
+                Toast.makeText(getApplicationContext(), "Error adding facility. Please try again.", Toast.LENGTH_SHORT).show();
                 finish();
             }
         });
