@@ -1,5 +1,8 @@
 package com.example.sphinxevents;
 
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.widget.Button;
@@ -18,6 +21,7 @@ public class InitialLoginActivity extends AppCompatActivity {
 
     private String deviceId;
     private DatabaseManager database;
+    private UserManager userManager;
 
     private EditText nameEditText;
     private EditText emailEditText;
@@ -36,6 +40,8 @@ public class InitialLoginActivity extends AppCompatActivity {
 
         deviceId = getIntent().getStringExtra("DEVICE_ID");
         database = DatabaseManager.getInstance();
+
+        userManager = UserManager.getInstance();
 
         nameEditText = findViewById(R.id.initial_login_name_edit_text);
         emailEditText = findViewById(R.id.initial_login_email_edit_text);
@@ -72,17 +78,27 @@ public class InitialLoginActivity extends AppCompatActivity {
             return;
         }
 
-        ArrayList<String> joinedEvents = new ArrayList<>();
-        ArrayList<String> pendingEvents = new ArrayList<>();
 
-        Entrant newUser = new Entrant(deviceId, name, email, phone, "",
-                joinedEvents, pendingEvents);
+        // Generate deterministic profile picture for user
+        Drawable profilePicture = TextDrawable.createTextDrawable(
+                this,
+                String.valueOf(name.charAt(0)),
+                Color.WHITE,
+                140
+        );
+
+        Bitmap profilePictureBitmap = TextDrawable.drawableToBitmap(profilePicture);
+        String profilePicturePath = userManager.saveBitmapToLocalStorage(this,
+                profilePictureBitmap, deviceId);
+
+        Entrant newUser = new Entrant(deviceId, name, email, phone, profilePicturePath,
+                "",null, null);
 
         database.saveUser(newUser, new DatabaseManager.UserCreationCallback() {
             @Override
             public void onSuccess(String deviceId) {
                 // Update the current user in UserManager
-                UserManager.getInstance().setCurrentUser(newUser);
+                userManager.setCurrentUser(newUser);
 
                 // Show success toast
                 Toast.makeText(InitialLoginActivity.this, "Profile created successfully!",
@@ -99,4 +115,5 @@ public class InitialLoginActivity extends AppCompatActivity {
             }
         });
     }
+
 }

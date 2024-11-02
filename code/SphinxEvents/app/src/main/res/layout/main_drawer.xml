@@ -17,20 +17,14 @@
         android:contentDescription="@string/close_drawer_speakable_text"
         android:layout_gravity="start" />
 
-    <!--
-    TODO: Get profile image from database and make it circular
-    TODO: Fix the margin depending on how pic looks like after
-          we implement the pic display fully
-    -->
     <ImageView
         android:id="@+id/drawer_profile_pic"
         android:layout_width="150dp"
         android:layout_height="150dp"
+        android:padding="3dp"
         android:layout_gravity="center"
-        android:padding="2dp"
         android:layout_margin="16dp"
         android:contentDescription="@string/profile_pic_speakable_text"
-        android:src="@drawable/baseline_person_24"
         android:background="@drawable/square_border"/>
 
     <TextView
