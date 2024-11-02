@@ -9,7 +9,8 @@ public class Entrant implements Serializable {
     private String name;
     private String email;
     private String phoneNumber;
-    private String profilePicture;
+    private String defaultPfpPath;
+    private String customPfpPath;
     private ArrayList<String> joinedEvents;
     private ArrayList<String> pendingEvents;
 
@@ -18,14 +19,15 @@ public class Entrant implements Serializable {
     }
 
     // Constructor
-    public Entrant(String deviceId, String name, String email, String phoneNumber, String profilePicture,
-                   ArrayList<String> joinedEvents, ArrayList<String> pendingEvents) {
+    public Entrant(String deviceId, String name, String email, String phoneNumber, String defaultPfpPath,
+                   String customPfpPath, ArrayList<String> joinedEvents, ArrayList<String> pendingEvents) {
         this.deviceId = deviceId;
         this.role = "Entrant";
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
-        this.profilePicture = profilePicture;
+        this.defaultPfpPath = defaultPfpPath;
+        this.customPfpPath = customPfpPath;
         this.joinedEvents = joinedEvents != null ? joinedEvents : new ArrayList<>();
         this.pendingEvents = pendingEvents != null ? pendingEvents : new ArrayList<>();
     }
@@ -40,8 +42,16 @@ public class Entrant implements Serializable {
     public String getPhoneNumber() { return this.phoneNumber; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
 
-    public String getProfilePicture() { return this.profilePicture; }
-    public void setProfilePicture(String profilePicture) { this.profilePicture = profilePicture; }
+    public String getDefaultPfpPath() { return this.defaultPfpPath; }
+    public void setDefaultPfpPath(String profilePicture) { this.defaultPfpPath = profilePicture; }
+
+    public String getCustomPfpPath() {
+        return customPfpPath;
+    }
+
+    public void setCustomPfpPath(String customPfpPath) {
+        this.customPfpPath = customPfpPath;
+    }
 
     public String getDeviceId() { return this.deviceId; }
 
@@ -54,4 +64,5 @@ public class Entrant implements Serializable {
 
     public ArrayList<String> getPendingEvents() { return this.pendingEvents; }
     public void addPendingEvent(String eventId) { pendingEvents.add(eventId); }
+
 }

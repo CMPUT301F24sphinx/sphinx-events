@@ -96,8 +96,8 @@ public class ManageFacilityActivity extends AppCompatActivity
             databaseManager.removeFacility(user.getDeviceId(), new DatabaseManager.FacilityRemovalCallback() {
                 @Override
                 public void onSuccess() {
-                    user = new Entrant(user.getDeviceId(), user.getName(), user.getEmail(), user.getPhoneNumber(), user.getProfilePicture(),
-                            user.getJoinedEvents(), user.getPendingEvents());
+                    user = new Entrant(user.getDeviceId(), user.getName(), user.getEmail(), user.getPhoneNumber(), user.getDefaultPfpPath(),
+                            user.getCustomPfpPath(), user.getJoinedEvents(), user.getPendingEvents());
                     databaseManager.saveUser(user, new DatabaseManager.UserCreationCallback() {
                         @Override
                         public void onSuccess(String deviceId) {

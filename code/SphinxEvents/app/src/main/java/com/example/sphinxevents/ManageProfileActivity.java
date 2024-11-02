@@ -1,5 +1,8 @@
 package com.example.sphinxevents;
 
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -14,6 +17,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class ManageProfileActivity extends AppCompatActivity {
+
+    private UserManager userManager;
 
     private ImageView profilePicture;
     private Button changePfpBtn;
@@ -37,6 +42,8 @@ public class ManageProfileActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        userManager = UserManager.getInstance();
 
         profilePicture = findViewById(R.id.manage_profile_picture);
         changePfpBtn = findViewById(R.id.manage_profile_change_pfp);
@@ -65,17 +72,20 @@ public class ManageProfileActivity extends AppCompatActivity {
         });
     }
 
-    //TODO: load pfp
     public void loadUserInformation() {
-        Entrant currentUser = UserManager.getInstance().getCurrentUser();
+        Entrant currentUser = userManager.getCurrentUser();
+
+        setProfilePicture();
+
         nameEditText.setText(currentUser.getName());
         emailEditText.setText(currentUser.getEmail());
         phoneNumberEditText.setText(currentUser.getPhoneNumber());
     }
 
     public void saveProfileChanges() {
-        Entrant updatedUser = UserManager.getInstance().getCurrentUser();
+        Entrant updatedUser = userManager.getCurrentUser();
 
+        String oldName = updatedUser.getName();
         String updatedName = nameEditText.getText().toString().trim();
         String updatedEmail = emailEditText.getText().toString().trim();
         String updatedPhone = phoneNumberEditText.getText().toString().trim();
@@ -105,18 +115,25 @@ public class ManageProfileActivity extends AppCompatActivity {
         DatabaseManager.getInstance().saveUser(updatedUser, new DatabaseManager.UserCreationCallback() {
             @Override
             public void onSuccess(String deviceId) {
-                UserManager.getInstance().setCurrentUser(updatedUser);
-                Toast.makeText(ManageProfileActivity.this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
+                userManager.setCurrentUser(updatedUser);
+
+                // Update users deterministic profile if name changed
+                if (!oldName.equals(updatedName)) {
+                    updateDefaultPfp();
+                }
+
+                Toast.makeText(ManageProfileActivity.this, "Profile updated successfully",
+                        Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(Exception e) {
-                Toast.makeText(ManageProfileActivity.this, "Failed to update profile: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(ManageProfileActivity.this,
+                        "Failed to update profile: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 
         finish();
-
     }
 
     /**
@@ -128,11 +145,73 @@ public class ManageProfileActivity extends AppCompatActivity {
      */
     // TODO: Notification preferences and pfp stuff
     public boolean notChanged(String name, String email, String phone) {
-        Entrant currentUser = UserManager.getInstance().getCurrentUser();
+        Entrant currentUser = userManager.getCurrentUser();
 
         return currentUser.getName().equals(name) &&
                 currentUser.getEmail().equals(email) &&
                 currentUser.getPhoneNumber().equals(phone);
+    }
+
+    /**
+     * Sets the profile picture display to users pfp
+     */
+    public void setProfilePicture() {
+        Entrant currentUser = userManager.getCurrentUser();
+        String customPfpPath = currentUser.getCustomPfpPath();
+        if (customPfpPath.isEmpty()) {
+            loadDefaultPfp();
+        }
+    }
+
+    /**
+     * loads the default profile picture form users storage to set display
+     */
+    public void loadDefaultPfp() {
+        Entrant currentUser = userManager.getCurrentUser();
+        String userName = currentUser.getName();
+        String path = currentUser.getDefaultPfpPath();
+
+        // Check if the profile picture path is not empty
+        if (path != null && !path.isEmpty()) {
+            // Load the bitmap from local storage
+            Bitmap profileBitmap = userManager.loadBitmapFromLocalStorage(path);
+
+            // Set the bitmap as the image drawable for the buttons
+            profilePicture.setImageBitmap(profileBitmap);
+
+        } else {
+            // Generate a deterministic profile picture if no path is found
+            Drawable textDrawable = TextDrawable.createTextDrawable(
+                    this,
+                    String.valueOf(userName.charAt(0)),
+                    Color.WHITE,
+                    140
+            );
+            profilePicture.setImageDrawable(textDrawable);
+        }
+    }
+
+    public void updateDefaultPfp() {
+        Entrant currentUser = UserManager.getInstance().getCurrentUser();
+        String deviceId = currentUser.getDeviceId();
+        String userName = currentUser.getName();
+
+
+
+        // Generate deterministic profile picture for user
+        Drawable newDefaultPfp = TextDrawable.createTextDrawable(
+                this,
+                String.valueOf(userName.charAt(0)),
+                Color.WHITE,
+                140
+        );
+
+        Bitmap defaultPfpBitmap = TextDrawable.drawableToBitmap(newDefaultPfp);
+        String profilePicturePath = userManager.saveBitmapToLocalStorage(this,
+                defaultPfpBitmap, deviceId);
+
+        currentUser.setDefaultPfpPath(profilePicturePath);
+        userManager.setCurrentUser(currentUser);
     }
 
 }

@@ -12,10 +12,10 @@ public class Organizer extends Entrant{
     public Organizer() {
     }
 
-    public Organizer(String deviceId, String name, String email, String phoneNumber, String profilePicture,
+    public Organizer(String deviceId, String name, String email, String phoneNumber, String defaultPfp, String customPfp,
                      ArrayList<String> joinedEvents, ArrayList<String> pendingEvents, Facility facility, ArrayList<String> createdEvents) {
 
-        super(deviceId, name, email, phoneNumber, profilePicture, joinedEvents, pendingEvents);
+        super(deviceId, name, email, phoneNumber, defaultPfp, customPfp, joinedEvents, pendingEvents);
         this.facility = facility;
         setRole("Organizer");
         this.createdEvents = createdEvents;
