@@ -18,15 +18,15 @@ public class AddFacilityActivity extends AppCompatActivity {
 
     // User and Database attributes
     private UserManager userManager;
-    private Entrant user;
     private DatabaseManager databaseManager;
-
-    private String context;  // stores extra context of activity
+    private Entrant user;
 
     // XML elements
+    private TextView headerTextView;
     private EditText nameEditText;
     private EditText locationEditText;
     private EditText phoneNumberEditText;
+    private Button addButton;
 
 
     @Override
@@ -40,12 +40,6 @@ public class AddFacilityActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Obtains extra context of activity if present
-        Intent intent = getIntent();
-        if (intent.hasExtra("Context")) {
-            context = intent.getStringExtra("Context");
-        }
-
         // Obtains DatabaseManager, UserManager, and current user
         databaseManager = DatabaseManager.getInstance();
         userManager = UserManager.getInstance();
@@ -55,15 +49,20 @@ public class AddFacilityActivity extends AppCompatActivity {
         nameEditText = findViewById(R.id.name_edit_text);
         locationEditText = findViewById(R.id.location_edit_text);
         phoneNumberEditText = findViewById(R.id.phone_number_edit_text);
-        TextView headerTextView = findViewById(R.id.adding_facility_header_textview);
-        Button addButton = findViewById(R.id.add_button);
-        if (context.equals("Edit Facility")) {
-            headerTextView.setText(R.string.editing_facility);
-            addButton.setText(R.string.save);  // sets text of button to "Save" instead of "Add"
+        headerTextView = findViewById(R.id.adding_facility_header_textview);
+        addButton = findViewById(R.id.add_button);
+        Button cancelButton = findViewById(R.id.cancel_button);
+
+        // Obtains extra context of activity if present
+        Intent intent = getIntent();
+        if (intent.hasExtra("Context")) {
+            if (intent.getStringExtra("Context").equals("Edit Facility")) {
+                setEditingDisplay((Organizer) user);
+            }
         }
 
+
         // Implements cancelButton on-click listener
-        Button cancelButton = findViewById(R.id.cancel_button);
         cancelButton.setOnClickListener(v -> {
             finish();  // Exit activity without changing user and facility
         });
@@ -108,17 +107,41 @@ public class AddFacilityActivity extends AppCompatActivity {
         // Adds facility to database
         databaseManager.addFacility(user.getDeviceId(), newFacility, new DatabaseManager.FacilityCreationCallback() {
             @Override
-            public void onSuccess(Facility facility) {
+            public void onSuccess() {
                 user = new Organizer(user.getDeviceId(), user.getName(), user.getEmail(),
                         user.getPhoneNumber(), user.getProfilePicture(), user.getJoinedEvents(),
-                        user.getPendingEvents(), facility, new ArrayList<>());
-                userManager.setCurrentUser(user);  // update user
-                finish();
+                        user.getPendingEvents(), newFacility, new ArrayList<>());
+                databaseManager.saveUser(user, new DatabaseManager.UserCreationCallback() {
+                    @Override
+                    public void onSuccess(String deviceId) {
+                        userManager.setCurrentUser(user);
+                        finish();
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        finish();
+                    }
+                });
             }
+
             @Override
             public void onFailure(Exception e) {
                 finish();
             }
         });
+    }
+
+    /**
+     * Sets EditText display when editing facility
+     * @param organizer Organizer who has facility
+     */
+    public void setEditingDisplay(Organizer organizer) {
+        Facility facility = organizer.getFacility();
+        headerTextView.setText(R.string.editing_facility);
+        nameEditText.setText(facility.getName());
+        locationEditText.setText(facility.getLocation());
+        phoneNumberEditText.setText(facility.getPhoneNumber());
+        addButton.setText(R.string.save);
     }
 }

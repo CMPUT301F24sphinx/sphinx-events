@@ -149,7 +149,7 @@ public class DatabaseManager {
 
     //---------------------------------------------------------------------------------------------
     public interface FacilityCreationCallback {
-        void onSuccess(Facility facility);
+        void onSuccess();
         void onFailure(Exception e);
     }
 
@@ -159,7 +159,7 @@ public class DatabaseManager {
                 .document(deviceId)
                 .set(facility)
                 .addOnSuccessListener(aVoid -> {
-                    callback.onSuccess(facility);
+                    callback.onSuccess();  // Notify success
                 })
                 .addOnFailureListener(callback::onFailure);
     }

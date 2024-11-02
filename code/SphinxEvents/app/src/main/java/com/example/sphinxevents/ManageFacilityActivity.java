@@ -71,6 +71,7 @@ public class ManageFacilityActivity extends AppCompatActivity
         // Clicking addFacilityButton -> start addFacilityActivity
         addFacilityButton.setOnClickListener(v -> {
             Intent addFacilityIntent = new Intent(ManageFacilityActivity.this, AddFacilityActivity.class);
+            addFacilityIntent.putExtra("Context", "Add Facility");
             startActivity(addFacilityIntent);
         });
 
@@ -89,7 +90,17 @@ public class ManageFacilityActivity extends AppCompatActivity
                 public void onSuccess() {
                     user = new Entrant(user.getDeviceId(), user.getName(), user.getEmail(), user.getPhoneNumber(), user.getProfilePicture(),
                             user.getJoinedEvents(), user.getPendingEvents());
-                    userManager.setCurrentUser(user);
+                    databaseManager.saveUser(user, new DatabaseManager.UserCreationCallback() {
+                        @Override
+                        public void onSuccess(String deviceId) {
+                            userManager.setCurrentUser(user);
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            finish();
+                        }
+                    });
                 }
                 @Override
                 public void onFailure(Exception e) {
@@ -154,6 +165,7 @@ public class ManageFacilityActivity extends AppCompatActivity
                 facilityLocationTextView.setText(getString(R.string.facility_location, facility.getLocation()));
                 facilityPhoneNumberTextView.setText(getString(R.string.facility_phone_number, facility.getPhoneNumber()));
             }
+
             @Override
             public void onFailure(Exception e) {
                 finish();
