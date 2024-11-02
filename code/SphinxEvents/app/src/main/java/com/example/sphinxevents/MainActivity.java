@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
             return insets;
         });
 
+
         // Register as a listener for currentUser updates
         UserManager.getInstance().addUserUpdateListener(this);
 
@@ -72,16 +74,8 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         // Initialize UI Elements
         initializeDrawer();
 
-        initializeExpandableLists();
+        expandableListView = findViewById(R.id.main_screen_expandable_listview);
 
-        listAdapter = new EventExListAdapter(this, headers, events);
-        expandableListView.setAdapter(listAdapter);
-
-        // Clicking event in main screen -> allows user to view event details
-        expandableListView.setOnChildClickListener((parent, view, groupPosition, childPosition, id) -> {
-            // Code for new activity that views events goes here
-            return true; // Indicating the event is handled
-        });
 
 
         Button manageFacilityButton = findViewById(R.id.drawer_manage_facility_btn);
@@ -179,9 +173,9 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
     }
 
     /**
-     * Initializes expandable lists with headers and event data.
+     * Updates the expandable lists with current user data
      */
-    public void initializeExpandableLists() {
+    public void updateExpandableLists() {
         Entrant currentUser = UserManager.getInstance().getCurrentUser();
 
         expandableListView = findViewById(R.id.main_screen_expandable_listview);
@@ -199,11 +193,22 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         events.put(headers.get(1), pendingEvents);
 
         // Add organizer stuff if needed
-        if (currentUser instanceof Organizer) {
+        if (currentUser.getRole().equals("Organizer")) {
+            Organizer organizer = (Organizer) currentUser;
+            Log.d("TEST", organizer.getFacility().getName());
             headers.add("Created Events");
             List<Event> createdEvents = new ArrayList<>();
             events.put(headers.get(2), createdEvents);
         }
+
+        listAdapter = new EventExListAdapter(this, headers, events);
+        expandableListView.setAdapter(listAdapter);
+
+        // Clicking event in main screen -> allows user to view event details
+        expandableListView.setOnChildClickListener((parent, view, groupPosition, childPosition, id) -> {
+            // Code for new activity that views events goes here
+            return true; // Indicating the event is handled
+        });
 
     }
 
@@ -214,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
     public void onUserUpdated(Entrant updatedUser) {
         // Update UI elements based on the new currentUser data
         updateDrawer();
-        initializeExpandableLists();
+        updateExpandableLists();
         // updateProfilePicture();
     }
 

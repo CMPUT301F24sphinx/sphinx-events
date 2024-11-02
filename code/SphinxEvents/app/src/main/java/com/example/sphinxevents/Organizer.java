@@ -8,10 +8,15 @@ public class Organizer extends Entrant{
     private ArrayList<String> createdEvents;
     private Facility facility;
 
+    // Empty Constructor
+    public Organizer() {
+    }
+
     public Organizer(String deviceId, String name, String email, String phoneNumber, String profilePicture,
                      ArrayList<String> joinedEvents, ArrayList<String> pendingEvents, Facility facility, ArrayList<String> createdEvents) {
 
         super(deviceId, name, email, phoneNumber, profilePicture, joinedEvents, pendingEvents);
+        this.facility = facility;
         setRole("Organizer");
         this.createdEvents = createdEvents;
     }

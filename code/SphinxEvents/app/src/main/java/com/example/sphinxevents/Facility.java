@@ -7,6 +7,10 @@ public class Facility {
     private String location;
     private String phoneNumber;
 
+    // Empty Constructor
+    public Facility() {
+    }
+
     Facility(String name, String location, String phoneNumber) {
         this.name = name;
         this.location = location;
