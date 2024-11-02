@@ -12,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
+        android:padding="8dp"
         android:background="@color/drawer_manage_facility_color">
 
         <ImageButton
@@ -20,7 +21,7 @@
             android:layout_height="48dp"
             android:background="@color/drawer_manage_facility_color"
             android:contentDescription="@string/go_back"
-            android:src="@drawable/baseline_arrow_back_24"
+            android:src="@drawable/white_baseline_arrow_back_24"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
@@ -33,9 +34,9 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             android:text="@string/managing_facility"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:textSize="24sp"
-            />
+            android:textStyle="bold" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -51,6 +52,7 @@
         app:layout_constraintRight_toRightOf="parent"
         android:textSize="24sp"
         android:textColor="@color/black"
+        android:textStyle="bold"
         android:visibility="gone"/>
 
     <Button
@@ -77,98 +79,154 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/managing_facility_header"
-        app:layout_constraintBottom_toTopOf="@id/facility_name_textview"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="20dp"
         android:text="@string/your_facility"
         android:textSize="24sp"
         android:textColor="@color/black"
+        android:textStyle="bold"
         android:visibility="visible"/>
 
-    <TextView
-        android:id="@+id/facility_name_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        app:layout_constraintTop_toBottomOf="@id/your_facility_textview"
-        app:layout_constraintBottom_toTopOf="@id/facility_location_textview"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:text="@string/facility_name"
-        android:textSize="24sp"
-        android:textColor="@color/black"
-        android:visibility="visible"/>
 
-    <TextView
-        android:id="@+id/facility_location_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        app:layout_constraintTop_toBottomOf="@id/facility_name_textview"
-        app:layout_constraintBottom_toTopOf="@id/facility_phone_number_textview"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:text="@string/facility_location"
-        android:textSize="24sp"
-        android:textColor="@color/black"
-        android:visibility="visible"/>
-
-    <TextView
-        android:id="@+id/facility_phone_number_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        app:layout_constraintTop_toBottomOf="@id/facility_location_textview"
-        app:layout_constraintBottom_toTopOf="@id/remove_edit_facility_constraintlayout"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:text="@string/facility_phone_number"
-        android:textSize="24sp"
-        android:textColor="@color/black"
-        android:visibility="visible"/>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/remove_edit_facility_constraintlayout"
+    <LinearLayout
+        android:id="@+id/facility_name_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        app:layout_constraintTop_toBottomOf="@id/facility_phone_number_textview"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:visibility="visible">
+        android:padding="10dp"
+        android:layout_marginTop="15dp"
+        app:layout_constraintTop_toBottomOf="@id/your_facility_textview"
+        app:layout_constraintBottom_toTopOf="@id/facility_location_layout"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
 
-        <Button
-            android:id="@+id/remove_facility_button"
+        <TextView
+            android:id="@+id/facility_name_textview_label"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="8dp"
+            android:gravity="center_vertical"
+            android:text="@string/facility_name_label"
+            android:textSize="22sp"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:visibility="visible"/>
+
+        <TextView
+            android:id="@+id/facility_name_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/edit_facility_button"
+            android:gravity="center_vertical"
+            android:textSize="22sp"
+            android:textColor="@color/black"
+            android:text="Facility Name"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/facility_location_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:layout_marginTop="15dp"
+        app:layout_constraintTop_toBottomOf="@id/facility_name_layout"
+        app:layout_constraintBottom_toTopOf="@id/facility_phone_number_layout"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <TextView
+            android:id="@+id/facility_location_textview_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:gravity="center_vertical"
+            android:text="@string/facility_location_label"
+            android:textSize="22sp"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:visibility="visible"/>
+
+        <TextView
+            android:id="@+id/facility_location_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:textSize="22sp"
+            android:textColor="@color/black"
+            android:text="Facility Location"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/facility_phone_number_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:layout_marginTop="15dp"
+        app:layout_constraintTop_toBottomOf="@id/facility_location_layout"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <TextView
+            android:id="@+id/facility_phone_number_textview_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_marginEnd="8dp"
+            android:text="@string/facility_phone_number_label"
+            android:textSize="22sp"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:visibility="visible"/>
+
+        <TextView
+            android:id="@+id/facility_phone_number_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:textSize="22sp"
+            android:textColor="@color/black"
+            android:text="Facility Phone Number"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/remove_edit_button_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/facility_phone_number_layout"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/remove_facility_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:padding="10dp"
-            android:backgroundTint="@color/facility_negative_button_color"
             android:text="@string/remove"
             android:textColor="@color/black"
-            android:textSize="24sp"
-            app:cornerRadius="0dp"
-            app:strokeColor="@color/black"
-            app:strokeWidth="2dp"
-            android:layout_marginEnd="60dp"
-            />
+            android:textSize="22sp"
+            android:backgroundTint="@color/facility_negative_button_color"
+            app:cornerRadius="4dp"
+            android:layout_marginEnd="16dp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/edit_facility_button"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/remove_facility_button"
-            app:layout_constraintRight_toRightOf="parent"
+            android:layout_weight="1"
             android:padding="10dp"
-            android:backgroundTint="@color/facility_positive_button_color"
             android:text="@string/edit"
             android:textColor="@color/black"
-            android:textSize="24sp"
-            app:cornerRadius="0dp"
-            app:strokeColor="@color/black"
-            app:strokeWidth="2dp" />
+            android:textSize="22sp"
+            android:backgroundTint="@color/facility_positive_button_color"
+            app:cornerRadius="4dp"
+            android:layout_marginEnd="16dp" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

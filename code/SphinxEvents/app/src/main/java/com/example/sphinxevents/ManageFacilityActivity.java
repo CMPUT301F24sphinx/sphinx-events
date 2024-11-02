@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,10 +28,13 @@ public class ManageFacilityActivity extends AppCompatActivity
     private TextView youHaveNoFacilityTextView;
     private Button addFacilityButton;
     private TextView yourFacilityTextView;
+    private LinearLayout facilityNameLayout;
     private TextView facilityNameTextView;
+    private LinearLayout facilityLocationLayout;
     private TextView facilityLocationTextView;
+    private LinearLayout facilityPhoneNumberLayout;
     private TextView facilityPhoneNumberTextView;
-    private ConstraintLayout removeEditFacilityConstraintLayout;
+    private LinearLayout removeEditButtonLayout;
 
 
     @Override
@@ -53,10 +58,13 @@ public class ManageFacilityActivity extends AppCompatActivity
         youHaveNoFacilityTextView = findViewById(R.id.you_have_no_facility_textview);
         addFacilityButton = findViewById(R.id.add_facility_button);
         yourFacilityTextView = findViewById(R.id.your_facility_textview);
+        facilityNameLayout = findViewById(R.id.facility_name_layout);
         facilityNameTextView = findViewById(R.id.facility_name_textview);
+        facilityLocationLayout = findViewById(R.id.facility_location_layout);
         facilityLocationTextView = findViewById(R.id.facility_location_textview);
+        facilityPhoneNumberLayout = findViewById(R.id.facility_phone_number_layout);
         facilityPhoneNumberTextView = findViewById(R.id.facility_phone_number_textview);
-        removeEditFacilityConstraintLayout = findViewById(R.id.remove_edit_facility_constraintlayout);
+        removeEditButtonLayout = findViewById(R.id.remove_edit_button_layout);
         Button editFacilityButton = findViewById(R.id.edit_facility_button);
         Button removeFacilityButton = findViewById(R.id.remove_facility_button);
 
@@ -147,10 +155,10 @@ public class ManageFacilityActivity extends AppCompatActivity
         youHaveNoFacilityTextView.setVisibility(entrantVisibility);
         addFacilityButton.setVisibility(entrantVisibility);
         yourFacilityTextView.setVisibility(organizerVisibility);
-        facilityNameTextView.setVisibility(organizerVisibility);
-        facilityLocationTextView.setVisibility(organizerVisibility);
-        facilityPhoneNumberTextView.setVisibility(organizerVisibility);
-        removeEditFacilityConstraintLayout.setVisibility(organizerVisibility);
+        facilityNameLayout.setVisibility(organizerVisibility);
+        facilityLocationLayout.setVisibility(organizerVisibility);
+        facilityPhoneNumberLayout.setVisibility(organizerVisibility);
+        removeEditButtonLayout.setVisibility(organizerVisibility);
     }
 
     /**
@@ -161,13 +169,13 @@ public class ManageFacilityActivity extends AppCompatActivity
         databaseManager.getFacility(user.getDeviceId(), new DatabaseManager.facilityRetrievalCallback() {
             @Override
             public void onSuccess(Facility facility) {
-                facilityNameTextView.setText(getString(R.string.facility_name, facility.getName()));
-                facilityLocationTextView.setText(getString(R.string.facility_location, facility.getLocation()));
-                facilityPhoneNumberTextView.setText(getString(R.string.facility_phone_number, facility.getPhoneNumber()));
+                facilityNameTextView.setText(facility.getName());
+                facilityLocationTextView.setText(facility.getLocation());
+                facilityPhoneNumberTextView.setText(facility.getPhoneNumber());
             }
-
             @Override
             public void onFailure(Exception e) {
+                Toast.makeText(getApplicationContext(), "Error managing facility. Please try again.", Toast.LENGTH_SHORT).show();
                 finish();
             }
         });
