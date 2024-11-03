@@ -2,6 +2,7 @@ package com.example.sphinxevents;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -109,6 +110,14 @@ public class AddFacilityActivity extends AppCompatActivity {
             return;
         }
 
+        // Checks if nothing changed in edit -> don't need to access database
+        if (context.equals("Edit Facility")) {
+            if (nothingChanged((Organizer) user, facilityName, facilityLocation, facilityPhoneNumber)) {
+                Toast.makeText(getApplicationContext(), "Changes saved!", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        }
+
         Facility newFacility = new Facility(facilityName, facilityLocation, facilityPhoneNumber);
 
         // Adds facility to database
@@ -158,5 +167,22 @@ public class AddFacilityActivity extends AppCompatActivity {
         locationEditText.setText(facility.getLocation());
         phoneNumberEditText.setText(facility.getPhoneNumber());
         addButton.setText(R.string.save);
+    }
+
+
+    /**
+     * Checks if edits to facility contains changes
+     *
+     * @param organizer organizer who wants to edit facility
+     * @param newName new facility name
+     * @param newLocation new facility location
+     * @param newPhoneNumber new facility phone number
+     * @return true if new inputs = old facility attributes, false otherwise
+     */
+    public boolean nothingChanged(Organizer organizer, String newName, String newLocation, String newPhoneNumber) {
+        Facility facility = organizer.getFacility();
+        return newName.equals(facility.getName()) &&
+                newLocation.equals(facility.getLocation()) &&
+                newPhoneNumber.equals(facility.getPhoneNumber());
     }
 }

@@ -91,7 +91,7 @@ public class ManageProfileActivity extends AppCompatActivity {
         String updatedPhone = phoneNumberEditText.getText().toString().trim();
 
         if (notChanged(updatedName, updatedEmail, updatedPhone)) {
-            return;
+            finish();
         }
 
         if (updatedName.isEmpty()) {

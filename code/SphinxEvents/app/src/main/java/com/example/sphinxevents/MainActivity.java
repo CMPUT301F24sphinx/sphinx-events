@@ -203,7 +203,6 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         // Add organizer stuff if needed
         if (currentUser.getRole().equals("Organizer")) {
             Organizer organizer = (Organizer) currentUser;
-            Log.d("TEST", organizer.getFacility().getName());
             headers.add("Created Events");
             List<Event> createdEvents = new ArrayList<>();
             events.put(headers.get(2), createdEvents);

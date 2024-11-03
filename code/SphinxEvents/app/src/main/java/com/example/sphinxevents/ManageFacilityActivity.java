@@ -102,6 +102,7 @@ public class ManageFacilityActivity extends AppCompatActivity
                         @Override
                         public void onSuccess(String deviceId) {
                             userManager.setCurrentUser(user);
+                            Toast.makeText(getApplicationContext(), "Facility removed!", Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
