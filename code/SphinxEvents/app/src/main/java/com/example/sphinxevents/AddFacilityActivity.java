@@ -125,7 +125,7 @@ public class AddFacilityActivity extends AppCompatActivity {
             @Override
             public void onSuccess() {
                 user = new Organizer(user.getDeviceId(), user.getName(), user.getEmail(),
-                        user.getPhoneNumber(), user.getDefaultPfpPath(), user.getCustomPfpPath(),
+                        user.getPhoneNumber(), user.getDefaultPfpPath(), user.getCustomPfpUri(),
                         user.getJoinedEvents(), user.getPendingEvents(), newFacility, new ArrayList<>());
                 databaseManager.saveUser(user, new DatabaseManager.UserCreationCallback() {
                     @Override

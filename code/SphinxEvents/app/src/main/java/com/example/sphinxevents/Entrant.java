@@ -10,7 +10,7 @@ public class Entrant implements Serializable {
     private String email;
     private String phoneNumber;
     private String defaultPfpPath;
-    private String customPfpPath;
+    private String customPfpUri;
     private ArrayList<String> joinedEvents;
     private ArrayList<String> pendingEvents;
 
@@ -27,7 +27,7 @@ public class Entrant implements Serializable {
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.defaultPfpPath = defaultPfpPath;
-        this.customPfpPath = customPfpPath;
+        this.customPfpUri = customPfpPath;
         this.joinedEvents = joinedEvents != null ? joinedEvents : new ArrayList<>();
         this.pendingEvents = pendingEvents != null ? pendingEvents : new ArrayList<>();
     }
@@ -45,12 +45,12 @@ public class Entrant implements Serializable {
     public String getDefaultPfpPath() { return this.defaultPfpPath; }
     public void setDefaultPfpPath(String profilePicture) { this.defaultPfpPath = profilePicture; }
 
-    public String getCustomPfpPath() {
-        return customPfpPath;
+    public String getCustomPfpUri() {
+        return customPfpUri;
     }
 
-    public void setCustomPfpPath(String customPfpPath) {
-        this.customPfpPath = customPfpPath;
+    public void setCustomPfpUri(String customPfpUri) {
+        this.customPfpUri = customPfpUri;
     }
 
     public String getDeviceId() { return this.deviceId; }

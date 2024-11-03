@@ -11,7 +11,6 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -97,7 +96,7 @@ public class ManageFacilityActivity extends AppCompatActivity
                 @Override
                 public void onSuccess() {
                     user = new Entrant(user.getDeviceId(), user.getName(), user.getEmail(), user.getPhoneNumber(), user.getDefaultPfpPath(),
-                            user.getCustomPfpPath(), user.getJoinedEvents(), user.getPendingEvents());
+                            user.getCustomPfpUri(), user.getJoinedEvents(), user.getPendingEvents());
                     databaseManager.saveUser(user, new DatabaseManager.UserCreationCallback() {
                         @Override
                         public void onSuccess(String deviceId) {

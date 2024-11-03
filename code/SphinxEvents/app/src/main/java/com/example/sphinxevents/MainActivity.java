@@ -5,9 +5,9 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
@@ -158,7 +158,6 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
     /**
      * Updates the user information displayed in the drawer
      */
-    // TODO: Update the profile picture
     public void updateDrawer() {
         Entrant currentUser = userManager.getCurrentUser();
 
@@ -221,12 +220,14 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
 
     public void updateProfilePicture() {
         Entrant currentUser = userManager.getCurrentUser();
-        String customPfpPath = currentUser.getCustomPfpPath();
-        loadDefaultPfp();
-//        if (customPfpPath.isEmpty()) {
-//            loadDefaultPfp();
-//        }
-        // TODO: Load custom pfp if exists, use default as fallback
+        String customPfpPath = currentUser.getCustomPfpUri();
+        if (customPfpPath.isEmpty()) {
+            loadDefaultPfp();
+        } else {
+            Uri customImageUri = Uri.parse(currentUser.getCustomPfpUri());
+            profilePicBtn.setImageURI(customImageUri);
+            profilePicDrawerView.setImageURI(customImageUri);
+        }
     }
 
     /**

@@ -1,9 +1,12 @@
 package com.example.sphinxevents;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -11,6 +14,10 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -19,10 +26,14 @@ import androidx.core.view.WindowInsetsCompat;
 public class ManageProfileActivity extends AppCompatActivity {
 
     private UserManager userManager;
+    private Entrant updatedUser;
+    private String oldCustomPfp;
 
     private ImageView profilePicture;
     private Button changePfpBtn;
     private Button deletePfpBtn;
+    private ActivityResultLauncher<Intent> resultLauncher;
+
     private EditText nameEditText;
     private EditText emailEditText;
     private EditText phoneNumberEditText;
@@ -44,9 +55,14 @@ public class ManageProfileActivity extends AppCompatActivity {
         });
 
         userManager = UserManager.getInstance();
+        updatedUser = userManager.getCurrentUser();
+        oldCustomPfp = updatedUser.getCustomPfpUri();
 
         profilePicture = findViewById(R.id.manage_profile_picture);
+
         changePfpBtn = findViewById(R.id.manage_profile_change_pfp);
+        registerResult();
+
         deletePfpBtn = findViewById(R.id.manage_profile_delete_pfp);
         nameEditText = findViewById(R.id.manage_profile_name_edit_text);
         emailEditText = findViewById(R.id.manage_profile_email_edit_text);
@@ -60,8 +76,19 @@ public class ManageProfileActivity extends AppCompatActivity {
         loadUserInformation();
     }
 
-    // TODO: implement change and delete pfp functionality
+
     public void initializeListeners() {
+
+        changePfpBtn.setOnClickListener(v -> {
+            pickImage();
+        });
+
+        deletePfpBtn.setOnClickListener(v -> {
+            if (!updatedUser.getCustomPfpUri().isEmpty()) {
+                updatedUser.setCustomPfpUri("");
+                setProfilePictureDisplay();
+            }
+        });
 
         cancelButton.setOnClickListener(v -> {
             finish();
@@ -75,7 +102,7 @@ public class ManageProfileActivity extends AppCompatActivity {
     public void loadUserInformation() {
         Entrant currentUser = userManager.getCurrentUser();
 
-        setProfilePicture();
+        setProfilePictureDisplay();
 
         nameEditText.setText(currentUser.getName());
         emailEditText.setText(currentUser.getEmail());
@@ -83,15 +110,16 @@ public class ManageProfileActivity extends AppCompatActivity {
     }
 
     public void saveProfileChanges() {
-        Entrant updatedUser = userManager.getCurrentUser();
 
-        String oldName = updatedUser.getName();
+        String oldName = userManager.getCurrentUser().getName();
+
+        String updatedCustomPfp = updatedUser.getCustomPfpUri();
         String updatedName = nameEditText.getText().toString().trim();
         String updatedEmail = emailEditText.getText().toString().trim();
         String updatedPhone = phoneNumberEditText.getText().toString().trim();
 
-        if (notChanged(updatedName, updatedEmail, updatedPhone)) {
-            Toast.makeText(ManageProfileActivity.this, "Profile updated successfully",
+        if (notChanged(updatedCustomPfp, updatedName, updatedEmail, updatedPhone)) {
+            Toast.makeText(ManageProfileActivity.this, "NOT CHANGED",
                     Toast.LENGTH_SHORT).show();
             finish();
             return;
@@ -139,30 +167,25 @@ public class ManageProfileActivity extends AppCompatActivity {
         finish();
     }
 
-    /**
-     * Checks if any attribute of the user has changed
-     * @param name the updated name
-     * @param email the updated email
-     * @param phone the updated phone
-     * @return false if no changes, true if there is a change
-     */
-    // TODO: Notification preferences and pfp stuff
-    public boolean notChanged(String name, String email, String phone) {
+
+    public boolean notChanged(String customPfp, String name, String email, String phone) {
         Entrant currentUser = userManager.getCurrentUser();
 
-        return currentUser.getName().equals(name) &&
+        return  oldCustomPfp.equals(customPfp) &&
+                currentUser.getName().equals(name) &&
                 currentUser.getEmail().equals(email) &&
                 currentUser.getPhoneNumber().equals(phone);
     }
 
     /**
-     * Sets the profile picture display to users pfp
+     * Sets the profile picture display
      */
-    public void setProfilePicture() {
-        Entrant currentUser = userManager.getCurrentUser();
-        String customPfpPath = currentUser.getCustomPfpPath();
+    public void setProfilePictureDisplay() {
+        String customPfpPath = updatedUser.getCustomPfpUri();
         if (customPfpPath.isEmpty()) {
             loadDefaultPfp();
+        } else {
+            loadCustomPfp();
         }
     }
 
@@ -199,8 +222,6 @@ public class ManageProfileActivity extends AppCompatActivity {
         String deviceId = currentUser.getDeviceId();
         String userName = currentUser.getName();
 
-
-
         // Generate deterministic profile picture for user
         Drawable newDefaultPfp = TextDrawable.createTextDrawable(
                 this,
@@ -215,6 +236,36 @@ public class ManageProfileActivity extends AppCompatActivity {
 
         currentUser.setDefaultPfpPath(profilePicturePath);
         userManager.setCurrentUser(currentUser);
+    }
+
+    private void loadCustomPfp() {
+        Uri customPfpUri = Uri.parse(updatedUser.getCustomPfpUri());
+        profilePicture.setImageURI(customPfpUri);
+    }
+
+    private void registerResult() {
+        resultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        try {
+                            Uri imageUri = result.getData().getData();
+                            updatedUser.setCustomPfpUri(imageUri.toString());
+
+                            setProfilePictureDisplay();
+                        } catch (Exception e){
+                            Toast.makeText(ManageProfileActivity.this, "No Image Selected",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+        );
+    }
+
+    private void pickImage() {
+        Intent intent = new Intent(MediaStore.ACTION_PICK_IMAGES);
+        resultLauncher.launch(intent);
     }
 
 }
