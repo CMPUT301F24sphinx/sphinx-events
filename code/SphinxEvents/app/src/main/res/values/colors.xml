@@ -27,4 +27,10 @@
     <color name="facility_positive_button_color">#9ED78C</color>
     <color name="facility_negative_button_color">#F88080</color>
     <color name="facility_input_color">#EDC0C0</color>
+
+    <!-- Admin Search Colors -->
+    <color name="facility_search_header_color">#ABABAB</color>
+    <color name="facility_search_query_color">#DCDCDC</color>
+    <color name="list_facility_background_color">#FDDBDB</color>
+
 </resources>

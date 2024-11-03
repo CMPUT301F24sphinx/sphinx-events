@@ -47,5 +47,7 @@
     <string name="name_label">Name *</string>
     <string name="email_label">Email *</string>
     <string name="phone_number_label">Phone Number</string>
+    <string name="no_result_found">No Result Found.</string>
+    <string name="facility_results_for">Facility Results For:</string>
 
 </resources>
