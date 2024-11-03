@@ -2,7 +2,6 @@ package com.example.sphinxevents;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -115,6 +114,7 @@ public class AddFacilityActivity extends AppCompatActivity {
             if (nothingChanged((Organizer) user, facilityName, facilityLocation, facilityPhoneNumber)) {
                 Toast.makeText(getApplicationContext(), "Changes saved!", Toast.LENGTH_SHORT).show();
                 finish();
+                return;
             }
         }
 

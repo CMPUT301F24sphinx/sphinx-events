@@ -91,7 +91,10 @@ public class ManageProfileActivity extends AppCompatActivity {
         String updatedPhone = phoneNumberEditText.getText().toString().trim();
 
         if (notChanged(updatedName, updatedEmail, updatedPhone)) {
+            Toast.makeText(ManageProfileActivity.this, "Profile updated successfully",
+                    Toast.LENGTH_SHORT).show();
             finish();
+            return;
         }
 
         if (updatedName.isEmpty()) {
