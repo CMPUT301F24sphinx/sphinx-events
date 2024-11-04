@@ -43,4 +43,5 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation(libs.core.splashscreen)
+    implementation(libs.zxing)
 }

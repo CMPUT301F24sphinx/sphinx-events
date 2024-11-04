@@ -50,4 +50,9 @@
     <string name="no_result_found">No Result Found.</string>
     <string name="facility_results_for">Facility Results For:</string>
 
+
+<!--    QR Code Scan Strings-->
+    <string name="qr_camera_scan">Camera</string>
+    <string name="qr_use_gallery">Gallery</string>
+
 </resources>
