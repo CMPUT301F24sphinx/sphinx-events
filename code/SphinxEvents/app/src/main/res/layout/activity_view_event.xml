@@ -8,16 +8,14 @@
     tools:context=".ScanQRCode">
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/eventPoster"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/splashscreen_icon_size"
-        android:padding="7dp"
-        app:layout_constraintBottom_toBottomOf="@id/eventDescription"
+        android:layout_height="300dp"
         app:layout_constraintDimensionRatio="1:1"
+        android:padding="7dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@id/main"
         app:srcCompat="@drawable/square_border" />
 
     <TextView
@@ -28,7 +26,7 @@
         app:layout_constraintBottom_toTopOf="@+id/eventTimeRemaining"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView"
+        app:layout_constraintTop_toBottomOf="@+id/eventPoster"
         app:layout_constraintVertical_bias="1.0" />
 
     <EditText
@@ -37,9 +35,12 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:inputType="date"
+        android:text="EVENT TIME LEFT"
         app:layout_constraintBottom_toTopOf="@+id/QR_cancelOrJoin_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintVertical_bias="0.2"
+        app:layout_constraintVertical_chainStyle="packed"
         app:layout_constraintTop_toBottomOf="@+id/eventDescription" />
 
     <LinearLayout
@@ -48,11 +49,9 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/main"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/eventTimeRemaining"
-
         >
 
         <com.google.android.material.button.MaterialButton
