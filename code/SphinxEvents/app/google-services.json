@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "181639745404",
-    "project_id": "sphinxevents-39afc",
-    "storage_bucket": "sphinxevents-39afc.appspot.com"
+    "project_number": "511961450151",
+    "project_id": "sphinxevents-f19da",
+    "storage_bucket": "sphinxevents-f19da.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:181639745404:android:0c361b8885a7f6e4c25ef9",
+        "mobilesdk_app_id": "1:511961450151:android:37aa87b948d79e73d03d82",
         "android_client_info": {
           "package_name": "com.example.sphinxevents"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBbMIob87lYCpAkXChOOnJbG5bAAecY3FE"
+          "current_key": "AIzaSyD9UtB0QDXcI91lGlRyQds01NbesobDSgk"
         }
       ],
       "services": {

@@ -9,12 +9,16 @@ public class Event {
     private String description;
     private String poster;
     private Date lotteryEndDate;
+    private Integer entrantLimit;
+    private Boolean geolocationReq;
 
-    Event(String name, String description, String poster, Date lotteryEndDate) {
+    Event(String name, String description, String poster, Date lotteryEndDate, Integer entrantLimit, Boolean geolocationReq) {
         this.name = name;
         this.description = description;
         this.poster = poster;
         this.lotteryEndDate = lotteryEndDate;
+        this.entrantLimit = entrantLimit;
+        this.geolocationReq = geolocationReq;
     }
 
     public String getName() {
@@ -44,5 +48,13 @@ public class Event {
     }
 
     public void setPoster(String poster) {this.poster = poster;}
+
+    public Integer getEntrantLimit() {return entrantLimit;}
+
+    public void setEntrantLimit(Integer entrantLimit) {this.entrantLimit = entrantLimit;}
+
+    public Boolean getGeolocationReq() {return geolocationReq;}
+
+    public void setGeolocationReq(Boolean geolocationReq) {this.geolocationReq = geolocationReq;}
 }
 

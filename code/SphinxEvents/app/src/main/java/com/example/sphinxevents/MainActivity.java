@@ -87,6 +87,13 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra("user_id", deviceId);
             startActivity(intent);
         });
+
+        Button createEventButton = findViewById(R.id.create_event_button);
+        createEventButton.setOnClickListener(v -> {
+            Intent createEventIntent = new Intent(MainActivity.this, CreateEventActivity.class);
+            createEventIntent.putExtra("user_id", deviceId);
+            startActivity(createEventIntent);
+        });
         
     }
 
