@@ -24,6 +24,8 @@ import androidx.core.view.WindowInsetsCompat;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
+import java.util.Objects;
+
 public class ScanQRCode extends AppCompatActivity {
 
 //    private ImageView eventPosterImageView;
@@ -37,14 +39,20 @@ public class ScanQRCode extends AppCompatActivity {
         if (intent != null ) {
             if("Camera".equals(intent.getAction())) {
                 doQRScan();
+            } else if("Gallery".equals(intent.getAction())){
+                doGalleryPick();
             }
         }
+
         setContentView(R.layout.activity_view_event);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+    }
+
+    private void doGalleryPick() {
     }
 
     public void doQRScan() {
@@ -58,26 +66,12 @@ public class ScanQRCode extends AppCompatActivity {
 
     ActivityResultLauncher<ScanOptions> barcodeLauncher = registerForActivityResult(new ScanContract(), result -> {
         if (result.getContents() != null) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Result");
-            builder.setMessage(result.getContents());
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.dismiss();
-                    return;
-                }
-            }).show();
+            Intent LoadEventIntent = new Intent(ScanQRCode.this, ViewEventDetails.class);
+            LoadEventIntent.putExtra("eventCode", result.getContents());
+            startActivity(LoadEventIntent);
         } else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Error, failed to can the QR Code try again");
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.dismiss();
-                    finish();
-                }
-            }).show();
+            finish();
+            Toast.makeText(this, "QR Scan failed try again", Toast.LENGTH_SHORT).show();
         }
     });
 }

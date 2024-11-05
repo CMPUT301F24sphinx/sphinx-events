@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.splashscreen.SplashScreen;
@@ -32,6 +33,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.DialogFragment;
 
 import com.google.firebase.firestore.DocumentReference;
+import com.journeyapps.barcodescanner.ScanContract;
+import com.journeyapps.barcodescanner.ScanOptions;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -91,12 +94,6 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
 
         expandableListView = findViewById(R.id.main_screen_expandable_listview);
 
-        Button manageFacilityButton = findViewById(R.id.drawer_manage_facility_btn);
-        manageFacilityButton.setOnClickListener(v -> {
-            Intent manageFacilityIntent = new Intent(MainActivity.this, ManageFacilityActivity.class);
-            startActivity(manageFacilityIntent);
-        });
-
         // Show QR Scan choices fragment
         ImageButton scanQRCode = findViewById(R.id.scan_qr_code_button);
         scanQRCode.setOnClickListener(v -> {
@@ -116,18 +113,18 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         builder.setMessage(R.string.scan_qr_code)
             .setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    // User cancels the dialog.
-                    // used neutral button to have cancel on one side and rest on the other
+                    return;
                 }
             })
             .setPositiveButton(R.string.qr_use_gallery, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    // START THE GAME!
+                    Intent CamScanIntent = new Intent(MainActivity.this, ScanQRCode.class);
+                    CamScanIntent.setAction("Gallery");
+                    startActivity(CamScanIntent);
                 }
             })
             .setNegativeButton(R.string.qr_camera_scan, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    // User cancels the dialog.
                     Intent CamScanIntent = new Intent(MainActivity.this, ScanQRCode.class);
                     CamScanIntent.setAction("Camera");
                     startActivity(CamScanIntent);
