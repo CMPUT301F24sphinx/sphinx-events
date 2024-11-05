@@ -7,7 +7,6 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
@@ -26,6 +25,8 @@ import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -163,7 +164,6 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
     /**
      * Updates the user information displayed in the drawer
      */
-    // TODO: Update the profile picture
     public void updateDrawer() {
         Entrant currentUser = userManager.getCurrentUser();
 
@@ -228,12 +228,19 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
 
     public void updateProfilePicture() {
         Entrant currentUser = userManager.getCurrentUser();
-        String customPfpPath = currentUser.getCustomPfpPath();
-        loadDefaultPfp();
-//        if (customPfpPath.isEmpty()) {
-//            loadDefaultPfp();
-//        }
-        // TODO: Load custom pfp if exists, use default as fallback
+        String customPfpUrl = currentUser.getCustomPfpUrl();
+        if (customPfpUrl.isEmpty()) {
+            loadDefaultPfp();
+        } else {
+            Glide.with(this)
+                    .load(customPfpUrl)
+                    .centerCrop()
+                    .into(profilePicBtn);
+            Glide.with(this)
+                    .load(customPfpUrl)
+                    .centerCrop()
+                    .into(profilePicDrawerView);
+        }
     }
 
     /**

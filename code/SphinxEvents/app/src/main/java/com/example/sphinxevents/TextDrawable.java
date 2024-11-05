@@ -12,6 +12,15 @@ import java.util.Random;
 
 public class TextDrawable {
 
+    /**
+     * Creates a square text Drawable with a random background color and centered text.
+     *
+     * @param context the Context used to access resources.
+     * @param text the text to display in the Drawable.
+     * @param textColor the color of the text.
+     * @param size the size (width and height) of the Drawable in pixels.
+     * @return a Drawable containing the specified text centered on a colored background.
+     */
     public static Drawable createTextDrawable(Context context, String text, int textColor, int size) {
         // Create a bitmap with the required dimensions
         Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
@@ -45,7 +54,12 @@ public class TextDrawable {
         return new BitmapDrawable(context.getResources(), bitmap);
     }
 
-    // Converts the Drawable to a Bitmap
+    /**
+     * Converts a Drawable object to a Bitmap.
+     *
+     * @param drawable the Drawable to convert.
+     * @return a Bitmap representation of the provided Drawable.
+     */
     public static Bitmap drawableToBitmap(Drawable drawable) {
         if (drawable instanceof BitmapDrawable) {
             return ((BitmapDrawable) drawable).getBitmap();
@@ -58,13 +72,19 @@ public class TextDrawable {
         return bitmap;
     }
 
+
+    /**
+     * Generates a random opaque color with restricted RGB values to avoid overly light shades.
+     *
+     * @return an integer representing the ARGB color value.
+     */
     private static int generateRandomColor() {
         Random random = new Random();
 
         // Restrict RGB values to avoid too light colors
-        int red = random.nextInt(128);   // Values from 0 to 127 (darker shades)
-        int green = random.nextInt(128); // Values from 0 to 127 (darker shades)
-        int blue = random.nextInt(128);  // Values from 0 to 127 (darker shades)
+        int red = random.nextInt(128);
+        int green = random.nextInt(128);
+        int blue = random.nextInt(128);
 
         return (0xFF << 24) | (red << 16) | (green << 8) | blue; // Alpha set to 255 (opaque)
     }

@@ -1,9 +1,12 @@
 package com.example.sphinxevents;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -11,23 +14,37 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.bumptech.glide.Glide;
+
 public class ManageProfileActivity extends AppCompatActivity {
 
     private UserManager userManager;
+    private Entrant updatedUser;
 
-    private ImageView profilePicture;
+    private Uri initialProfilePicUri;
+    private Uri newProfilePicUri;
+
+    private String initialName;
+
+    private ImageView profilePictureView;
     private Button changePfpBtn;
     private Button deletePfpBtn;
+    private ActivityResultLauncher<Intent> resultLauncher;
+
     private EditText nameEditText;
     private EditText emailEditText;
     private EditText phoneNumberEditText;
+
     private CheckBox organizerNotifications;
     private CheckBox adminNotifications;
+
     private Button cancelButton;
     private Button saveButton;
 
@@ -44,8 +61,18 @@ public class ManageProfileActivity extends AppCompatActivity {
         });
 
         userManager = UserManager.getInstance();
+        updatedUser = userManager.getCurrentUser();
 
-        profilePicture = findViewById(R.id.manage_profile_picture);
+        // Initialize variables that handle profile selection
+        String profilePictureUrl = updatedUser.getCustomPfpUrl();
+        if (!profilePictureUrl.isEmpty()) {
+            newProfilePicUri = initialProfilePicUri = Uri.parse(profilePictureUrl);
+        }
+
+        initialName = userManager.getCurrentUser().getName();
+
+        profilePictureView = findViewById(R.id.manage_profile_picture);
+
         changePfpBtn = findViewById(R.id.manage_profile_change_pfp);
         deletePfpBtn = findViewById(R.id.manage_profile_delete_pfp);
         nameEditText = findViewById(R.id.manage_profile_name_edit_text);
@@ -56,12 +83,26 @@ public class ManageProfileActivity extends AppCompatActivity {
         cancelButton = findViewById(R.id.manage_profile_cancel);
         saveButton = findViewById(R.id.manage_profile_save);
 
+        registerResult();
         initializeListeners();
         loadUserInformation();
     }
 
-    // TODO: implement change and delete pfp functionality
+
+    /**
+     * Sets up on click listeners for the change, delete, cancel, and save buttons
+     */
     public void initializeListeners() {
+        changePfpBtn.setOnClickListener(v -> {
+            pickImage();
+        });
+
+        deletePfpBtn.setOnClickListener(v -> {
+            if (newProfilePicUri != null) {
+                newProfilePicUri = null;
+                setProfilePictureDisplay();  // Update display to reflect deletion of picture
+            }
+        });
 
         cancelButton.setOnClickListener(v -> {
             finish();
@@ -72,97 +113,161 @@ public class ManageProfileActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Initializes display to show users current information
+     */
     public void loadUserInformation() {
         Entrant currentUser = userManager.getCurrentUser();
 
-        setProfilePicture();
+        setProfilePictureDisplay();
 
         nameEditText.setText(currentUser.getName());
         emailEditText.setText(currentUser.getEmail());
         phoneNumberEditText.setText(currentUser.getPhoneNumber());
     }
 
+    /**
+     * Updates the users information if any changes are made
+     */
     public void saveProfileChanges() {
-        Entrant updatedUser = userManager.getCurrentUser();
-
-        String oldName = updatedUser.getName();
         String updatedName = nameEditText.getText().toString().trim();
         String updatedEmail = emailEditText.getText().toString().trim();
         String updatedPhone = phoneNumberEditText.getText().toString().trim();
 
+        // If nothing changed, finish activity and return
         if (notChanged(updatedName, updatedEmail, updatedPhone)) {
-            Toast.makeText(ManageProfileActivity.this, "Profile updated successfully",
-                    Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
 
-        if (updatedName.isEmpty()) {
-            nameEditText.setError("Name cannot be empty");
-            return;
-        } else if (updatedEmail.isEmpty()) {
-            emailEditText.setError("Email cannot be empty");
-            return;
-        } else if (!InputValidator.isValidEmail(updatedEmail)) {
-            emailEditText.setError("Invalid email address");
-            return;
-        } else if (!updatedPhone.isEmpty() && !InputValidator.isValidPhone(updatedPhone)) {
-            phoneNumberEditText.setError("Invalid phone number");
-            return;
-        }
+        // Validate the new inputs and do not continue if validation fails
+        if (!validateInputs(updatedName, updatedEmail, updatedPhone)) return;
 
+        // update user information
         updatedUser.setName(updatedName);
         updatedUser.setEmail(updatedEmail);
         updatedUser.setPhoneNumber(updatedPhone);
 
+        // Determine if profile picture changed
+        boolean profilePictureChanged = (initialProfilePicUri == null && newProfilePicUri != null) ||
+                (initialProfilePicUri != null && !initialProfilePicUri.equals(newProfilePicUri));
+
+        if (profilePictureChanged) {
+            if (newProfilePicUri != null) {  // Profile picture was either added or changed
+                DatabaseManager.getInstance().uploadProfilePicture(updatedUser.getDeviceId(), newProfilePicUri,
+                        new DatabaseManager.UploadProfilePictureCallback() {
+                            @Override
+                            public void onSuccess(String url) {
+                                updatedUser.setCustomPfpUrl(url);
+                                saveUser();
+                            }
+
+                            @Override
+                            public void onFailure() {
+                                Toast.makeText(ManageProfileActivity.this,
+                                        "Unable to upload profile picture", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            } else {  // Profile Pic was deleted
+                DatabaseManager.getInstance().deleteProfilePicture(updatedUser.getDeviceId(),
+                        new DatabaseManager.DeleteProfilePictureCallback() {
+                            @Override
+                            public void onSuccess() {
+                                updatedUser.setCustomPfpUrl("");
+                                saveUser();
+                            }
+
+                            @Override
+                            public void onFailure() {
+                                Toast.makeText(ManageProfileActivity.this,
+                                        "Unable to remove profile picture", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            }
+        } else {
+            // No changes to profile picture
+            saveUser();
+        }
+    }
+
+    /**
+     * Validates the name, email, and phone inputs of the user
+     *
+     * @param updatedName The name to validate
+     * @param updatedEmail The email to validate
+     * @param updatedPhone The phone to validate
+     * @return True if inputs are valid, false otherwise
+     */
+    private boolean validateInputs(String updatedName, String updatedEmail, String updatedPhone) {
+        if (updatedName.isEmpty()) {
+            nameEditText.setError("Name cannot be empty");
+            return false;
+        } else if (updatedEmail.isEmpty()) {
+            emailEditText.setError("Email cannot be empty");
+            return false;
+        } else if (!InputValidator.isValidEmail(updatedEmail)) {
+            emailEditText.setError("Invalid email address");
+            return false;
+        } else if (!updatedPhone.isEmpty() && !InputValidator.isValidPhone(updatedPhone)) {
+            phoneNumberEditText.setError("Invalid phone number");
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Saves the updated user into the database. Also triggers generation of new default profile
+     * picture if the users name has changed.
+     */
+    private void saveUser() {
         DatabaseManager.getInstance().saveUser(updatedUser, new DatabaseManager.UserCreationCallback() {
             @Override
             public void onSuccess(String deviceId) {
                 userManager.setCurrentUser(updatedUser);
-
-                // Update users deterministic profile if name changed
-                if (!oldName.equals(updatedName)) {
+                if (!initialName.equals(updatedUser.getName())) {
                     updateDefaultPfp();
                 }
-
                 Toast.makeText(ManageProfileActivity.this, "Profile updated successfully",
                         Toast.LENGTH_SHORT).show();
+                finish();
             }
 
             @Override
             public void onFailure(Exception e) {
-                Toast.makeText(ManageProfileActivity.this,
-                        "Failed to update profile: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(ManageProfileActivity.this, "Failed to update profile: " +
+                        e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-
-        finish();
     }
 
     /**
-     * Checks if any attribute of the user has changed
-     * @param name the updated name
-     * @param email the updated email
-     * @param phone the updated phone
-     * @return false if no changes, true if there is a change
+     * Checks if profile information was updated in the inputs
+     *
+     * @param name Name input
+     * @param email Email input
+     * @param phone Phone input
+     * @return True if input contents do not differ from users current information, false otherwise
      */
-    // TODO: Notification preferences and pfp stuff
     public boolean notChanged(String name, String email, String phone) {
         Entrant currentUser = userManager.getCurrentUser();
 
-        return currentUser.getName().equals(name) &&
+        boolean profilePicUnchanged = (initialProfilePicUri == null && newProfilePicUri == null) ||
+                (initialProfilePicUri != null && initialProfilePicUri.equals(newProfilePicUri));
+
+        return profilePicUnchanged &&
+                currentUser.getName().equals(name) &&
                 currentUser.getEmail().equals(email) &&
                 currentUser.getPhoneNumber().equals(phone);
     }
 
     /**
-     * Sets the profile picture display to users pfp
+     * Sets the profile picture display
      */
-    public void setProfilePicture() {
-        Entrant currentUser = userManager.getCurrentUser();
-        String customPfpPath = currentUser.getCustomPfpPath();
-        if (customPfpPath.isEmpty()) {
+    public void setProfilePictureDisplay() {
+        if (newProfilePicUri == null) {  // Means no custom profile picture is selected
             loadDefaultPfp();
+        } else {
+            loadCustomPfp();
         }
     }
 
@@ -179,27 +284,27 @@ public class ManageProfileActivity extends AppCompatActivity {
             // Load the bitmap from local storage
             Bitmap profileBitmap = userManager.loadBitmapFromLocalStorage(path);
 
-            // Set the bitmap as the image drawable for the buttons
-            profilePicture.setImageBitmap(profileBitmap);
+            profilePictureView.setImageBitmap(profileBitmap);
 
         } else {
-            // Generate a deterministic profile picture if no path is found
+            // Generate a new deterministic profile picture if no path is found
             Drawable textDrawable = TextDrawable.createTextDrawable(
                     this,
                     String.valueOf(userName.charAt(0)),
                     Color.WHITE,
                     140
             );
-            profilePicture.setImageDrawable(textDrawable);
+            profilePictureView.setImageDrawable(textDrawable);
         }
     }
 
+    /**
+     * Updates the users default profile picture if name has been changed
+     */
     public void updateDefaultPfp() {
         Entrant currentUser = UserManager.getInstance().getCurrentUser();
         String deviceId = currentUser.getDeviceId();
         String userName = currentUser.getName();
-
-
 
         // Generate deterministic profile picture for user
         Drawable newDefaultPfp = TextDrawable.createTextDrawable(
@@ -215,6 +320,45 @@ public class ManageProfileActivity extends AppCompatActivity {
 
         currentUser.setDefaultPfpPath(profilePicturePath);
         userManager.setCurrentUser(currentUser);
+    }
+
+    /**
+     * Sets the profile picture display to users custom profile picture
+     */
+    private void loadCustomPfp() {
+        Glide.with(this)
+                .load(newProfilePicUri)
+                .centerCrop()
+                .into(profilePictureView);
+    }
+
+    /**
+     * Registers an activity result launcher to handle image selection,
+     * updating the profile picture display if an image is selected.
+     */
+    private void registerResult() {
+        resultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    Uri imageUri = result.getData() != null ? result.getData().getData() : null;
+                    if (imageUri != null) {
+                        newProfilePicUri = imageUri;
+                        setProfilePictureDisplay();
+                    } else {
+                        Toast.makeText(ManageProfileActivity.this, "No Image Selected",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
+    }
+
+
+    /**
+     * Launches an intent to pick an image from external storage
+     */
+    private void pickImage() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        resultLauncher.launch(intent);
     }
 
 }
