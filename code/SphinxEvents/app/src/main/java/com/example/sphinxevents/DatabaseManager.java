@@ -1,9 +1,13 @@
 
 package com.example.sphinxevents;
 
+import android.net.Uri;
+
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 public class DatabaseManager {
     private static DatabaseManager instance;
@@ -207,4 +211,53 @@ public class DatabaseManager {
                 .addOnFailureListener(callback::onFailure);  // Notify failure
     }
     //---------------------------------------------------------------------------------------------
+
+    public interface UploadProfilePictureCallback {
+        void onSuccess(String url);
+        void onFailure();
+    }
+
+    public void uploadProfilePicture(String deviceId, Uri pfpUri, UploadProfilePictureCallback callback) {
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+        StorageReference profilePicRef = storageRef.child("profile_pictures/" + deviceId + ".png");
+
+        // Start uploading the image
+        profilePicRef.putFile(pfpUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // On successful upload, get the download URL
+                    profilePicRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                        // Call onSuccess callback with the download URL
+                        callback.onSuccess(uri.toString());
+                    }).addOnFailureListener(e -> {
+                        // Notify the callback of failure to get the download URL
+                        callback.onFailure();
+                    });
+                })
+                .addOnFailureListener(e -> {
+                    // Notify the callback of failure to upload the image
+                    callback.onFailure();
+                });
+    }
+
+    public interface DeleteProfilePictureCallback {
+        void onSuccess();
+        void onFailure();
+    }
+
+    public void deleteProfilePicture(String deviceId, DeleteProfilePictureCallback callback) {
+        // Create a reference to the profile picture in Firebase Storage
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+        StorageReference profilePicRef = storageRef.child("profile_pictures/" + deviceId + ".png");
+
+        // Delete the profile picture
+        profilePicRef.delete()
+                .addOnSuccessListener(aVoid -> {
+                    // Call the callback on success
+                    callback.onSuccess();
+                })
+                .addOnFailureListener(e -> {
+                    // Call the callback on failure
+                    callback.onFailure();
+                });
+    }
 }

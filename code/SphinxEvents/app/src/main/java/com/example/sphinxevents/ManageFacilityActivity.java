@@ -96,7 +96,7 @@ public class ManageFacilityActivity extends AppCompatActivity
                 @Override
                 public void onSuccess() {
                     user = new Entrant(user.getDeviceId(), user.getName(), user.getEmail(), user.getPhoneNumber(), user.getDefaultPfpPath(),
-                            user.getCustomPfpUri(), user.getJoinedEvents(), user.getPendingEvents());
+                            user.getCustomPfpUrl(), user.getJoinedEvents(), user.getPendingEvents());
                     databaseManager.saveUser(user, new DatabaseManager.UserCreationCallback() {
                         @Override
                         public void onSuccess(String deviceId) {

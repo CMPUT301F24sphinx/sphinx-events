@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
@@ -26,6 +25,8 @@ import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -220,13 +221,18 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
 
     public void updateProfilePicture() {
         Entrant currentUser = userManager.getCurrentUser();
-        String customPfpPath = currentUser.getCustomPfpUri();
-        if (customPfpPath.isEmpty()) {
+        String customPfpUrl = currentUser.getCustomPfpUrl();
+        if (customPfpUrl.isEmpty()) {
             loadDefaultPfp();
         } else {
-            Uri customImageUri = Uri.parse(currentUser.getCustomPfpUri());
-            profilePicBtn.setImageURI(customImageUri);
-            profilePicDrawerView.setImageURI(customImageUri);
+            Glide.with(this)
+                    .load(customPfpUrl)
+                    .centerCrop()
+                    .into(profilePicBtn);
+            Glide.with(this)
+                    .load(customPfpUrl)
+                    .centerCrop()
+                    .into(profilePicDrawerView);
         }
     }
 
