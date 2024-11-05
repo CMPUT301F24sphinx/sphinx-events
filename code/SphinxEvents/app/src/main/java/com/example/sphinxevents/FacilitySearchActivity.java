@@ -41,6 +41,17 @@ public class FacilitySearchActivity extends AppCompatActivity {
             return insets;
         });
 
+        // Sets up updating list if facility is removed
+        removeFacilityLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    // Called when RemoveFacilityActivity returns
+                    if (result.getResultCode() == FACILITY_REMOVED) {  // If facility removal occurred
+                        refreshDisplay();  // update list display
+                    }
+                }
+        );
+
         // Obtains query string passed through intent
         String query = "";
         Intent intent = getIntent();
@@ -49,8 +60,11 @@ public class FacilitySearchActivity extends AppCompatActivity {
         }
 
         // Obtains XML elements
+        TextView queryTextView = findViewById(R.id.search_query_text_view);
         facilityList = findViewById(R.id.facilities_list_view);
         noResultsTextView = findViewById(R.id.no_results_text_view);
+
+        queryTextView.setText(getString(R.string.facility_search_query, query));
 
         // Sets onClick listener for back button
         ImageButton backButton = findViewById(R.id.search_facility_back_btn);
@@ -69,17 +83,6 @@ public class FacilitySearchActivity extends AppCompatActivity {
                 else {  // displays results
                     facilityAdapter = new FacilityAdapter(FacilitySearchActivity.this, facilities);
                     facilityList.setAdapter(facilityAdapter);
-
-                    // Sets up updating list if facility is removed
-                    removeFacilityLauncher = registerForActivityResult(
-                        new ActivityResultContracts.StartActivityForResult(),
-                        result -> {
-                            // Called when RemoveFacilityActivity returns
-                            if (result.getResultCode() == FACILITY_REMOVED) {  // If facility removal occurred
-                                refreshDisplay();  // update list display
-                            }
-                        }
-                    );
 
                     // Clicking facility
                     facilityList.setOnItemClickListener((parent, view, position, id) -> {
