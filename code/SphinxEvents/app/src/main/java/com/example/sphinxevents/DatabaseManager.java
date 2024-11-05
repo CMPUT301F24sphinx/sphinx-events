@@ -11,6 +11,8 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 
+import java.util.ArrayList;
+
 public class DatabaseManager {
     private static DatabaseManager instance;
     private FirebaseFirestore database;
