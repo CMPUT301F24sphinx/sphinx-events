@@ -8,20 +8,20 @@
     tools:context=".ManageFacilityActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/managing_facility_header"
+        android:id="@+id/removing_facility_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         android:padding="8dp"
-        android:background="@color/drawer_manage_facility_color">
+        android:background="@color/facility_search_header_color">
 
         <ImageButton
-            android:id="@+id/manage_facility_back_btn"
+            android:id="@+id/removing_facility_back_btn"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:background="@color/drawer_manage_facility_color"
+            android:background="@color/facility_search_header_color"
             android:contentDescription="@string/go_back"
-            android:src="@drawable/white_baseline_arrow_back_24"
+            android:src="@drawable/black_baseline_arrow_back_24"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
@@ -33,59 +33,12 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:text="@string/managing_facility"
-            android:textColor="@color/white"
+            android:text="@string/facility_details"
+            android:textColor="@color/black"
             android:textSize="24sp"
             android:textStyle="bold" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-    <TextView
-        android:id="@+id/you_have_no_facility_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/you_have_no_facility"
-        app:layout_constraintTop_toBottomOf="@id/managing_facility_header"
-        app:layout_constraintBottom_toTopOf="@+id/add_facility_button"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:textSize="24sp"
-        android:textColor="@color/black"
-        android:textStyle="bold"
-        android:visibility="gone"/>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/add_facility_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/you_have_no_facility_textview"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:padding="15dp"
-        android:text="@string/add_facility"
-        android:textColor="@color/black"
-        android:textSize="24sp"
-        android:backgroundTint="@color/facility_positive_button_color"
-        app:cornerRadius="4dp"
-        android:visibility="gone"/>
-
-
-    <TextView
-        android:id="@+id/your_facility_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/managing_facility_header"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginTop="20dp"
-        android:text="@string/your_facility"
-        android:textSize="24sp"
-        android:textColor="@color/black"
-        android:textStyle="bold"
-        android:visibility="visible"/>
-
 
     <LinearLayout
         android:id="@+id/facility_name_layout"
@@ -93,7 +46,7 @@
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:layout_marginTop="15dp"
-        app:layout_constraintTop_toBottomOf="@id/your_facility_textview"
+        app:layout_constraintTop_toBottomOf="@id/removing_facility_header"
         app:layout_constraintBottom_toTopOf="@id/facility_location_layout"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent">
@@ -188,43 +141,20 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/remove_edit_button_layout"
-        android:layout_width="match_parent"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/remove_facility_button"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/facility_phone_number_layout"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:padding="10dp">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/remove_facility_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:padding="10dp"
-            android:text="@string/remove"
-            android:textColor="@color/black"
-            android:textSize="22sp"
-            android:backgroundTint="@color/facility_negative_button_color"
-            app:cornerRadius="4dp"
-            android:layout_marginEnd="16dp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/edit_facility_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:padding="10dp"
-            android:text="@string/edit"
-            android:textColor="@color/black"
-            android:textSize="22sp"
-            android:backgroundTint="@color/facility_positive_button_color"
-            app:cornerRadius="4dp" />
-
-    </LinearLayout>
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:padding="10dp"
+        android:text="@string/remove"
+        android:textColor="@color/black"
+        android:textSize="24sp"
+        android:backgroundTint="@color/facility_negative_button_color"
+        app:cornerRadius="4dp"
+        android:layout_marginEnd="16dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

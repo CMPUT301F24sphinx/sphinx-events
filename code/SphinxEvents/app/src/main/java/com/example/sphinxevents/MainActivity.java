@@ -81,17 +81,9 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         userManager = UserManager.getInstance();
         retrieveUser();
 
-        // Initialize UI Elements
-        initializeDrawer();
+        initializeDrawer();  // initializes drawer display and functionalities
 
         expandableListView = findViewById(R.id.main_screen_expandable_listview);
-
-        Button manageFacilityButton = findViewById(R.id.drawer_manage_facility_btn);
-        manageFacilityButton.setOnClickListener(v -> {
-            Intent manageFacilityIntent = new Intent(MainActivity.this, ManageFacilityActivity.class);
-            startActivity(manageFacilityIntent);
-        });
-
     }
 
     /**
@@ -133,6 +125,8 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         ImageButton closeDrawerButton = findViewById(R.id.close_drawer_button);
         DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
         Button manageProfileBtn = findViewById(R.id.drawer_manage_profile_btn);
+        Button manageFacilityBtn = findViewById(R.id.drawer_manage_facility_btn);
+        Button administratorBtn = findViewById(R.id.drawer_administrator_btn);
 
         // Set profile picture button to trigger drawer
         profilePicBtn.setOnClickListener(v -> {
@@ -154,6 +148,17 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
                     ManageProfileActivity.class);
             startActivity(manageProfileIntent);
         });
+
+        // Sets onClickListener for managing facility
+        manageFacilityBtn.setOnClickListener(v -> {
+            Intent manageFacilityIntent = new Intent(MainActivity.this, ManageFacilityActivity.class);
+            startActivity(manageFacilityIntent);
+        });
+
+        // Sets OnClickListener for administrator actions
+        administratorBtn.setOnClickListener(v -> {
+            // TODO: Go to administrator main search screen activity
+        });
     }
 
     /**
@@ -169,6 +174,8 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         userName.setText(currentUser.getName());
         userEmail.setText(currentUser.getEmail());
         userRole.setText(currentUser.getRole());
+
+        setAdminPrivileges(currentUser);
     }
 
     /**
@@ -264,6 +271,22 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
             profilePicBtn.setImageDrawable(textDrawable);
             profilePicDrawerView.setImageDrawable(textDrawable);
         }
+    }
+
+    /**
+     * Allows user to access admin functionalities if they are admin
+     * @param user the current user
+     */
+    public void setAdminPrivileges(Entrant user) {
+        databaseManager.isUserAdministrator(user.getDeviceId(), new DatabaseManager.IsAdminCallback() {
+            @Override
+            public void onResult(boolean isAdmin) {
+                if (isAdmin) {
+                    // Sets administrator button as visible
+                    findViewById(R.id.drawer_administrator_btn).setVisibility(View.VISIBLE);
+                }
+            }
+        });
     }
 
     /**

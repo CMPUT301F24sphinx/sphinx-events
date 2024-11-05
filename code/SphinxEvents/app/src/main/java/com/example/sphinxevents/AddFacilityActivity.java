@@ -118,7 +118,7 @@ public class AddFacilityActivity extends AppCompatActivity {
             }
         }
 
-        Facility newFacility = new Facility(facilityName, facilityLocation, facilityPhoneNumber);
+        Facility newFacility = new Facility(facilityName, facilityLocation, facilityPhoneNumber, user.getDeviceId());
 
         // Adds facility to database
         databaseManager.addFacility(user.getDeviceId(), newFacility, new DatabaseManager.FacilityCreationCallback() {
