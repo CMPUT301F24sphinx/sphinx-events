@@ -97,8 +97,6 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         // Show QR Scan choices fragment
         ImageButton scanQRCode = findViewById(R.id.scan_qr_code_button);
         scanQRCode.setOnClickListener(v -> {
-//            Intent CamScanIntent = new Intent(MainActivity.this, ScanQRCode.class);
-//            startActivity(CamScanIntent);
             scanQRFrag();
         });
     }
@@ -121,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
                     Intent CamScanIntent = new Intent(MainActivity.this, ScanQRCode.class);
                     CamScanIntent.setAction("Gallery");
                     startActivity(CamScanIntent);
+                    return;
                 }
             })
             .setNegativeButton(R.string.qr_camera_scan, new DialogInterface.OnClickListener() {
@@ -128,6 +127,7 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
                     Intent CamScanIntent = new Intent(MainActivity.this, ScanQRCode.class);
                     CamScanIntent.setAction("Camera");
                     startActivity(CamScanIntent);
+                    return;
                 }
             }).show();
     }

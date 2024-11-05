@@ -37,6 +37,8 @@
         <activity
             android:name=".ScanQRCode"
             android:exported="false"  />
+        <activity android:name=".ViewEventDetails"
+            android:exported="false"/>
         <activity android:name=".ScanWithCam"
             android:stateNotNeeded="true"
             android:theme="@style/zxing_CaptureTheme"/>
