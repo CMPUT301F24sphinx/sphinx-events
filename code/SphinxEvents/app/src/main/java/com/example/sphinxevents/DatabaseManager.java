@@ -215,7 +215,7 @@ public class DatabaseManager {
                             String name = document.getString("name");
                             String location = document.getString("location");
                             String phoneNumber = document.getString("phoneNumber");
-                            Facility facility = new Facility(name, location, phoneNumber);
+                            Facility facility = new Facility(name, location, phoneNumber, deviceId);
                             callback.onSuccess(facility);
                         } else {
                             callback.onFailure(new Exception("Facility does not exist."));
@@ -276,6 +276,11 @@ public class DatabaseManager {
         void onFailure(Exception e);
     }
 
+    /**
+     * Searches database for facilities that match name
+     * @param query the facility name to find in database
+     * @param callback Callback to handle success or failure of searching database
+     */
     public void searchFacility(String query, FacilitySearchCallback callback) {
         // Query the facilities collection for documents with a matching name
         database.collection("facilities")
@@ -288,7 +293,8 @@ public class DatabaseManager {
                             String name = document.getString("name");
                             String location = document.getString("location");
                             String phoneNumber = document.getString("phoneNumber");
-                            Facility facility = new Facility(name, location, phoneNumber);
+                            String ownerId = document.getId();
+                            Facility facility = new Facility(name, location, phoneNumber, ownerId);
                             facilities.add(facility);
                         }
                         callback.onSuccess(facilities);
@@ -297,4 +303,34 @@ public class DatabaseManager {
                     }
                 });
     }
+
+    /**
+     * Callback interface for admin check
+     */
+    public interface IsAdminCallback {
+        /**
+         * Called when result is obtained
+         * @param isAdmin boolean on whether user is admin
+         */
+        void onResult(boolean isAdmin);
+    }
+
+    /**
+     * Checks if a user deviceId is in the administrators collection
+     * @param userId The deviceId of the user to check.
+     * @param callback A callback to handle the result (true if admin, false otherwise).
+     */
+    public void isUserAdministrator(String userId, IsAdminCallback callback) {
+        database.collection("administrators")
+                .document(userId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    callback.onResult(documentSnapshot.exists());
+                })
+                .addOnFailureListener(e -> {
+                    // Handle any errors
+                    callback.onResult(false);
+                });
+    }
+
 }

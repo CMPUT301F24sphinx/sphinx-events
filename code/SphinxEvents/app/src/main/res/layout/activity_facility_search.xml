@@ -17,7 +17,7 @@
         android:background="@color/facility_search_header_color">
 
         <ImageButton
-            android:id="@+id/manage_facility_back_btn"
+            android:id="@+id/search_facility_back_btn"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:contentDescription="@string/go_back"
@@ -59,6 +59,7 @@
         android:layout_weight="1" />
 
     <TextView
+        android:id="@+id/no_results_text_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"

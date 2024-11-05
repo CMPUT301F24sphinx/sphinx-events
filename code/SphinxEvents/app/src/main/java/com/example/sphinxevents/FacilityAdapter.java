@@ -13,9 +13,9 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 
-public class FacilityArrayAdapter extends ArrayAdapter<Facility> {
+public class FacilityAdapter extends ArrayAdapter<Facility> {
 
-    public FacilityArrayAdapter(@NonNull Context context, ArrayList<Facility> facilities) {
+    public FacilityAdapter(@NonNull Context context, ArrayList<Facility> facilities) {
         super(context, 0, facilities);
     }
 
@@ -33,8 +33,10 @@ public class FacilityArrayAdapter extends ArrayAdapter<Facility> {
 
         Facility facility = getItem(position);
         TextView facilityNameTextView = view.findViewById(R.id.facility_name_text_view);
+        TextView facilityLocationTextView = view.findViewById(R.id.facility_location_text_view);
 
         facilityNameTextView.setText(facility.getName());
+        facilityLocationTextView.setText(facility.getLocation());
 
         return view;
     }
