@@ -203,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
 
         // Sets OnClickListener for administrator actions
         administratorBtn.setOnClickListener(v -> {
-            // TODO: Go to administrator search screen activity
+            // TODO: Go to administrator main search screen activity
         });
     }
 
