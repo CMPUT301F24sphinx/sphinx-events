@@ -130,9 +130,8 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
                 public void onClick(DialogInterface dialog, int id) {
                     // User cancels the dialog.
                     Intent CamScanIntent = new Intent(MainActivity.this, ScanQRCode.class);
+                    CamScanIntent.setAction("Camera");
                     startActivity(CamScanIntent);
-
-//                    ScanQRCode SCANINST = new ScanQRCode();
                 }
             }).show();
     }
