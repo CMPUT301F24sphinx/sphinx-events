@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "511961450151",
+    "project_id": "sphinxevents-f19da",
+    "storage_bucket": "sphinxevents-f19da.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:511961450151:android:37aa87b948d79e73d03d82",
+        "android_client_info": {
+          "package_name": "com.example.sphinxevents"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD9UtB0QDXcI91lGlRyQds01NbesobDSgk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
