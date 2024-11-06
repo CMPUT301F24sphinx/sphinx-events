@@ -1,3 +1,7 @@
+/*
+ * Adapter for expandable lists
+ * Implements all functionalities of expandable lists except the getChildView()
+ */
 
 package com.example.sphinxevents;
 

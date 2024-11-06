@@ -1,3 +1,7 @@
+/*
+ * Represents organizer's facility
+ * Holds facility information
+ */
 
 package com.example.sphinxevents;
 

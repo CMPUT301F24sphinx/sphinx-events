@@ -1,3 +1,8 @@
+/*
+ * Allows user to add a facility to their profile
+ * If they already have a facility, they can either remove or edit it
+ */
+
 package com.example.sphinxevents;
 
 import android.content.Intent;
