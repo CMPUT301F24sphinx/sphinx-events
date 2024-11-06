@@ -10,7 +10,6 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
@@ -35,6 +34,8 @@ import androidx.fragment.app.DialogFragment;
 import com.google.firebase.firestore.DocumentReference;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
+
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -173,6 +174,7 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         Button manageProfileBtn = findViewById(R.id.drawer_manage_profile_btn);
         Button manageFacilityBtn = findViewById(R.id.drawer_manage_facility_btn);
         Button administratorBtn = findViewById(R.id.drawer_administrator_btn);
+        Button createEventBtn = findViewById(R.id.create_event_button);
 
         // Set profile picture button to trigger drawer
         profilePicBtn.setOnClickListener(v -> {
@@ -205,12 +207,17 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         administratorBtn.setOnClickListener(v -> {
             // TODO: Go to administrator main search screen activity
         });
+
+        createEventBtn.setOnClickListener(v -> {
+            Intent createEventIntent = new Intent(this, CreateEventActivity.class);
+            startActivity(createEventIntent);
+        });
+
     }
 
     /**
      * Updates the user information displayed in the drawer
      */
-    // TODO: Update the profile picture
     public void updateDrawer() {
         Entrant currentUser = userManager.getCurrentUser();
 
@@ -275,12 +282,19 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
 
     public void updateProfilePicture() {
         Entrant currentUser = userManager.getCurrentUser();
-        String customPfpPath = currentUser.getCustomPfpPath();
-        loadDefaultPfp();
-//        if (customPfpPath.isEmpty()) {
-//            loadDefaultPfp();
-//        }
-        // TODO: Load custom pfp if exists, use default as fallback
+        String customPfpUrl = currentUser.getCustomPfpUrl();
+        if (customPfpUrl.isEmpty()) {
+            loadDefaultPfp();
+        } else {
+            Glide.with(this)
+                    .load(customPfpUrl)
+                    .centerCrop()
+                    .into(profilePicBtn);
+            Glide.with(this)
+                    .load(customPfpUrl)
+                    .centerCrop()
+                    .into(profilePicDrawerView);
+        }
     }
 
     /**
