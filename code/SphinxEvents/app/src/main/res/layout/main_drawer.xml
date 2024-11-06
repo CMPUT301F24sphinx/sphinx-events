@@ -17,21 +17,23 @@
         android:contentDescription="@string/close_drawer_speakable_text"
         android:layout_gravity="start" />
 
-    <!--
-    TODO: Get profile image from database and make it circular
-    TODO: Fix the margin depending on how pic looks like after
-          we implement the pic display fully
-    -->
     <ImageView
         android:id="@+id/drawer_profile_pic"
         android:layout_width="150dp"
         android:layout_height="150dp"
+        android:padding="3dp"
         android:layout_gravity="center"
-        android:padding="2dp"
         android:layout_margin="16dp"
         android:contentDescription="@string/profile_pic_speakable_text"
-        android:src="@drawable/baseline_person_24"
         android:background="@drawable/square_border"/>
+
+    <TextView
+        android:id="@+id/drawer_role_display"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="18sp"
+        android:textStyle="bold"/>
 
     <!-- TODO: Load user name from database -->
     <TextView
@@ -40,7 +42,6 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textSize="18sp"
-        android:text="Test Name"
         android:textStyle="bold"
         />
 
@@ -54,7 +55,6 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textSize="18sp"
-        android:text="testEmail@gmail.com"
         android:textStyle="bold"/>
 
     <!-- Divider -->
@@ -106,6 +106,20 @@
         app:cornerRadius="0dp"
         android:backgroundTint="@color/drawer_notifications_color"
         />
+
+    <Button
+        android:id="@+id/drawer_administrator_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_marginBottom="8dp"
+        android:padding="8dp"
+        android:text="@string/drawer_administrator"
+        android:textSize="24sp"
+        app:cornerRadius="0dp"
+        android:backgroundTint="@color/drawer_administrator_color"
+        android:visibility="gone"/>
 
 
 

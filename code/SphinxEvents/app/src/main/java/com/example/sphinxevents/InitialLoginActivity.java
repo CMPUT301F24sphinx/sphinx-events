@@ -1,10 +1,12 @@
 package com.example.sphinxevents;
 
-import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -19,6 +21,7 @@ public class InitialLoginActivity extends AppCompatActivity {
 
     private String deviceId;
     private DatabaseManager database;
+    private UserManager userManager;
 
     private EditText nameEditText;
     private EditText emailEditText;
@@ -38,6 +41,8 @@ public class InitialLoginActivity extends AppCompatActivity {
         deviceId = getIntent().getStringExtra("DEVICE_ID");
         database = DatabaseManager.getInstance();
 
+        userManager = UserManager.getInstance();
+
         nameEditText = findViewById(R.id.initial_login_name_edit_text);
         emailEditText = findViewById(R.id.initial_login_email_edit_text);
         phoneEditText = findViewById(R.id.initial_login_phone_edit_text);
@@ -45,7 +50,6 @@ public class InitialLoginActivity extends AppCompatActivity {
 
         // Set a click listener to the create profile button
         createProfileButton.setOnClickListener(v -> createProfile());
-
     }
 
     /**
@@ -60,27 +64,47 @@ public class InitialLoginActivity extends AppCompatActivity {
         String phone = phoneEditText.getText().toString().trim();
 
         // Basic validation
-        if (name.isEmpty() || email.isEmpty() || phone.isEmpty()) {
-            Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+        if (name.isEmpty()){
+            nameEditText.setError("Please enter your name");
+            return;
+        } else if (email.isEmpty()) {
+            emailEditText.setError("Email cannot be empty");
+            return;
+        } else if (!InputValidator.isValidEmail(email)) {
+            emailEditText.setError("Invalid email address");
+            return;
+        } else if (!phone.isEmpty() && !InputValidator.isValidPhone(phone)) {
+            phoneEditText.setError("Invalid phone number");
             return;
         }
 
-        ArrayList<String> joinedEvents = new ArrayList<String>();
-        ArrayList<String> pendingEvents = new ArrayList<String>();
 
-        Entrant newUser = new Entrant(deviceId, name, email, phone, "",
-                joinedEvents, pendingEvents);
+        // Generate deterministic profile picture for user
+        Drawable profilePicture = TextDrawable.createTextDrawable(
+                this,
+                String.valueOf(name.charAt(0)),
+                Color.WHITE,
+                140
+        );
+
+        Bitmap profilePictureBitmap = TextDrawable.drawableToBitmap(profilePicture);
+        String profilePicturePath = userManager.saveBitmapToLocalStorage(this,
+                profilePictureBitmap, deviceId);
+
+        Entrant newUser = new Entrant(deviceId, name, email, phone, profilePicturePath,
+                "",null, null);
 
         database.saveUser(newUser, new DatabaseManager.UserCreationCallback() {
             @Override
             public void onSuccess(String deviceId) {
+                // Update the current user in UserManager
+                userManager.setCurrentUser(newUser);
+
                 // Show success toast
                 Toast.makeText(InitialLoginActivity.this, "Profile created successfully!",
                         Toast.LENGTH_SHORT).show();
 
-                Intent intent = new Intent(InitialLoginActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
+                finish();  // Close InitialLoginActivity
             }
 
             @Override
@@ -91,4 +115,5 @@ public class InitialLoginActivity extends AppCompatActivity {
             }
         });
     }
+
 }

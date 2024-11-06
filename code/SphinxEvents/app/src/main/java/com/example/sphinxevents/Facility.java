@@ -1,16 +1,24 @@
 
 package com.example.sphinxevents;
 
-public class Facility {
+import java.io.Serializable;
+
+public class Facility implements Serializable {
 
     private String name;
     private String location;
     private String phoneNumber;
+    private String ownerId;
 
-    Facility(String name, String location, String phoneNumber) {
+    // Empty Constructor
+    public Facility() {
+    }
+
+    Facility(String name, String location, String phoneNumber, String ownerId) {
         this.name = name;
         this.location = location;
         this.phoneNumber = phoneNumber;
+        this.ownerId = ownerId;
     }
 
     public String getName() {
@@ -35,5 +43,9 @@ public class Facility {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public String getOwnerId() {
+        return ownerId;
     }
 }
