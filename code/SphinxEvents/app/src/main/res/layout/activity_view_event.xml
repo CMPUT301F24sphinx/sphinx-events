@@ -10,7 +10,7 @@
     <ImageView
         android:id="@+id/eventPoster"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="400dp"
         app:layout_constraintDimensionRatio="1:1"
         android:padding="7dp"
         app:layout_constraintEnd_toEndOf="parent"

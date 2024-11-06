@@ -282,20 +282,20 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
     }
 
     public void updateProfilePicture() {
-//        Entrant currentUser = userManager.getCurrentUser();
-//        String customPfpUrl = currentUser.getCustomPfpUrl();
-//        if (customPfpUrl.isEmpty()) {
-//            loadDefaultPfp();
-//        } else {
-//            Glide.with(this)
-//                    .load(customPfpUrl)
-//                    .centerCrop()
-//                    .into(profilePicBtn);
-//            Glide.with(this)
-//                    .load(customPfpUrl)
-//                    .centerCrop()
-//                    .into(profilePicDrawerView);
-//        }
+        Entrant currentUser = userManager.getCurrentUser();
+        String customPfpUrl = currentUser.getCustomPfpUrl();
+        if (customPfpUrl != null && customPfpUrl.isEmpty()) {
+            loadDefaultPfp();
+        } else {
+            Glide.with(this)
+                    .load(customPfpUrl)
+                    .centerCrop()
+                    .into(profilePicBtn);
+            Glide.with(this)
+                    .load(customPfpUrl)
+                    .centerCrop()
+                    .into(profilePicDrawerView);
+        }
     }
 
     /**

@@ -63,9 +63,6 @@ public class ScanQRCode extends AppCompatActivity {
             if("Camera".equals(intent.getAction())) {
                 doQRScan();
             }
-//            else if("Gallery".equals(intent.getAction())){
-//                doGalleryPick();
-//            }
         }
     }
 

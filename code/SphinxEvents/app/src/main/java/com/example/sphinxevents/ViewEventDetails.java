@@ -1,6 +1,7 @@
 package com.example.sphinxevents;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.icu.text.DateFormat;
 import android.os.Bundle;
@@ -74,21 +75,26 @@ public class ViewEventDetails extends AppCompatActivity {
         databaseManager.getEvent(eventCode, new DatabaseManager.eventRetrievalCallback() {
             @Override
             public void onSuccess(Event event) {
-                Log.d("Aniket", event.getName());
-                Log.d("Aniket", event.getDescription());
-                Log.d("Aniket", event.getPoster());
-
-//                SimpleDateFormat dateFormat = new SimpleDateFormat("/MM/dd/yyyy");
-//                Date currDate = Calendar.getInstance().getTime();
                 String formattedDate = DateFormat.getDateInstance(DateFormat.FULL).format(event.getLotteryEndDate());
-
                 String posterCode = event.getPoster();
 
                 storageReference = FirebaseStorage.getInstance().getReference().child(posterCode);
-                Glide.with(ViewEventDetails.this)
-                        .load(storageReference)
-                        .into(eventPosterLayout);
-
+                final long ONE_MEGABYTE = 2048 * 2048;
+                storageReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                    @Override
+                    public void onSuccess(byte[] bytes) {
+                        // Data for "images/island.jpg" is returns, use this as needed
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        eventPosterLayout.setImageBitmap(bitmap);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle any errors
+                        Toast.makeText(getApplicationContext(), "Failed to retrive event poster", Toast.LENGTH_LONG).show();
+                        finish();
+                    }
+                });
                 eventNameLayout.setText(event.getName());
                 eventDescLayout.setText(event.getDescription());
                 eventDateLayout.setText(formattedDate);
