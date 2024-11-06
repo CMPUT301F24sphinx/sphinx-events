@@ -1,3 +1,8 @@
+/*
+ * Displays all information of facility that was clicked by administrator in FacilitySearchActivity
+ * Allows administrator to remove facility
+ */
+
 package com.example.sphinxevents;
 
 import android.content.Intent;
@@ -12,6 +17,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.example.sphinxevents.DatabaseManager;
+import com.example.sphinxevents.Entrant;
+import com.example.sphinxevents.Facility;
+import com.example.sphinxevents.FacilitySearchActivity;
 
 public class RemoveFacilityActivity extends AppCompatActivity {
 

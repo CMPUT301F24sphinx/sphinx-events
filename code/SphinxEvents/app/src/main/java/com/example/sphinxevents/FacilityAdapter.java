@@ -1,3 +1,6 @@
+/*
+ * Adapter for listviews that hold facilities
+ */
 
 package com.example.sphinxevents;
 
@@ -10,6 +13,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.example.sphinxevents.Facility;
 
 import java.util.ArrayList;
 
