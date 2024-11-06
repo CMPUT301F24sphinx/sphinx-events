@@ -58,6 +58,8 @@ public class CreateEventActivity extends AppCompatActivity {
     Button cancelButton;
     Button createConfirmButton;
     Button uploadPosterButton;
+    boolean databaseUpdated;
+    boolean posterUpdated;
 
 
 
@@ -91,13 +93,13 @@ public class CreateEventActivity extends AppCompatActivity {
                 final Calendar date = Calendar.getInstance();
                 int year = date.get(Calendar.YEAR);
                 int month = date.get(Calendar.MONTH);
-                int day = date.get(Calendar.DAY_OF_MONTH);
+                int day = date.get(Calendar.DATE);
 
                 DatePickerDialog datePickerDialog = new DatePickerDialog(CreateEventActivity.this, new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker view, int year,
                                                   int monthOfYear, int dayOfMonth) {
-                                dateString = (year + "/" + (monthOfYear + 1) + "/" + day).toString();
+                                dateString = (year + "/" + (monthOfYear + 1) + "/" + dayOfMonth).toString();
                                 regDateText.setText(dateString);
 
                             }
@@ -105,6 +107,8 @@ public class CreateEventActivity extends AppCompatActivity {
                         year, month, day);
                 // at last we are calling show to
                 // display our date picker dialog.
+                datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis());
+
                 datePickerDialog.show();
             }
 
@@ -123,7 +127,9 @@ public class CreateEventActivity extends AppCompatActivity {
                 String eventName = eventNameText.getText().toString().trim();
                 String eventDesc = eventDescText.getText().toString().trim();
                 String entrantLimitString = entrantLimitText.getText().toString().trim();
-                boolean geolocattionReq = geolocationReqCheckbox.isChecked();
+                boolean geolocationReq = geolocationReqCheckbox.isChecked();
+                databaseUpdated = false;
+                posterUpdated = false;
 
                 // Check if any required fields are empty
                 if (eventName.isEmpty() || eventDesc.isEmpty() || dateString == null) {
@@ -145,7 +151,7 @@ public class CreateEventActivity extends AppCompatActivity {
                 }
 
                 // Generate a random key for the poster
-                String posterRandKey = UUID.randomUUID().toString();
+                String posterRandKey = "EventPosters/"+UUID.randomUUID().toString() + ".jpg";
 
                 // Parse the date string to a Date object
                 Date regDate;
@@ -158,13 +164,14 @@ public class CreateEventActivity extends AppCompatActivity {
                 }
 
                 // Create a new Event object
-                Event newEvent = new Event(eventName, eventDesc, posterRandKey, regDate, entrantLimit, geolocattionReq);
+                Event newEvent = new Event(eventName, eventDesc, posterRandKey, regDate, entrantLimit, geolocationReq);
 
                 // Save event to Firestore
                 databaseManager.createEvent(newEvent, new DatabaseManager.EventCreationCallback() {
                     @Override
                     public void onSuccess(DocumentReference eventRef) {
-                        Toast.makeText(getApplicationContext(), "Event created successfully", Toast.LENGTH_SHORT).show();
+                        databaseUpdated = true;
+                        Toast.makeText(getApplicationContext(), "Event created successfully"+databaseUpdated, Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -172,12 +179,13 @@ public class CreateEventActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "Event creation failed", Toast.LENGTH_SHORT).show();
                     }
                 });
-                storageReference = FirebaseStorage.getInstance().getReference("images/" + posterRandKey);
+                storageReference = FirebaseStorage.getInstance().getReference(posterRandKey);
                 storageReference.putFile(posterUri)
                         .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                             @Override
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                Toast.makeText(getApplicationContext(), "Success", Toast.LENGTH_SHORT).show();
+                                posterUpdated = true;
+                                Toast.makeText(getApplicationContext(), "Success"+posterUpdated, Toast.LENGTH_SHORT).show();
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
@@ -186,7 +194,11 @@ public class CreateEventActivity extends AppCompatActivity {
                             }
                         });
 
-
+                Intent qrEventIntent = new Intent(CreateEventActivity.this, qrCodeActivity.class);
+                qrEventIntent.putExtra("poster_id", posterRandKey);
+                CreateEventActivity.this.startActivity(qrEventIntent);
+                finish();
+                    // new activity to create and show qr code.
             }
         });
 
@@ -232,5 +244,6 @@ public class CreateEventActivity extends AppCompatActivity {
             Toast.makeText(this, "You haven't picked Image",Toast.LENGTH_LONG).show();
         }
     }
+
 
 }
