@@ -1,3 +1,8 @@
+/*
+ * Allows user to add a facility to their profile
+ * If they already have a facility, they can either remove or edit it
+ */
+
 package com.example.sphinxevents;
 
 import android.content.Intent;
@@ -94,24 +99,14 @@ public class ManageFacilityActivity extends AppCompatActivity
             // Removes facility from database
             databaseManager.removeFacility(user.getDeviceId(), new DatabaseManager.FacilityRemovalCallback() {
                 @Override
-                public void onSuccess() {
-                    user = new Entrant(user.getDeviceId(), user.getName(), user.getEmail(), user.getPhoneNumber(), user.getDefaultPfpPath(),
-                            user.getCustomPfpUrl(), user.getJoinedEvents(), user.getPendingEvents());
-                    databaseManager.saveUser(user, new DatabaseManager.UserCreationCallback() {
-                        @Override
-                        public void onSuccess(String deviceId) {
-                            userManager.setCurrentUser(user);
-                            Toast.makeText(getApplicationContext(), "Facility removed!", Toast.LENGTH_SHORT).show();
-                        }
-
-                        @Override
-                        public void onFailure(Exception e) {
-                            finish();
-                        }
-                    });
+                public void onSuccess(Entrant updatedUser) {
+                    userManager.setCurrentUser(updatedUser);
+                    Toast.makeText(getApplicationContext(), "Facility removed!", Toast.LENGTH_SHORT).show();
                 }
+
                 @Override
                 public void onFailure(Exception e) {
+                    Toast.makeText(getApplicationContext(), "Error adding facility.", Toast.LENGTH_SHORT).show();
                     finish();
                 }
             });
