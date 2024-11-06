@@ -426,12 +426,13 @@ public class DatabaseManager {
                             String poster = document.getString("poster");
                             Timestamp dateTimestamp = document.getTimestamp("lotteryEndDate");
                             Date lotteryEndDate = dateTimestamp.toDate();
-                            Integer entrantLimit = (Integer) document.get("entrantLimit");
+//                            Integer entrantLimit = document.getString("entrantLimit");
+                            Integer entrantLimit = 1;
                             Boolean geolocationReq = document.getBoolean("geolocationReq");
                             Event event = new Event(name, description, poster, lotteryEndDate, entrantLimit, geolocationReq);
                             callback.onSuccess(event);
                         } else {
-                            callback.onFailure(new Exception("Facility does not exist."));
+                            callback.onFailure(new Exception("Event does not exist."));
                         }
                     } else {
                         callback.onFailure(task.getException());

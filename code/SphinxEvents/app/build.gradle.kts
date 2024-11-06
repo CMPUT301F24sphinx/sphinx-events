@@ -50,7 +50,7 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
     implementation(libs.core.splashscreen)
     implementation(libs.zxing)
-
+    implementation(libs.glide2)
 
 
     implementation(libs.glide)

@@ -15,6 +15,7 @@ activity = "1.9.2"
 constraintlayout = "2.1.4"
 zxingver = "4.3.0"
 zxingAndroidEmbedded = "4.3.0"
+glide2ver = "7.2.0"
 
 [libraries]
 compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "compiler" }
@@ -33,6 +34,7 @@ activity = { group = "androidx.activity", name = "activity", version.ref = "acti
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 zxing-android-embedded = { module = "com.journeyapps:zxing-android-embedded", version.ref = "zxingAndroidEmbedded" }
 zxing = { module = "com.journeyapps:zxing-android-embedded", version.ref = "zxingver"}
+glide2 = { module = "com.firebaseui:firebase-ui-storage", version.ref = "glide2ver"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
