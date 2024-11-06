@@ -64,6 +64,7 @@ public class DatabaseManager {
                 .add(event)
                 .addOnSuccessListener(callback::onSuccess)
                 .addOnFailureListener(callback::onFailure);
+
     }
 
     /**
