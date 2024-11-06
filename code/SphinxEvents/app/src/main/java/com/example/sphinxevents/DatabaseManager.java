@@ -3,6 +3,7 @@ package com.example.sphinxevents;
 
 import android.net.Uri;
 
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -10,8 +11,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
-
-import java.util.ArrayList;
+import java.util.Date;
 
 public class DatabaseManager {
     private static DatabaseManager instance;
@@ -390,4 +390,53 @@ public class DatabaseManager {
                     callback.onFailure();
                 });
     }
+
+    /**
+     * Callback interface for facility retrieval
+     */
+    public interface eventRetrievalCallback {
+        /**
+         * Called when facility is retrieved successfully
+         * @param event the facility that was retrieved
+         */
+        void onSuccess(Event event);
+
+        /**
+         * Called when error occurs during facility retrieval
+         * @param e the exception that occurred
+         */
+        void onFailure(Exception e);
+    }
+
+    /**
+     * Retrieves a facility from the database
+     * @param eventID ID of event, key of events in database
+     * @param callback Callback to handle success or failure of event retrieval
+     */
+    public void getEvent(String eventID, eventRetrievalCallback callback) {
+        database.collection("events")
+                .document(eventID)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            String name = document.getString("name");
+                            String description = document.getString("description");
+                            String poster = document.getString("poster");
+                            Timestamp dateTimestamp = document.getTimestamp("lotteryEndDate");
+                            Date lotteryEndDate = dateTimestamp.toDate();
+                            Integer entrantLimit = (Integer) document.get("entrantLimit");
+                            Boolean geolocationReq = document.getBoolean("geolocationReq");
+                            Event event = new Event(name, description, poster, lotteryEndDate, entrantLimit, geolocationReq);
+                            callback.onSuccess(event);
+                        } else {
+                            callback.onFailure(new Exception("Facility does not exist."));
+                        }
+                    } else {
+                        callback.onFailure(task.getException());
+                    }
+                });
+    }
+
 }

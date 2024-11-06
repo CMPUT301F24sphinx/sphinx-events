@@ -115,14 +115,15 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
                     return;
                 }
             })
-            .setPositiveButton(R.string.qr_use_gallery, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    Intent CamScanIntent = new Intent(MainActivity.this, ScanQRCode.class);
-                    CamScanIntent.setAction("Gallery");
-                    startActivity(CamScanIntent);
-                    return;
-                }
-            })
+// OPtional gallery scan, might do later it keeps breaking
+//            .setPositiveButton(R.string.qr_use_gallery, new DialogInterface.OnClickListener() {
+//                public void onClick(DialogInterface dialog, int id) {
+//                    Intent CamScanIntent = new Intent(MainActivity.this, ScanQRCode.class);
+//                    CamScanIntent.setAction("Gallery");
+//                    startActivity(CamScanIntent);
+//                    return;
+//                }
+//            })
             .setNegativeButton(R.string.qr_camera_scan, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     Intent CamScanIntent = new Intent(MainActivity.this, ScanQRCode.class);
@@ -281,20 +282,20 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
     }
 
     public void updateProfilePicture() {
-        Entrant currentUser = userManager.getCurrentUser();
-        String customPfpUrl = currentUser.getCustomPfpUrl();
-        if (customPfpUrl.isEmpty()) {
-            loadDefaultPfp();
-        } else {
-            Glide.with(this)
-                    .load(customPfpUrl)
-                    .centerCrop()
-                    .into(profilePicBtn);
-            Glide.with(this)
-                    .load(customPfpUrl)
-                    .centerCrop()
-                    .into(profilePicDrawerView);
-        }
+//        Entrant currentUser = userManager.getCurrentUser();
+//        String customPfpUrl = currentUser.getCustomPfpUrl();
+//        if (customPfpUrl.isEmpty()) {
+//            loadDefaultPfp();
+//        } else {
+//            Glide.with(this)
+//                    .load(customPfpUrl)
+//                    .centerCrop()
+//                    .into(profilePicBtn);
+//            Glide.with(this)
+//                    .load(customPfpUrl)
+//                    .centerCrop()
+//                    .into(profilePicDrawerView);
+//        }
     }
 
     /**

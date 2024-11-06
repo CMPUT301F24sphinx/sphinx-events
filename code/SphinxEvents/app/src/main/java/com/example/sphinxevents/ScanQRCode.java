@@ -62,69 +62,68 @@ public class ScanQRCode extends AppCompatActivity {
         if (intent != null ) {
             if("Camera".equals(intent.getAction())) {
                 doQRScan();
-            } else if("Gallery".equals(intent.getAction())){
-                doGalleryPick();
             }
+//            else if("Gallery".equals(intent.getAction())){
+//                doGalleryPick();
+//            }
         }
     }
 
-    private void doGalleryPick() {
-
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        launchSomeActivity.launch(intent);
-    }
-
-    ActivityResultLauncher<Intent> launchSomeActivity = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() == Activity.RESULT_OK) {
-            Intent data = result.getData();
-            // do your operation from here....
-            if (data != null && data.getData() != null) {
-                Uri selectedImageUri = data.getData();
-                handleImage(selectedImageUri);
-            } else {
-                makeText(this, "Result get data failed, try again", Toast.LENGTH_SHORT).show();
-            }
-        }
-    });
-    
-    public void handleImage(Uri selectedImageUri){
-        // code form zxing github forum translated from Kotlin to Java
-        // https://github.com/journeyapps/zxing-android-embedded/discussions/685
-
-        Bitmap selectedImageBitmap;
-        try {
-            selectedImageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImageUri);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        selectedImageBitmap = Bitmap.createScaledBitmap(selectedImageBitmap, 500, 700, false);
-
-        int[] intArray = new int[selectedImageBitmap.getWidth() * selectedImageBitmap.getHeight()];
-        selectedImageBitmap.getPixels(intArray, 0, selectedImageBitmap.getWidth(), 0, 0, selectedImageBitmap.getWidth(),
-                selectedImageBitmap.getHeight());
-        LuminanceSource source = new RGBLuminanceSource(selectedImageBitmap.getWidth(),
-                selectedImageBitmap.getHeight(), intArray);
-        BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
-
-        Reader reader = new QRCodeReader();
-        Result myresult = null;
-        try {
-            myresult = reader.decode(bitmap);
-        } catch (NotFoundException e) {
-            makeText(this, "Failed to decode image try again", Toast.LENGTH_SHORT).show();
-            finish();
-        } catch (ChecksumException e) {
-            makeText(this, "Failed to decode image try again", Toast.LENGTH_SHORT).show();
-            finish();
-        } catch (FormatException e) {
-            makeText(this, "Failed to decode image try again", Toast.LENGTH_SHORT).show();
-            finish();
-        }
-        String decoded = myresult.getText();
-        Toast.makeText(this, decoded, Toast.LENGTH_SHORT).show();
-    }
+//    private void doGalleryPick() {
+//
+//        Intent intent = new Intent();
+//        intent.setType("image/*");
+//        intent.setAction(Intent.ACTION_GET_CONTENT);
+//        launchSomeActivity.launch(intent);
+//    }
+//    ActivityResultLauncher<Intent> launchSomeActivity = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+//        if (result.getResultCode() == Activity.RESULT_OK) {
+//            Intent data = result.getData();
+//            // do your operation from here....
+//            if (data != null && data.getData() != null) {
+//                Uri selectedImageUri = data.getData();
+//                handleImage(selectedImageUri);
+//            } else {
+//                makeText(this, "Result get data failed, try again", Toast.LENGTH_SHORT).show();
+//            }
+//        }
+//    });
+//    public void handleImage(Uri selectedImageUri){
+//        // code form zxing github forum translated from Kotlin to Java
+//        // https://github.com/journeyapps/zxing-android-embedded/discussions/685
+//
+//        Bitmap selectedImageBitmap;
+//        try {
+//            selectedImageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImageUri);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//        selectedImageBitmap = Bitmap.createScaledBitmap(selectedImageBitmap, 500, 700, false);
+//
+//        int[] intArray = new int[selectedImageBitmap.getWidth() * selectedImageBitmap.getHeight()];
+//        selectedImageBitmap.getPixels(intArray, 0, selectedImageBitmap.getWidth(), 0, 0, selectedImageBitmap.getWidth(),
+//                selectedImageBitmap.getHeight());
+//        LuminanceSource source = new RGBLuminanceSource(selectedImageBitmap.getWidth(),
+//                selectedImageBitmap.getHeight(), intArray);
+//        BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
+//
+//        Reader reader = new QRCodeReader();
+//        Result myresult = null;
+//        try {
+//            myresult = reader.decode(bitmap);
+//        } catch (NotFoundException e) {
+//            makeText(this, "Failed to decode image try again", Toast.LENGTH_SHORT).show();
+//            finish();
+//        } catch (ChecksumException e) {
+//            makeText(this, "Failed to decode image try again", Toast.LENGTH_SHORT).show();
+//            finish();
+//        } catch (FormatException e) {
+//            makeText(this, "Failed to decode image try again", Toast.LENGTH_SHORT).show();
+//            finish();
+//        }
+//        String decoded = myresult.getText();
+//        Toast.makeText(this, decoded, Toast.LENGTH_SHORT).show();
+//    }
 
     public void doQRScan() {
         ScanOptions options = new ScanOptions();

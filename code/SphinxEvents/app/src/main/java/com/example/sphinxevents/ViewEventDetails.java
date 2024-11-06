@@ -15,14 +15,16 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class ViewEventDetails extends AppCompatActivity {
 
-    private DatabaseManager databaseManager;
-    private ImageView eventPosterLayout;
-    private TextView eventDescLayout;
-    private EditText eventDateLayout;
+    DatabaseManager databaseManager;
+    ImageView eventPosterLayout;
+    TextView eventDescLayout;
+    EditText eventDateLayout;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
 
         String eventCode;
 
@@ -42,4 +44,18 @@ public class ViewEventDetails extends AppCompatActivity {
             return insets;
         });
     }
+
+    databaseManager.getEvent(user.getDeviceId(), new DatabaseManager.facilityRetrievalCallback() {
+        @Override
+        public void onSuccess(Facility facility) {
+            facilityNameTextView.setText(facility.getName());
+            facilityLocationTextView.setText(facility.getLocation());
+            facilityPhoneNumberTextView.setText(facility.getPhoneNumber());
+        }
+        @Override
+        public void onFailure(Exception e) {
+            Toast.makeText(getApplicationContext(), "Error managing facility. Please try again.", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+    });
 }
