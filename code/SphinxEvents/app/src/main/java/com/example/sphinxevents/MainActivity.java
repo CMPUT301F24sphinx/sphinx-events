@@ -127,6 +127,7 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         Button manageProfileBtn = findViewById(R.id.drawer_manage_profile_btn);
         Button manageFacilityBtn = findViewById(R.id.drawer_manage_facility_btn);
         Button administratorBtn = findViewById(R.id.drawer_administrator_btn);
+        Button createEventBtn = findViewById(R.id.create_event_button);
 
         // Set profile picture button to trigger drawer
         profilePicBtn.setOnClickListener(v -> {
@@ -159,6 +160,12 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         administratorBtn.setOnClickListener(v -> {
             // TODO: Go to administrator main search screen activity
         });
+
+        createEventBtn.setOnClickListener(v -> {
+            Intent createEventIntent = new Intent(this, CreateEventActivity.class);
+            startActivity(createEventIntent);
+        });
+
     }
 
     /**

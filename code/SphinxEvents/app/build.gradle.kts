@@ -34,8 +34,8 @@ android {
 
 
 dependencies {
-    implementation("com.google.zxing:core:3.4.1")
-    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+    implementation(libs.core)
+    implementation(libs.zxing.android.embedded)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage)
@@ -44,10 +44,12 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.firebase.storage)
+    implementation(libs.core.splashscreen)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-    implementation(libs.core.splashscreen)
+
+
 
     implementation(libs.glide)
     annotationProcessor(libs.compiler)
