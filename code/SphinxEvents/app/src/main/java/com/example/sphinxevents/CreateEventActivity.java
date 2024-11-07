@@ -44,6 +44,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
@@ -147,7 +148,8 @@ public class CreateEventActivity extends AppCompatActivity {
                         return;
                     }
                 } else {
-                    entrantLimit = 0;
+//                    entrantLimit = 0;
+                    entrantLimit = null;
                 }
 
                 // Generate a random key for the poster
@@ -163,8 +165,10 @@ public class CreateEventActivity extends AppCompatActivity {
                     return;
                 }
 
+                ArrayList<String> entrants = new ArrayList<String>();
+
                 // Create a new Event object
-                Event newEvent = new Event(eventName, eventDesc, posterRandKey, regDate, entrantLimit, geolocationReq);
+                Event newEvent = new Event(eventName, eventDesc, posterRandKey, regDate, entrantLimit, geolocationReq, entrants);
 
                 // Save event to Firestore
                 databaseManager.createEvent(newEvent, new DatabaseManager.EventCreationCallback() {

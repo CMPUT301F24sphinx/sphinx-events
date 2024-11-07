@@ -2,13 +2,20 @@
 package com.example.sphinxevents;
 
 import android.net.Uri;
+import android.util.Log;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.protobuf.Value;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -453,10 +460,10 @@ public class DatabaseManager {
                             String poster = document.getString("poster");
                             Timestamp dateTimestamp = document.getTimestamp("lotteryEndDate");
                             Date lotteryEndDate = dateTimestamp.toDate();
-//                            Integer entrantLimit = document.getString("entrantLimit");
-                            Integer entrantLimit = 1;
+                            Integer entrantLimit = Integer.valueOf(document.get("entrantLimit").toString());
                             Boolean geolocationReq = document.getBoolean("geolocationReq");
-                            Event event = new Event(name, description, poster, lotteryEndDate, entrantLimit, geolocationReq);
+                            ArrayList<String> entrants = (ArrayList<String>) document.get("eventEntrants");
+                            Event event = new Event(name, description, poster, lotteryEndDate, entrantLimit, geolocationReq, entrants);
                             callback.onSuccess(event);
                         } else {
                             callback.onFailure(new Exception("Event does not exist."));
@@ -467,4 +474,21 @@ public class DatabaseManager {
                 });
     }
 
+    public void joinEvent(String userID, String eventID) {
+        database.collection("events")
+                .document(eventID)
+                .update("entrants", FieldValue.arrayUnion(userID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("Aniket", "DocumentSnapshot successfully updated!");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w("Aniket", "Error updating document", e);
+                    }
+                });
+    }
 }
