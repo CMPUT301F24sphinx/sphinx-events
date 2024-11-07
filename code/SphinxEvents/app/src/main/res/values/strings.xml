@@ -55,6 +55,8 @@
     <string name="facility_details">Facility Details</string>
     <string name="facility_search_query">\"%s\"</string>
 
+<!--    Managing Event String-->
+    <string name="manageevent_event_details">Event Details</string>
 
 <!--    QR Code Scan Strings-->
     <string name="qr_camera_scan">Camera</string>

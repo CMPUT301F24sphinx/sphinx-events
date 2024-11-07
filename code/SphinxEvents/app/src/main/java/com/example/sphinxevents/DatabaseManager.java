@@ -17,8 +17,10 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.protobuf.Value;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class DatabaseManager {
     private static DatabaseManager instance;
@@ -488,6 +490,64 @@ public class DatabaseManager {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Log.w("Aniket", "Error updating document", e);
+                    }
+                });
+    }
+
+    public void updateOrganizerCreatedEvents(String userID, String eventID) {
+        database.collection("users")
+                .document(userID)
+                .update("createdEvents", FieldValue.arrayUnion(eventID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("Aniket", "Event" + eventID + " added to " + userID);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w("Aniket", "Event not added to organizer's createdevents array", e);
+                    }
+                });
+    }
+
+    /**
+     * Callback interface for created Events retrieval
+     */
+    public interface getCreatedEventsCallback {
+        /**
+         * Called when events are retrieved successfully
+         * @param createdEventsID the facility that was retrieved
+         */
+        void onSuccess(List<String> createdEventsID);
+
+        /**
+         * Called when error occurs during events retrival
+         * @param e the exception that occurred
+         */
+        void onFailure(Exception e);
+    }
+
+    /**
+     * Retrieves a facility from the database
+     * @param userID ID of organizer, key of users in db
+     */
+    public void getCreatedEvents(String userID, getCreatedEventsCallback callback) {
+        database.collection("users")
+                .document(userID)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            List<String> createdEvents = (List<String>) document.get("createdEvents");
+                            callback.onSuccess(createdEvents);
+                        } else {
+                            callback.onFailure(new Exception("Created Events does not exist."));
+                        }
+                    } else {
+                        callback.onFailure(task.getException());
                     }
                 });
     }

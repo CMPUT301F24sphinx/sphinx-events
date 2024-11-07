@@ -78,6 +78,12 @@ public class CreateEventActivity extends AppCompatActivity {
         databaseManager = DatabaseManager.getInstance();
 
 
+        Intent intent = getIntent();
+        if (intent != null ) {
+            String CreatorID = intent.getExtras().getString("DeviceID");
+        }
+
+
         EditText eventNameText = findViewById(R.id.event_name);
         EditText eventDescText = findViewById(R.id.event_description);
         EditText regDateText = findViewById(R.id.reg_deadline);
@@ -176,6 +182,11 @@ public class CreateEventActivity extends AppCompatActivity {
                     public void onSuccess(DocumentReference eventRef) {
                         databaseUpdated = true;
                         Toast.makeText(getApplicationContext(), "Event created successfully"+databaseUpdated, Toast.LENGTH_SHORT).show();
+                        Intent intent = getIntent();
+                        if (intent != null ) {
+                            String CreatorID = intent.getExtras().getString("DeviceID");
+                            databaseManager.updateOrganizerCreatedEvents(CreatorID, eventRef.getId());
+                        }
                     }
 
                     @Override

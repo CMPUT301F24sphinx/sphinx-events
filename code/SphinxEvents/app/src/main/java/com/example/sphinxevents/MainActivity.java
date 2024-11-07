@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
@@ -211,6 +212,7 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
 
         createEventBtn.setOnClickListener(v -> {
             Intent createEventIntent = new Intent(this, CreateEventActivity.class);
+            createEventIntent.putExtra("DeviceID", deviceId);
             startActivity(createEventIntent);
         });
 
@@ -258,6 +260,7 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
 
         List<Event> joinedEvents = new ArrayList<>();
         List<Event> pendingEvents = new ArrayList<>();
+        ArrayList<Event> createdEvents = new ArrayList<>();
 
         events.put(headers.get(0), joinedEvents);
         events.put(headers.get(1), pendingEvents);
@@ -266,7 +269,27 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         if (currentUser.getRole().equals("Organizer")) {
             Organizer organizer = (Organizer) currentUser;
             headers.add("Created Events");
-            List<Event> createdEvents = new ArrayList<>();
+
+            databaseManager.getCreatedEvents(currentUser.getDeviceId(), new DatabaseManager.getCreatedEventsCallback() {
+                @Override
+                public void onSuccess(List<String> createdEventsID) {
+                    for(Integer i = 0; i < createdEventsID.size(); ++i){
+                        databaseManager.getEvent(createdEventsID.get(i), new DatabaseManager.eventRetrievalCallback() {
+                            @Override
+                            public void onSuccess(Event event) {
+                                createdEvents.add(event);
+                            }
+                            @Override
+                            public void onFailure(Exception e) {
+                                Log.d("Aniket", "Cant retrieve created event with code");
+                            }
+                        });
+                    }
+                }
+                @Override
+                public void onFailure(Exception e) {
+                }
+            });
             events.put(headers.get(2), createdEvents);
         }
 
