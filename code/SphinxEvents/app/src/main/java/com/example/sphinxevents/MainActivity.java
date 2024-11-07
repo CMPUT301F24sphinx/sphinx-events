@@ -276,6 +276,8 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         // Clicking event in main screen -> allows user to view event details
         expandableListView.setOnChildClickListener((parent, view, groupPosition, childPosition, id) -> {
             // Code for new activity that views events goes here
+            Intent viewEnteredEvents = new Intent(this, ViewEnteredEvent.class);
+            startActivity(viewEnteredEvents);
             return true; // Indicating the event is handled
         });
 
