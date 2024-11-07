@@ -54,5 +54,9 @@
     <string name="facility_results_for">Facility Results For:</string>
     <string name="facility_details">Facility Details</string>
     <string name="facility_search_query">\"%s\"</string>
+    <string name="Confirm">Confirm</string>
+    <string name="Cancel">Cancel</string>
+    <string name="upload_poster">Upload Poster</string>
+    <string name="back_to_home">Back to Home</string>
 
 </resources>

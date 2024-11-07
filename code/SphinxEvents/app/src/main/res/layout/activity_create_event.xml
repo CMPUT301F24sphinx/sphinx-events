@@ -73,43 +73,60 @@
 
     <Button
         android:id="@+id/poster_upload_btn"
-        android:layout_width="149dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="8dp"
-        android:text="Upload Poster"
-        android:textAlignment="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="124dp"
+        android:layout_marginTop="17dp"
+        android:layout_marginEnd="125dp"
+        android:layout_weight="1"
+        android:backgroundTint="@color/change_pfp"
+        android:padding="10dp"
+        android:text="@string/upload_poster"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        app:cornerRadius="4dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.505"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/poster_img" />
 
-    <Button
-        android:id="@+id/cancel_btn"
-        android:layout_width="149dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="248dp"
-        android:layout_marginBottom="70dp"
-        android:text="cancel"
-        android:textAlignment="center"
+    <LinearLayout
+        android:id="@+id/buttons_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.061"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/poster_img" />
+        app:layout_constraintTop_toBottomOf="@+id/geolocation_checkbox">
 
-    <Button
-        android:id="@+id/confirm_btn"
-        android:layout_width="149dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="248dp"
-        android:layout_marginBottom="70dp"
-        android:text="confirm"
-        android:textAlignment="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.893"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/poster_img" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/cancel_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/facility_negative_button_color"
+            android:padding="10dp"
+            android:text="@string/Cancel"
+            android:textColor="@color/black"
+            android:textSize="22sp"
+            app:cornerRadius="4dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/confirm_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="@color/facility_positive_button_color"
+            android:padding="10dp"
+            android:text="@string/Confirm"
+            android:textColor="@color/black"
+            android:textSize="22sp"
+            app:cornerRadius="4dp" />
+
+    </LinearLayout>
 
     <EditText
         android:id="@+id/entrant_limit"
@@ -148,7 +165,6 @@
         android:layout_marginBottom="51dp"
         android:layoutDirection="rtl"
         android:text="Geo-Location Requirement:"
-        app:layout_constraintBottom_toTopOf="@+id/cancel_btn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.917"
         app:layout_constraintStart_toStartOf="parent"
