@@ -1,3 +1,8 @@
+/*
+ * Allows user to add/edit their facility
+ * User can input/edit name, location, and phone number of their facility
+ */
+
 package com.example.sphinxevents;
 
 import android.content.Intent;
@@ -91,14 +96,13 @@ public class AddFacilityActivity extends AppCompatActivity {
         }
 
         // Ensures location is entered
-        // TODO: other location verifications
         String facilityLocation = locationEditText.getText().toString();
         if (facilityLocation.isEmpty()) {
             locationEditText.setError("Location is required");
             return;
         }
 
-        // Ensures phone number is entered
+        // Ensures phone number is entered and valid
         String facilityPhoneNumber = phoneNumberEditText.getText().toString();
         if (facilityPhoneNumber.isEmpty()) {
             phoneNumberEditText.setError("Phone number is required");

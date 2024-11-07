@@ -1,3 +1,8 @@
+/*
+ * Displays results of facilities whose name matches the administrator's query
+ * Allows administrator to click on facility in list in order to view all details and remove it
+ */
+
 package com.example.sphinxevents;
 
 import android.content.Intent;
