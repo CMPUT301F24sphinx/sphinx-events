@@ -38,7 +38,6 @@ public class viewNotificationsActivity extends AppCompatActivity {
         }
 
 
-        ListView notificationList = findViewById(R.id.notifs_listview);
         databaseManager = DatabaseManager.getInstance();
 
         EdgeToEdge.enable(this);
@@ -76,8 +75,5 @@ public class viewNotificationsActivity extends AppCompatActivity {
                 finish();
             }
         });
-
-        NotificationAdapter customAdapter = new NotificationAdapter(getApplicationContext(), messages, sender);
-        notificationList.setAdapter(customAdapter);
     }
 }
