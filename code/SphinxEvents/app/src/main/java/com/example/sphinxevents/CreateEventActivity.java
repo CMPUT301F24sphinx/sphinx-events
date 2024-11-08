@@ -1,5 +1,7 @@
 package com.example.sphinxevents;
 
+import static java.sql.Types.NULL;
+
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -46,12 +48,6 @@ public class CreateEventActivity extends AppCompatActivity {
     private String dateString;
     private DatabaseManager databaseManager;
 
-    /**
-     * Initializes the activity, sets up UI elements, and sets listeners for date picker,
-     * poster upload, and event creation.
-     *
-     * @param savedInstanceState Bundle with saved instance state data.
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,7 +94,7 @@ public class CreateEventActivity extends AppCompatActivity {
         createConfirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                createEvent(eventNameText, eventDescText, regDateText, entrantLimitText, geolocationReqCheckbox);
+                createEvent(eventNameText, eventDescText, entrantLimitText, geolocationReqCheckbox);
             }
         });
 
@@ -151,25 +147,24 @@ public class CreateEventActivity extends AppCompatActivity {
      *
      * @param eventNameText      EditText for event name.
      * @param eventDescText      EditText for event description.
-     * @param regDateText        EditText for registration deadline.
      * @param entrantLimitText   EditText for entrant limit.
      * @param geolocationReqCheckbox CheckBox for geolocation requirement.
      */
-    private void createEvent(EditText eventNameText, EditText eventDescText, EditText regDateText,
+    private void createEvent(EditText eventNameText, EditText eventDescText,
                              EditText entrantLimitText, CheckBox geolocationReqCheckbox) {
         String eventName = eventNameText.getText().toString().trim();
         String eventDesc = eventDescText.getText().toString().trim();
         String entrantLimitString = entrantLimitText.getText().toString().trim();
         boolean geolocationReq = geolocationReqCheckbox.isChecked();
 
-        if (eventName.isEmpty() || eventDesc.isEmpty() || dateString == null) {
+        if (eventName.isEmpty() || eventDesc.isEmpty() || dateString == null || posterUri == null) {
             Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show();
             return;
         }
 
         Integer entrantLimit;
         try {
-            entrantLimit = entrantLimitString.isEmpty() ? 0 : Integer.valueOf(entrantLimitString);
+            entrantLimit = entrantLimitString.isEmpty() ? NULL : Integer.valueOf(entrantLimitString);
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Invalid entrant limit", Toast.LENGTH_SHORT).show();
             return;
