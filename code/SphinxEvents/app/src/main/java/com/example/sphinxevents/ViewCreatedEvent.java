@@ -1,31 +1,29 @@
 package com.example.sphinxevents;
 
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.NumberPicker;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.google.firebase.firestore.DocumentReference;
+
+import java.util.ArrayList;
 
 public class ViewCreatedEvent extends AppCompatActivity {
 
     private String eventCode;
     private EditText messageTextLayout;
+    DatabaseManager database;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,17 +37,19 @@ public class ViewCreatedEvent extends AppCompatActivity {
             return insets;
         });
 
+        database = DatabaseManager.getInstance();
+
+
         Intent intent = getIntent();
         if (intent != null ) {
             eventCode = intent.getExtras().getString("eventCode");
+        } else{
+            finish();
         }
-
-        createNotificationChannel();
 
         messageTextLayout = findViewById(R.id.message_to_entrants);
         Button notifyEntrantsBtn = findViewById(R.id.notify_entrants_button);
         notifyEntrantsBtn.setOnClickListener(v -> {
-
             sendMessage(eventCode);
         });
 
@@ -60,46 +60,34 @@ public class ViewCreatedEvent extends AppCompatActivity {
     }
 
     private void sendMessage(String eventCode) {
-
-        CharSequence textTitle = "Sphinx Exents";
-        CharSequence textContent = "Test Notification";
-
-        Log.d("Aniket", messageTextLayout.getText().toString());
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "Event Notification")
-                .setSmallIcon(R.drawable.baseline_qr_code_scanner_24)
-                .setContentTitle(textTitle)
-                .setContentText(messageTextLayout.getText().toString())
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-
-        NotificationManagerCompat notifMan = NotificationManagerCompat.from(this);
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            // I have no idea what this shit means but it gives an errir
-            return;
-        }
-        notifMan.notify(100, builder.build());
+        database.getEvent(eventCode, new DatabaseManager.eventRetrievalCallback() {
+            @Override
+            public void onSuccess(Event event) {
+                sendMessageToEntrants(event);
+                ArrayList<String> entrants = event.getEventEntrants();
+            }
+            @Override
+            public void onFailure(Exception e) {
+            }
+        });
     }
 
-    private void createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is not in the Support Library.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            String CHANNEL_ID = "Event Notification";
-            CharSequence name = getString(R.string.channel_name);
-            String description = getString(R.string.channel_description);
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
-            channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this.
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
+    private void sendMessageToEntrants(Event event) {
+
+        ArrayList<String> entrants = event.getEventEntrants();
+        for(String entrant: entrants){
+
+            Notification notif = new Notification(eventCode, entrant, Notification.notifType.Message);
+            notif.setMessage(messageTextLayout.getText().toString());
+            database.createNotification(notif, new DatabaseManager.NotificationCreationCallback() {
+                @Override
+                public void onSuccess(DocumentReference notifRef) {
+                }
+                @Override
+                public void onFailure(Exception e) {
+                    Log.d("Aniket", event.getName().toString());
+                }
+            });
         }
     }
 }

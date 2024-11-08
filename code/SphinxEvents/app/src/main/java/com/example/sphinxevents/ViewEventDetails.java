@@ -145,7 +145,7 @@ public class ViewEventDetails extends AppCompatActivity {
                 eventNameLayout.setText(event.getName());
                 eventDescLayout.setText(event.getDescription());
                 eventDateLayout.setText(formattedDate);
-                eventLimitLayout.setText(event.getEntrantLimit().toString());
+                eventLimitLayout.setText(event.getEntrantLimit() != null ? event.getEntrantLimit().toString() : "0");
 
                 if(event.getGeolocationReq() == true){
                     eventLocationReqLayout.setText("Your location has to match the Event's Facility Location");

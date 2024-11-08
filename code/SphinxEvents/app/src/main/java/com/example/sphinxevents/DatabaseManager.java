@@ -470,7 +470,7 @@ public class DatabaseManager {
                                 entrantLimit = null;
                             }
                             Boolean geolocationReq = document.getBoolean("geolocationReq");
-                            ArrayList<String> entrants = (ArrayList<String>) document.get("eventEntrants");
+                            ArrayList<String> entrants = (ArrayList<String>) document.get("entrants");
                             Event event = new Event(name, description, poster, lotteryEndDate, entrantLimit, geolocationReq, entrants);
                             callback.onSuccess(event);
                         } else {
@@ -556,5 +556,19 @@ public class DatabaseManager {
                         callback.onFailure(task.getException());
                     }
                 });
+    }
+
+    // --------------------------------------------------------------------------------------------------
+
+    public interface NotificationCreationCallback {
+        void onSuccess(DocumentReference notifRef);
+        void onFailure(Exception e);
+    }
+
+    public void createNotification(Notification notification, NotificationCreationCallback callback) {
+        database.collection("notifications")
+                .add(notification)
+                .addOnSuccessListener(callback::onSuccess)
+                .addOnFailureListener(callback::onFailure);
     }
 }
