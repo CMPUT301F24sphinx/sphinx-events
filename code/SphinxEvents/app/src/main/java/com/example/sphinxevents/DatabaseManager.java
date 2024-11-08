@@ -428,25 +428,27 @@ public class DatabaseManager {
                 });
     }
 
+    // ---------------------------------------------------------------------------------------------
+
     /**
-     * Callback interface for facility retrieval
+     * Callback interface for event retrieval
      */
     public interface eventRetrievalCallback {
         /**
-         * Called when facility is retrieved successfully
-         * @param event the facility that was retrieved
+         * Called when event is retrieved successfully
+         * @param event the evnt that was retrieved
          */
         void onSuccess(Event event);
 
         /**
-         * Called when error occurs during facility retrieval
+         * Called when error occurs during event retrieval
          * @param e the exception that occurred
          */
         void onFailure(Exception e);
     }
 
     /**
-     * Retrieves a facility from the database
+     * Retrieves a event from the database
      * @param eventID ID of event, key of events in database
      * @param callback Callback to handle success or failure of event retrieval
      */
@@ -483,6 +485,11 @@ public class DatabaseManager {
                 });
     }
 
+    /**
+     * Adds Id of entree to entrants field of event
+     * @param userID ID of user being added
+     * @param eventID ID of event being updated
+     */
     public void joinEvent(String userID, String eventID) {
         database.collection("events")
                 .document(eventID)
@@ -490,17 +497,20 @@ public class DatabaseManager {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.d("Aniket", "DocumentSnapshot successfully updated!");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.w("Aniket", "Error updating document", e);
                     }
                 });
     }
 
+    /**
+     * Adds Id of new created event to createdEvents field of user with userID
+     * @param userID The user who created the event
+     * @param eventID The event that is been uploaded
+     */
     public void updateOrganizerCreatedEvents(String userID, String eventID) {
         database.collection("users")
                 .document(userID)
@@ -508,13 +518,11 @@ public class DatabaseManager {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.d("Aniket", "Event" + eventID + " added to " + userID);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.w("Aniket", "Event not added to organizer's createdevents array", e);
                     }
                 });
     }
@@ -525,7 +533,7 @@ public class DatabaseManager {
     public interface getCreatedEventsCallback {
         /**
          * Called when events are retrieved successfully
-         * @param createdEventsID the facility that was retrieved
+         * @param createdEventsID List of Id's of events
          */
         void onSuccess(List<String> createdEventsID);
 
@@ -537,8 +545,8 @@ public class DatabaseManager {
     }
 
     /**
-     * Retrieves a facility from the database
-     * @param userID ID of organizer, key of users in db
+     * Retrieves an Event from db
+     * @param userID ID of user who created event
      */
     public void getCreatedEvents(String userID, getCreatedEventsCallback callback) {
         database.collection("users")
@@ -561,11 +569,28 @@ public class DatabaseManager {
 
     // --------------------------------------------------------------------------------------------------
 
+    /**
+     * Callback interface for createNotification
+     */
     public interface NotificationCreationCallback {
+        /**
+         * Called when notification is created successfully
+         * @param notifRef DocumentReference object to new created notification
+         */
         void onSuccess(DocumentReference notifRef);
+
+        /**
+         * Called when notification creation fails
+         * @param e Exception returned on failed notification retrieval
+         */
         void onFailure(Exception e);
     }
 
+    /**
+     * Adds notification object to "notification" collection in database
+     * @param notification The notification object being uploaded
+     * @param callback Call back function on weather upload succeeded or faulted
+     */
     public void createNotification(Notification notification, NotificationCreationCallback callback) {
         database.collection("notifications")
                 .add(notification)
@@ -574,10 +599,28 @@ public class DatabaseManager {
     }
 
 
+    /**
+     * Callback interface for getNotification
+     */
     public interface getNotificationsCallback {
+        /**
+         * Callback for successful notification retrieval
+         * @param notificationIDs List of DocumentSnapShots of returned notifications
+         */
         void onSuccess(List<DocumentSnapshot> notificationIDs);
+
+        /**
+         * Callback for failed notification retrieval
+         * @param e Exception for failed notification retrieval
+         */
         void onFailure(Exception e);
     }
+
+    /**
+     * Gets list of DocumentSnapshots of notifications sent to userID
+     * @param userID The user who is the reviewer of notifications
+     * @param callback Success or Fail callback
+     */
     public void getNotifications(String userID, getNotificationsCallback callback) {
         database.collection("notifications")
                 .whereEqualTo("toUser", userID)
@@ -588,13 +631,8 @@ public class DatabaseManager {
                         if (!query.isEmpty()) {
                             List<DocumentSnapshot> notifDocSnapshots =  query.getDocuments();
                             callback.onSuccess(notifDocSnapshots);
-//                            ArrayList<String> messages = new ArrayList<>();
-//                            for(int i = 0; i < notifDocSnapshots.size(); i++){
-//                                messages.add(notifDocSnapshots.get(i).get("message").toString());
-//                            }
-//                            callback.onSuccess(messages);
                         } else {
-                            callback.onFailure(new Exception("Created Events does not exist."));
+                            callback.onFailure(task.getException());
                         }
                     } else {
                         callback.onFailure(task.getException());

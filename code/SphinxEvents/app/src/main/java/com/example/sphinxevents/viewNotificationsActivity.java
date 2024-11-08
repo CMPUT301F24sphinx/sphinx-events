@@ -1,5 +1,7 @@
 package com.example.sphinxevents;
 
+import static android.widget.Toast.makeText;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,6 +26,7 @@ public class viewNotificationsActivity extends AppCompatActivity {
     private String userID;
     private DatabaseManager databaseManager;
     ArrayList<String> messages;
+    ArrayList<String> sender;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -33,7 +36,9 @@ public class viewNotificationsActivity extends AppCompatActivity {
         if (intent != null ) {
             userID = intent.getExtras().getString("userID");
         }
-        Log.d("Aniket", userID);
+
+
+        ListView notificationList = findViewById(R.id.notifs_listview);
         databaseManager = DatabaseManager.getInstance();
 
         EdgeToEdge.enable(this);
@@ -55,23 +60,24 @@ public class viewNotificationsActivity extends AppCompatActivity {
                 ListView simpleList = findViewById(R.id.notifs_listview);
 
                 ArrayList<String> messages = new ArrayList<>();
+                ArrayList<String> sender = new ArrayList<>();
 
                 for(int i = 0; i < notificationIDs.size(); ++i){
                     messages.add(notificationIDs.get(i).get("message").toString());
+                    sender.add(notificationIDs.get(i).get("eventName").toString());
                 }
 
-                NotificationAdapter customAdapter = new NotificationAdapter(getApplicationContext(), messages);
+                NotificationAdapter customAdapter = new NotificationAdapter(getApplicationContext(), messages, sender);
                 simpleList.setAdapter(customAdapter);
             }
             @Override
             public void onFailure(Exception e) {
+                Toast.makeText(getApplicationContext(), "Error loading notifications", Toast.LENGTH_SHORT).show();
                 finish();
             }
         });
 
-        ListView simpleList = findViewById(R.id.notifs_listview);
-
-        NotificationAdapter customAdapter = new NotificationAdapter(getApplicationContext(), messages);
-        simpleList.setAdapter(customAdapter);
+        NotificationAdapter customAdapter = new NotificationAdapter(getApplicationContext(), messages, sender);
+        notificationList.setAdapter(customAdapter);
     }
 }

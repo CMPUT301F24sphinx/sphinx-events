@@ -318,12 +318,9 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
             // Code for new activity that views events goes here
             Intent viewEnteredEvents = new Intent(this, ViewCreatedEvent.class);
             viewEnteredEvents.putExtra("eventCode", eventCodes.get(headers.get(groupPosition)).get(childPosition));
-//            Log.d("Aniket", groupPosition + " " + childPosition + " " + eventCodes.get(headers.get(groupPosition)).get(childPosition));
-//            Log.d("Aniket", eventCodes.get(headers.get(groupPosition)).get(childPosition));
             startActivity(viewEnteredEvents);
             return true; // Indicating the event is handled
         });
-
     }
 
     public void updateProfilePicture() {
