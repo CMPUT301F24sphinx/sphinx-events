@@ -79,6 +79,7 @@ public class DatabaseManager {
                 .add(event)
                 .addOnSuccessListener(callback::onSuccess)
                 .addOnFailureListener(callback::onFailure);
+
     }
 
     /**
@@ -252,9 +253,10 @@ public class DatabaseManager {
      */
     public interface FacilityRemovalCallback {
         /**
-         * Called when facility deletion is successful
+         * Called when facility is successfully removed
+         * @param updatedUser the updated user object
          */
-        void onSuccess();
+        void onSuccess(Entrant updatedUser);
 
         /**
          * Called when error occurs during facility deletion
@@ -264,17 +266,45 @@ public class DatabaseManager {
     }
 
     /**
-     * Removes a facility from database
+     * Removes a facility from database, updates user who owns faciltiy
      * @param deviceId key for facility
      * @param callback Callback to handle success or failure of facility deletion
      */
     public void removeFacility(String deviceId, FacilityRemovalCallback callback) {
         // Remove the facility document from the Firestore collection
+        // TODO: Remove events that facility is hosting
         database.collection("facilities")
                 .document(deviceId)
                 .delete()
                 .addOnSuccessListener(aVoid -> {
-                    callback.onSuccess();  // Notify success
+                    // Remove facility from user
+                    getUser(deviceId, new UserRetrievalCallback() {
+                        @Override
+                        public void onSuccess(Entrant user) {
+                            // Updates user to be an Entrant
+                            Entrant updatedUser = new Entrant(user.getDeviceId(), user.getName(), user.getEmail(),
+                                    user.getPhoneNumber(), user.getDefaultPfpPath(), user.getCustomPfpUrl(),
+                                    user.isOrgNotificationsEnabled(), user.isAdminNotificationsEnabled(),
+                                    user.getJoinedEvents(), user.getPendingEvents());
+                            saveUser(updatedUser, new UserCreationCallback() {
+                                @Override
+                                public void onSuccess(String deviceId) {
+                                    callback.onSuccess(updatedUser);  // Notify success
+                                }
+
+                                @Override
+                                public void onFailure(Exception e) {
+                                    callback.onFailure(new Exception("Failed to remove facility from user"));
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            callback.onFailure(new Exception("Failed to remove facility from user"));
+                        }
+                    });
+
                 })
                 .addOnFailureListener(callback::onFailure);  // Notify failure
     }

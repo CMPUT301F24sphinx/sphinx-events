@@ -22,6 +22,12 @@
             android:name=".AddFacilityActivity"
             android:exported="false" />
         <activity
+            android:name=".qrCodeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CreateEventActivity"
+            android:exported="false" />
+        <activity
             android:name=".ManageFacilityActivity"
             android:exported="false" />
         <activity
