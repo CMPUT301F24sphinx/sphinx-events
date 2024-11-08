@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -193,8 +194,7 @@ public class CreateEventActivity extends AppCompatActivity {
 
         ArrayList<String> entrants = new ArrayList<String>();
 
-                // Create a new Event object
-//                Event newEvent = new Event(eventName, eventDesc, posterRandKey, regDate, entrantLimit, geolocationReq, entrants);
+        // Create a new Event object
         Event newEvent = new Event(eventName, eventDesc, posterId, regDate, entrantLimit, geolocationReq, entrants);
 
         databaseManager.createEvent(newEvent, new DatabaseManager.EventCreationCallback() {

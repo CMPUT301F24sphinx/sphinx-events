@@ -118,12 +118,16 @@ public class ViewEventDetails extends AppCompatActivity {
                 String currUser = UserManager.getInstance().getCurrentUser().getDeviceId();
                 ArrayList<String> eventEntrants = event.getEventEntrants();
 
-                Log.d("Aniket", String.valueOf(eventEntrants.size()));
-                for (int i = 0; i < eventEntrants.size(); i++) {
-                    if(currUser.equals(eventEntrants.get(i))){
-                        Log.d("Aniket", eventEntrants.get(i));
-                        Toast.makeText(getApplicationContext(), "You have already joined this event!", Toast.LENGTH_LONG).show();
-                        return;
+                if(eventEntrants == null){
+                    eventEntrants = new ArrayList<>();
+                }
+
+                if(eventEntrants != null){
+                    for (int i = 0; i < eventEntrants.size(); i++) {
+                        if (currUser.equals(eventEntrants.get(i))) {
+                            Toast.makeText(getApplicationContext(), "You have already joined this event!", Toast.LENGTH_LONG).show();
+                            return;
+                        }
                     }
                 }
 
