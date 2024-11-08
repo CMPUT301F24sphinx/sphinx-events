@@ -92,7 +92,8 @@ public class InitialLoginActivity extends AppCompatActivity {
                 profilePictureBitmap, deviceId);
 
         Entrant newUser = new Entrant(deviceId, name, email, phone, profilePicturePath,
-                "",null, null);
+                "", true, true,
+                null, null);
 
         database.saveUser(newUser, new DatabaseManager.UserCreationCallback() {
             @Override

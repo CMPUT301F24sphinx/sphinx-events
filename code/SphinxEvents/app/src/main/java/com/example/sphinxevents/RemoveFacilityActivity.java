@@ -69,6 +69,7 @@ public class RemoveFacilityActivity extends AppCompatActivity {
                         // Updates user to be an Entrant
                         Entrant updatedUser = new Entrant(user.getDeviceId(), user.getName(), user.getEmail(),
                                 user.getPhoneNumber(), user.getDefaultPfpPath(), user.getCustomPfpUrl(),
+                                user.isOrgNotificationsEnabled(), user.isAdminNotificationsEnabled(),
                                 user.getJoinedEvents(), user.getPendingEvents());
                         databaseManager.saveUser(updatedUser, new DatabaseManager.UserCreationCallback() {
                             @Override
