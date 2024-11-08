@@ -169,8 +169,8 @@ public class CreateEventActivity extends AppCompatActivity {
             Toast.makeText(this, "Invalid entrant limit", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        String posterId = "EventPosters/" + UUID.randomUUID() + ".jpg";
+        String posterRandKey = UUID.randomUUID().toString();
+        String posterId = "EventPosters/" + posterRandKey + ".jpg";
         Date regDate;
         try {
             regDate = new SimpleDateFormat("yyyy/MM/dd").parse(dateString);
@@ -186,7 +186,7 @@ public class CreateEventActivity extends AppCompatActivity {
             public void onSuccess(DocumentReference eventRef) {
                 Toast.makeText(getApplicationContext(), "Event created successfully", Toast.LENGTH_SHORT).show();
                 uploadPosterImage(posterId);
-                startQrCodeActivity(posterId);
+                startQrCodeActivity(posterRandKey);
                 finish();
             }
 
@@ -214,11 +214,11 @@ public class CreateEventActivity extends AppCompatActivity {
     /**
      * Launches the QR code activity for the created event.
      *
-     * @param posterId ID for the poster, passed to the QR code activity.
+     * @param posterRandKey ID for the poster, passed to the QR code activity.
      */
-    private void startQrCodeActivity(String posterId) {
+    private void startQrCodeActivity(String posterRandKey) {
         Intent qrEventIntent = new Intent(CreateEventActivity.this, qrCodeActivity.class);
-        qrEventIntent.putExtra("poster_id", posterId);
+        qrEventIntent.putExtra("poster_id", posterRandKey);
         startActivity(qrEventIntent);
     }
 
