@@ -1,23 +1,28 @@
 package com.example.sphinxevents;
 
 import static java.sql.Types.NULL;
-
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -32,6 +37,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
@@ -62,6 +68,13 @@ public class CreateEventActivity extends AppCompatActivity {
         });
 
         databaseManager = DatabaseManager.getInstance();
+
+
+        Intent intent = getIntent();
+        if (intent != null ) {
+            String CreatorID = intent.getExtras().getString("DeviceID");
+        }
+
 
         // Initialize UI components
         EditText eventNameText = findViewById(R.id.event_name);
@@ -179,12 +192,20 @@ public class CreateEventActivity extends AppCompatActivity {
             return;
         }
 
-        Event newEvent = new Event(eventName, eventDesc, posterId, regDate, entrantLimit, geolocationReq);
+        ArrayList<String> entrants = new ArrayList<String>();
+
+        // Create a new Event object
+        Event newEvent = new Event(eventName, eventDesc, posterId, regDate, entrantLimit, geolocationReq, entrants);
 
         databaseManager.createEvent(newEvent, new DatabaseManager.EventCreationCallback() {
             @Override
             public void onSuccess(DocumentReference eventRef) {
                 Toast.makeText(getApplicationContext(), "Event created successfully", Toast.LENGTH_SHORT).show();
+                Intent intent = getIntent();
+                if (intent != null ) {
+                    String CreatorID = intent.getExtras().getString("DeviceID");
+                    databaseManager.updateOrganizerCreatedEvents(CreatorID, eventRef.getId());
+                }
                 uploadPosterImage(posterId);
                 startQrCodeActivity(posterRandKey);
                 finish();
