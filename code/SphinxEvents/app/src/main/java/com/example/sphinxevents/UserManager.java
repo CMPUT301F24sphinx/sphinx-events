@@ -30,7 +30,7 @@ import java.util.List;
 public class UserManager {
     private static UserManager instance;
     private Entrant currentUser;
-    private final List<UserUpdateListener> listeners = new ArrayList<>();
+    private final ArrayList<UserUpdateListener> listeners = new ArrayList<>();
 
     /**
      * Initializes the UserManager instance

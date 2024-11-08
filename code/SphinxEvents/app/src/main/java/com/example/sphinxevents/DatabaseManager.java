@@ -134,6 +134,11 @@ public class DatabaseManager {
         void onFailure(Exception e);
     }
 
+    /**
+     * Retrieves a user from the Firestore database using the users device ID
+     * @param deviceId The device ID of the user
+     * @param callback Callback to handle success or failure of user retrieval
+     */
     public void getUser(String deviceId, UserRetrievalCallback callback) {
         database.collection("users")
                 .document(deviceId)
@@ -142,13 +147,9 @@ public class DatabaseManager {
                     if (task.isSuccessful() && task.getResult() != null) {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
-
                             Entrant user = document.toObject(Entrant.class);
-
                             if (user != null) {
-
                                 String role = document.getString("role");
-                                // TODO: Admin role as well if needed
                                 switch (role) {
                                     case "Organizer":
                                         // If needed, you can cast to Organizer or handle it here
