@@ -9,10 +9,10 @@
 
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/view_qr_code_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Button1"
+        android:text="@string/view_qrcode_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/manage_event_header"
@@ -20,10 +20,10 @@
         app:layout_constraintVertical_bias="0.1"/>
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/edit_event_details_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Button2"
+        android:text="@string/edit_event_details_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/manage_event_header"
@@ -31,10 +31,10 @@
         app:layout_constraintVertical_bias="0.2"/>
 
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/view_entrant_data_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Button3"
+        android:text="@string/view_entrant_data_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/manage_event_header"
@@ -42,15 +42,29 @@
         app:layout_constraintVertical_bias="0.3"/>
 
     <Button
-        android:id="@+id/button4"
+        android:id="@+id/notify_entrants_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Button4"
+        android:text="@string/notify_entrants_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/manage_event_header"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintVertical_bias="0.4"/>
+        app:layout_constraintVertical_bias="0.5"/>
+
+    <EditText
+        android:id="@+id/message_to_entrants"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:backgroundTint="@android:color/darker_gray"
+        android:ems="10"
+        android:hint="Message to all entrants"
+        android:inputType="text"
+        android:padding="10dp"
+        app:layout_constraintBottom_toTopOf="@+id/notify_entrants_button"
+ />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/manage_event_header"
@@ -61,7 +75,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
-            android:id="@+id/manage_event_back_btn"
+            android:id="@+id/manage_event_back_button"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="@color/header_color"

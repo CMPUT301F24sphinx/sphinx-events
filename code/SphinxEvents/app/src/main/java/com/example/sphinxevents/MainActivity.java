@@ -39,6 +39,7 @@ import com.journeyapps.barcodescanner.ScanOptions;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -53,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
     private ExpandableListView expandableListView;  // expandable list of events
     private List<String> headers;  // headers/parents/group names
     private HashMap<String, List<Event>> events;  // map each group name to list of Event objects
+    private HashMap<String, List<String>> eventCodes;
     private ExpandableListAdapter listAdapter;
 
     private ImageButton profilePicBtn;
@@ -254,6 +256,7 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
 
         headers = new ArrayList<>();
         events = new HashMap<>();
+        eventCodes = new HashMap<>();
 
         headers.add("Joined Events");
         headers.add("Pending Events");
@@ -273,11 +276,16 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
             databaseManager.getCreatedEvents(currentUser.getDeviceId(), new DatabaseManager.getCreatedEventsCallback() {
                 @Override
                 public void onSuccess(List<String> createdEventsID) {
+
+                    eventCodes.put(headers.get(2), createdEventsID);
                     for(Integer i = 0; i < createdEventsID.size(); ++i){
+                        Log.d("Aniket", eventCodes.get(headers.get(2)).get(i));
                         databaseManager.getEvent(createdEventsID.get(i), new DatabaseManager.eventRetrievalCallback() {
                             @Override
                             public void onSuccess(Event event) {
                                 createdEvents.add(event);
+                                Log.d("Aniket", event.getName());
+
                             }
                             @Override
                             public void onFailure(Exception e) {
@@ -299,7 +307,10 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         // Clicking event in main screen -> allows user to view event details
         expandableListView.setOnChildClickListener((parent, view, groupPosition, childPosition, id) -> {
             // Code for new activity that views events goes here
-            Intent viewEnteredEvents = new Intent(this, ViewEnteredEvent.class);
+            Intent viewEnteredEvents = new Intent(this, ViewCreatedEvent.class);
+            viewEnteredEvents.putExtra("eventCode", eventCodes.get(headers.get(groupPosition)).get(childPosition));
+            Log.d("Aniket", groupPosition + " " + childPosition);
+            Log.d("Aniket", eventCodes.get(headers.get(groupPosition)).get(childPosition));
             startActivity(viewEnteredEvents);
             return true; // Indicating the event is handled
         });

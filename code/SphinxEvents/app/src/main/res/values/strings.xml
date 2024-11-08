@@ -57,6 +57,17 @@
 
 <!--    Managing Event String-->
     <string name="manageevent_event_details">Event Details</string>
+    <string name="view_qrcode_button">View QR Code</string>
+    <string name="edit_event_details_button">Edit Event Details</string>
+    <string name="view_entrant_data_button">View Entrant Data</string>
+    <string name="notify_entrants_button">Send Message</string>
+
+<!--    Notifications-->
+    <string name="channel_name">NotificationChannel</string>
+    <string name="channel_description">NotificationChannelDesc</string>
+    <string name="CHANNEL_ID">NotificationChannelID</string>
+
+
 
 <!--    QR Code Scan Strings-->
     <string name="qr_camera_scan">Camera</string>

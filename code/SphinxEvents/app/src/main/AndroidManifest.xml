@@ -7,6 +7,7 @@
         android:required="false" />
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -49,6 +50,10 @@
         <activity android:name=".ScanWithCam"
             android:stateNotNeeded="true"
             android:theme="@style/zxing_CaptureTheme"/>
+        <activity android:name=".ViewCreatedEvent"
+            android:exported="false"/>
+        <activity android:name=".ViewEnteredEvent"
+            android:exported="false"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"

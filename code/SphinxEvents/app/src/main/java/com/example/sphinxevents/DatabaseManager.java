@@ -462,7 +462,13 @@ public class DatabaseManager {
                             String poster = document.getString("poster");
                             Timestamp dateTimestamp = document.getTimestamp("lotteryEndDate");
                             Date lotteryEndDate = dateTimestamp.toDate();
-                            Integer entrantLimit = Integer.valueOf(document.get("entrantLimit").toString());
+
+                            Integer entrantLimit;
+                            if(document.get("entrantLimit") != null) {
+                                entrantLimit = Integer.valueOf(document.get("entrantLimit").toString());
+                            } else{
+                                entrantLimit = null;
+                            }
                             Boolean geolocationReq = document.getBoolean("geolocationReq");
                             ArrayList<String> entrants = (ArrayList<String>) document.get("eventEntrants");
                             Event event = new Event(name, description, poster, lotteryEndDate, entrantLimit, geolocationReq, entrants);
