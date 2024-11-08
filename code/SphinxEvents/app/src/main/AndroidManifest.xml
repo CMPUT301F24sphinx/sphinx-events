@@ -54,6 +54,8 @@
             android:exported="false"/>
         <activity android:name=".ViewEnteredEvent"
             android:exported="false"/>
+        <activity android:name=".viewNotificationsActivity"
+            android:exported="false"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"

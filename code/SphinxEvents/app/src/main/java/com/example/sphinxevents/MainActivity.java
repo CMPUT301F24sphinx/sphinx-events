@@ -177,6 +177,7 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
         Button manageProfileBtn = findViewById(R.id.drawer_manage_profile_btn);
         Button manageFacilityBtn = findViewById(R.id.drawer_manage_facility_btn);
+        Button viewNotificationsBtn = findViewById(R.id.drawer_notifications_btn);
         Button administratorBtn = findViewById(R.id.drawer_administrator_btn);
         Button createEventBtn = findViewById(R.id.create_event_button);
 
@@ -205,6 +206,14 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         manageFacilityBtn.setOnClickListener(v -> {
             Intent manageFacilityIntent = new Intent(MainActivity.this, ManageFacilityActivity.class);
             startActivity(manageFacilityIntent);
+        });
+
+        // Set the Notification button to activate Notification page
+        viewNotificationsBtn.setOnClickListener(v -> {
+            Intent viewNotificationsIntent = new Intent(this,
+                    viewNotificationsActivity.class);
+            viewNotificationsIntent.putExtra("userID", userManager.getCurrentUser().getDeviceId().toString());
+            startActivity(viewNotificationsIntent);
         });
 
         // Sets OnClickListener for administrator actions

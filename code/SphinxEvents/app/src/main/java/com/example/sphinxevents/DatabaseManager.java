@@ -13,6 +13,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.protobuf.Value;
@@ -570,5 +571,34 @@ public class DatabaseManager {
                 .add(notification)
                 .addOnSuccessListener(callback::onSuccess)
                 .addOnFailureListener(callback::onFailure);
+    }
+
+
+    public interface getNotificationsCallback {
+        void onSuccess(List<DocumentSnapshot> notificationIDs);
+        void onFailure(Exception e);
+    }
+    public void getNotifications(String userID, getNotificationsCallback callback) {
+        database.collection("notifications")
+                .whereEqualTo("toUser", userID)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        QuerySnapshot query = task.getResult();
+                        if (!query.isEmpty()) {
+                            List<DocumentSnapshot> notifDocSnapshots =  query.getDocuments();
+                            callback.onSuccess(notifDocSnapshots);
+//                            ArrayList<String> messages = new ArrayList<>();
+//                            for(int i = 0; i < notifDocSnapshots.size(); i++){
+//                                messages.add(notifDocSnapshots.get(i).get("message").toString());
+//                            }
+//                            callback.onSuccess(messages);
+                        } else {
+                            callback.onFailure(new Exception("Created Events does not exist."));
+                        }
+                    } else {
+                        callback.onFailure(task.getException());
+                    }
+                });
     }
 }

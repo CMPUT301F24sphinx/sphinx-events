@@ -43,14 +43,14 @@ public class ViewCreatedEvent extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent != null ) {
             eventCode = intent.getExtras().getString("eventCode");
-        } else{
-            finish();
         }
 
         messageTextLayout = findViewById(R.id.message_to_entrants);
         Button notifyEntrantsBtn = findViewById(R.id.notify_entrants_button);
         notifyEntrantsBtn.setOnClickListener(v -> {
-            sendMessage(eventCode);
+            if(!messageTextLayout.getText().toString().equals("")){
+                sendMessage(eventCode);
+            }
         });
 
         ImageButton backButton = findViewById(R.id.manage_event_back_button);
