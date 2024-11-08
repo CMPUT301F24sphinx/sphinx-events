@@ -1,3 +1,12 @@
+/*
+ * Class Name: DatabaseManager
+ * Date: 2024-11-06
+ *
+ * Description:
+ * This class is responsible for managing interactions with Firebase Firestore and Firebase Storage.
+ * It includes functionality for storing and retrieving data, as well as handling operations related to
+ * user and event management. Some methods are currently under development and will be added as needed.
+ */
 
 package com.example.sphinxevents;
 
@@ -13,6 +22,12 @@ import java.util.ArrayList;
 
 import java.util.ArrayList;
 
+//TODO: Add a more descriptive comment for the class when more functionality is implemented.
+/**
+ * This class manages interactions with a Firebase Firestore database and Firebase Storage.
+ * It provides methods for handling data storage, retrieval, and other operations related to
+ * user and event management.
+ */
 public class DatabaseManager {
     private static DatabaseManager instance;
     private FirebaseFirestore database;
@@ -269,6 +284,7 @@ public class DatabaseManager {
                             // Updates user to be an Entrant
                             Entrant updatedUser = new Entrant(user.getDeviceId(), user.getName(), user.getEmail(),
                                     user.getPhoneNumber(), user.getDefaultPfpPath(), user.getCustomPfpUrl(),
+                                    user.isOrgNotificationsEnabled(), user.isAdminNotificationsEnabled(),
                                     user.getJoinedEvents(), user.getPendingEvents());
                             saveUser(updatedUser, new UserCreationCallback() {
                                 @Override
@@ -367,13 +383,28 @@ public class DatabaseManager {
                 });
     }
 
-    //---------------------------------------------------------------------------------------------
-
+    /**
+     * Callback interface for uploading a profile picture.
+     */
     public interface UploadProfilePictureCallback {
+        /**
+         * Called when the profile picture is successfully uploaded.
+         * @param url The download URL of the uploaded profile picture.
+         */
         void onSuccess(String url);
+
+        /**
+         * Called when the profile picture upload fails.
+         */
         void onFailure();
     }
 
+    /**
+     * Uploads a profile picture to Firebase Storage.
+     * @param deviceId The device ID of the user for whom the profile picture is being uploaded.
+     * @param pfpUri URI of the profile picture to upload
+     * @param callback Callback to handle success of failure of the upload.
+     */
     public void uploadProfilePicture(String deviceId, Uri pfpUri, UploadProfilePictureCallback callback) {
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
         StorageReference profilePicRef = storageRef.child("profile_pictures/" + deviceId + ".png");
@@ -396,11 +427,26 @@ public class DatabaseManager {
                 });
     }
 
+    /**
+     * Callback interface for deleting a profile picture.
+     */
     public interface DeleteProfilePictureCallback {
+        /**
+         * Called when the profile picture is successfully deleted.
+         */
         void onSuccess();
+
+        /**
+         * Called when profile picture deletion fails.
+         */
         void onFailure();
     }
 
+    /**
+     * Deletes a profile picture from Firebase Storage.
+     * @param deviceId The device ID of the user whose profile picture is being deleted.
+     * @param callback Callback to handle success or failure of the deletion.
+     */
     public void deleteProfilePicture(String deviceId, DeleteProfilePictureCallback callback) {
         // Create a reference to the profile picture in Firebase Storage
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();

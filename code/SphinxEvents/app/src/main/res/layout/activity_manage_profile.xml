@@ -28,7 +28,7 @@
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_gravity="center"
-        android:padding="2dp"
+        android:padding="3dp"
         android:layout_margin="16dp"
         android:contentDescription="@string/profile_pic_speakable_text"
         android:src="@drawable/baseline_person_24"
@@ -156,6 +156,7 @@
         app:layout_constraintEnd_toStartOf="@id/manage_profile_notifications_admin"
         android:text="@string/organizers"
         android:textSize="20sp"
+        android:buttonTint="@color/drawer_manage_profile_color"
         />
 
     <CheckBox
@@ -167,6 +168,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:text="@string/administrators"
         android:textSize="20sp"
+        android:buttonTint="@color/drawer_manage_profile_color"
         />
 
     <Button

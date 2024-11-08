@@ -32,7 +32,6 @@ android {
     }
 }
 
-
 dependencies {
     implementation(libs.core)
     implementation(libs.zxing.android.embedded)
@@ -43,14 +42,12 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
-    implementation(libs.firebase.storage)
     implementation(libs.core.splashscreen)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-
-
-
+    implementation(libs.core.splashscreen)
     implementation(libs.glide)
     annotationProcessor(libs.compiler)
+    androidTestImplementation(libs.espresso.intents)
 }
