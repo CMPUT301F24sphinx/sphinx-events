@@ -88,7 +88,7 @@ public class ManageProfileActivity extends AppCompatActivity {
 
         // Initialize variables that handle profile selection
         String profilePictureUrl = updatedUser.getCustomPfpUrl();
-        if (!profilePictureUrl.isEmpty()) {
+        if (profilePictureUrl != null && !profilePictureUrl.isEmpty()) {
             newProfilePicUri = initialProfilePicUri = Uri.parse(profilePictureUrl);
         }
 
