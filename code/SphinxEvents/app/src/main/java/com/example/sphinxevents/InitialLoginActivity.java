@@ -1,3 +1,15 @@
+/*
+ * Class Name: InitialLoginActivity
+ * Date: 2024-11-06
+ *
+ * Description:
+ * InitialLoginActivity is the activity that handles the initial login process for users.
+ * Users are allowed to implement a name, email, and optional phone number. The activity also
+ * conducts basic input validation. A deterministic profile picture based on the users name is
+ * generated when the user is ready to create their profile. The user data is stored in the
+ * Firebase Firestore database.
+ */
+
 package com.example.sphinxevents;
 
 import android.graphics.Bitmap;
@@ -15,8 +27,13 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.sphinxevents.DatabaseManager;
+
 import java.util.ArrayList;
 
+/**
+ * Activity for handling the initial login process where users can create their profile.
+ */
 public class InitialLoginActivity extends AppCompatActivity {
 
     private String deviceId;
@@ -26,6 +43,7 @@ public class InitialLoginActivity extends AppCompatActivity {
     private EditText nameEditText;
     private EditText emailEditText;
     private EditText phoneEditText;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +73,9 @@ public class InitialLoginActivity extends AppCompatActivity {
     /**
      * Creates a new user profile based on input from the user
      * <p>
-     *     Validates user input fields. OTHER EXPLANATIONS
+     *     Validates user input fields, creates an Entrant object to represent the user,
+     *     generates a deterministic profile picture based on the first character of the user's
+     *     name, stores the user in the Firebase Firestore database.
      * </p>
      */
     private void createProfile() {
