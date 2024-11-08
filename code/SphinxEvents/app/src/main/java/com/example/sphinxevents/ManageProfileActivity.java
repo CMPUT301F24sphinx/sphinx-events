@@ -47,6 +47,7 @@ import com.bumptech.glide.Glide;
 public class ManageProfileActivity extends AppCompatActivity {
 
     private UserManager userManager;
+    private DatabaseManager databaseManager;
     private Entrant updatedUser;
 
     private Uri initialProfilePicUri;
@@ -83,6 +84,7 @@ public class ManageProfileActivity extends AppCompatActivity {
 
         userManager = UserManager.getInstance();
         updatedUser = userManager.getCurrentUser();
+        databaseManager = DatabaseManager.getInstance();
 
         // Initialize variables that handle profile selection
         String profilePictureUrl = updatedUser.getCustomPfpUrl();
@@ -185,7 +187,7 @@ public class ManageProfileActivity extends AppCompatActivity {
 
         if (profilePictureChanged) {
             if (newProfilePicUri != null) {  // Profile picture was either added or changed
-                DatabaseManager.getInstance().uploadProfilePicture(updatedUser.getDeviceId(), newProfilePicUri,
+                databaseManager.uploadProfilePicture(updatedUser.getDeviceId(), newProfilePicUri,
                         new DatabaseManager.UploadProfilePictureCallback() {
                             @Override
                             public void onSuccess(String url) {
@@ -200,7 +202,7 @@ public class ManageProfileActivity extends AppCompatActivity {
                             }
                         });
             } else {  // Profile Pic was deleted
-                DatabaseManager.getInstance().deleteProfilePicture(updatedUser.getDeviceId(),
+                databaseManager.deleteProfilePicture(updatedUser.getDeviceId(),
                         new DatabaseManager.DeleteProfilePictureCallback() {
                             @Override
                             public void onSuccess() {
@@ -251,7 +253,7 @@ public class ManageProfileActivity extends AppCompatActivity {
      * picture if the users name has changed.
      */
     private void saveUser() {
-        DatabaseManager.getInstance().saveUser(updatedUser, new DatabaseManager.UserCreationCallback() {
+        databaseManager.saveUser(updatedUser, new DatabaseManager.UserCreationCallback() {
             @Override
             public void onSuccess(String deviceId) {
                 userManager.setCurrentUser(updatedUser);
