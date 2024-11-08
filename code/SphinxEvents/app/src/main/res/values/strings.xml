@@ -54,5 +54,15 @@
     <string name="facility_results_for">Facility Results For:</string>
     <string name="facility_details">Facility Details</string>
     <string name="facility_search_query">\"%s\"</string>
+    <string name="Confirm">Confirm</string>
+    <string name="Cancel">Cancel</string>
+    <string name="upload_poster">Upload Poster*</string>
+    <string name="back_to_home">Back to Home</string>
+    <string name="entrant_limit_optional">Entrant Limit(optional)</string>
+    <string name="geo_location_requirement">Geo-Location Requirement:</string>
+    <string name="registration_deadline_yyyy_mm_dd">Registration Deadline(yyyy/MM/dd)*</string>
+    <string name="name">Name*</string>
+    <string name="create_an_event">Create an Event</string>
+    <string name="event_description">Event Description*</string>
 
 </resources>
