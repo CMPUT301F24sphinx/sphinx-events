@@ -15,12 +15,18 @@ import androidx.core.view.WindowInsetsCompat;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
+/**
+ * Activity to use Camera and scan a QR code
+ */
 public class ScanQRCode extends AppCompatActivity {
 
+    /**
+     * On creating the QR Scan activity scan the QR code
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_view_event);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -28,6 +34,7 @@ public class ScanQRCode extends AppCompatActivity {
             return insets;
         });
 
+        // Get info from caller intent and if it is Camera scan the qr
         Intent intent = getIntent();
         if (intent != null ) {
             if("Camera".equals(intent.getAction())) {
@@ -36,6 +43,10 @@ public class ScanQRCode extends AppCompatActivity {
         }
     }
 
+    /**
+     * Set options for the way the scanner looks and operates
+     * Use ScanWithCam class to capture video
+     */
     public void doQRScan() {
         ScanOptions options = new ScanOptions();
         options.setPrompt("Volume up to turn on flash");
@@ -45,6 +56,10 @@ public class ScanQRCode extends AppCompatActivity {
         barcodeLauncher.launch(options);
     }
 
+    /**
+     * If the results of scan are non null start Activity to view the event
+     * if null close activity and give error toast
+     */
     ActivityResultLauncher<ScanOptions> barcodeLauncher = registerForActivityResult(new ScanContract(), result -> {
         if (result.getContents() != null) {
             Intent LoadEventIntent = new Intent(ScanQRCode.this, ViewEventDetails.class);

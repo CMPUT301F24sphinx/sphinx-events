@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
                     return;
                 }
             })
-// OPtional gallery scan, might do later it keeps breaking
+// Optional gallery scan, might do later it keeps breaking
 //            .setPositiveButton(R.string.qr_use_gallery, new DialogInterface.OnClickListener() {
 //                public void onClick(DialogInterface dialog, int id) {
 //                    Intent CamScanIntent = new Intent(MainActivity.this, ScanQRCode.class);

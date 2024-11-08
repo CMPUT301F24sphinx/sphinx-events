@@ -617,7 +617,7 @@ public class DatabaseManager {
     }
 
     /**
-     * Gets list of DocumentSnapshots of notifications sent to userID
+     * Gets list of DocumentSnapshots of notifications sent to` userID
      * @param userID The user who is the reviewer of notifications
      * @param callback Success or Fail callback
      */

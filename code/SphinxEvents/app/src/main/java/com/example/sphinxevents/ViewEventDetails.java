@@ -37,10 +37,12 @@ import java.util.UUID;
 
 public class ViewEventDetails extends AppCompatActivity {
 
+    // db stuff
     private FirebaseStorage storage;
     private StorageReference storageReference;
-
     private DatabaseManager databaseManager;
+
+    // Layout items
     private ImageView eventPosterLayout;
     private TextView eventNameLayout;
     private TextView eventDescLayout;
@@ -48,10 +50,13 @@ public class ViewEventDetails extends AppCompatActivity {
     private TextView eventLimitLayout;
     private TextView eventLocationReqLayout;
 
+    /**
+     * On creation of activity
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_view_event);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -59,9 +64,11 @@ public class ViewEventDetails extends AppCompatActivity {
             return insets;
         });
 
+        // ID of event being viewed
         String eventCode;
         databaseManager = DatabaseManager.getInstance();
 
+        // Connect layout stuff to xml views
         eventPosterLayout = findViewById(R.id.eventPoster);
         eventNameLayout = findViewById(R.id.eventName);
         eventDescLayout = findViewById(R.id.eventDescription);
@@ -71,16 +78,17 @@ public class ViewEventDetails extends AppCompatActivity {
         Button eventGoBackLayout = findViewById(R.id.cancel_event_button);
         Button eventEnterEventLayout = findViewById(R.id.add_event_button);
 
+        // Extract passed event code from previous activity and then query that Event from db
         Intent intent = getIntent();
         if (intent != null ) {
             eventCode = intent.getExtras().getString("eventCode");
             getEvent(eventCode);
-            Toast.makeText(this, eventCode, Toast.LENGTH_SHORT).show();
         } else{
             Toast.makeText(this, "QR Scan failed in ViewEventDetails", Toast.LENGTH_SHORT).show();
-            finish();
+            finish(); // exit activity if failed
         }
 
+        // Exit the activity with back button
         eventGoBackLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -88,6 +96,7 @@ public class ViewEventDetails extends AppCompatActivity {
             }
         });
 
+        // Check if user can join event
         eventEnterEventLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -96,6 +105,11 @@ public class ViewEventDetails extends AppCompatActivity {
         });
     }
 
+    /**
+     * Check if user can enter the event
+     * This functionality isn't fully implemented because it's not required by Part3 due date
+     * @param eventCode ID of the event to join
+     */
     public void joinEventCheck(String eventCode){
         databaseManager.getEvent(eventCode, new DatabaseManager.eventRetrievalCallback() {
             @Override
@@ -132,31 +146,40 @@ public class ViewEventDetails extends AppCompatActivity {
         });
     }
 
+    /**
+     * Get event obj with eventCode eventID
+     * Sets the activity layout text and image to event data queried
+     * @param eventCode eventID of event we want
+     */
     public void getEvent(String eventCode) {
 
         databaseManager.getEvent(eventCode, new DatabaseManager.eventRetrievalCallback() {
             @Override
             public void onSuccess(Event event) {
 
+                // Get information of event
                 String posterCode = event.getPoster();
                 SimpleDateFormat dateFormatter = new SimpleDateFormat("EEEE, MMMM d, yyyy 'at' h:m:s a z");
                 String formattedDate = dateFormatter.format(event.getLotteryEndDate());
 
+                // Set layout items to information gotten above
                 eventNameLayout.setText(event.getName());
                 eventDescLayout.setText(event.getDescription());
                 eventDateLayout.setText(formattedDate);
                 eventLimitLayout.setText(event.getEntrantLimit() != null ? event.getEntrantLimit().toString() : "0");
 
+                // If location is required change the text otherwise the default says no location required
+                // when joining events is fully implements this will have to check users locaion or else fail
                 if(event.getGeolocationReq() == true){
                     eventLocationReqLayout.setText("Your location has to match the Event's Facility Location");
                 }
 
+                // Get poster from database using filepath of poster
                 storageReference = FirebaseStorage.getInstance().getReference().child(posterCode);
                 final long ONE_MEGABYTE = 2048 * 2048;
                 storageReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                     @Override
                     public void onSuccess(byte[] bytes) {
-                        // Data for "images/island.jpg" is returns, use this as needed
                         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                         eventPosterLayout.setImageBitmap(bitmap);
                     }
