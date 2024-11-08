@@ -1,4 +1,3 @@
-
 package com.example.sphinxevents;
 
 import android.net.Uri;
@@ -417,4 +416,119 @@ public class DatabaseManager {
                     callback.onFailure();
                 });
     }
+    //---------------------------------------------------------------------------------------------
+    //Admin profile search handling:
+
+    /**
+     * Callback interface for profiles search
+     */
+    public interface ProfilesSearchCallback {
+        /**
+         * Called when profile search is successful
+         * @param users array of profiles that match query
+         */
+        void onSuccess(ArrayList<Entrant> users);
+
+        /**
+         * Called when error occurs during facility search
+         * @param e the exception that occurred
+         */
+        void onFailure(Exception e);
+    }
+
+    /**
+     * Searches database for users that match name
+     * @param query the profile name to find in database
+     * @param callback Callback to handle success or failure of searching database
+     */
+    public void searchProfiles(String query, ProfilesSearchCallback callback) {
+        // Query the users collection for documents with a matching name
+        database.collection("users")
+                .whereEqualTo("name", query)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        ArrayList<Entrant> users = new ArrayList<>();
+                        for (DocumentSnapshot document : task.getResult()) {
+                            String deviceId = document.getId();
+                            String name = document.getString("name");
+                            String email = document.getString("email");
+                            String phoneNumber = document.getString("phoneNumber");
+                            String defaultPfpPath = document.getString("defaultPfpPath");
+                            String customPfpUrl = document.getString("customPfpUrl");
+                            ArrayList<String> joinedEvents = (ArrayList<String>) document.get("joinedEvents");
+                            ArrayList<String> pendingEvents = (ArrayList<String>) document.get("pendingEvents");
+
+                            Entrant entrant = new Entrant(deviceId, name, email, phoneNumber, defaultPfpPath,
+                                    customPfpUrl, joinedEvents, pendingEvents);
+                            users.add(entrant);
+                        }
+                        callback.onSuccess(users);
+                    } else {
+                        callback.onFailure(task.getException());
+                    }
+                });
+    }
+
+    /**
+     * Callback interface for user deletion
+     */
+    public interface ProfileRemovalCallback {
+        /**
+         * Called when profile is successfully removed
+         * @param updatedUser the updated user object
+         */
+        void onSuccess(Entrant updatedUser);
+
+        /**
+         * Called when error occurs during facility deletion
+         * @param e the exception that occurred
+         */
+        void onFailure(Exception e);
+    }
+
+    /**
+     * Removes a user profile from database
+     * @param deviceId key for profile
+     * @param callback Callback to handle success or failure of profile deletion
+     */
+    public void removeProfile(String deviceId, ProfileRemovalCallback callback) {
+        // Remove the user from the Firestore collection
+        database.collection("users")
+                .document(deviceId)
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    // Remove user profile
+                    getUser(deviceId, new UserRetrievalCallback() {
+                        @Override
+                        public void onSuccess(Entrant user) {
+                            // Updates user to be an Entrant
+                            Entrant updatedUser = new Entrant(user.getDeviceId(), user.getName(), user.getEmail(),
+                                    user.getPhoneNumber(), user.getDefaultPfpPath(), user.getCustomPfpUrl(),
+                                    user.getJoinedEvents(), user.getPendingEvents());
+                            saveUser(updatedUser, new UserCreationCallback() {
+                                @Override
+                                public void onSuccess(String deviceId) {
+                                    callback.onSuccess(updatedUser);  // Notify success
+                                }
+
+                                @Override
+                                public void onFailure(Exception e) {
+                                    callback.onFailure(new Exception("Failed to remove facility from user"));
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            callback.onFailure(new Exception("Failed to remove facility from user"));
+                        }
+                    });
+
+                })
+                .addOnFailureListener(callback::onFailure);  // Notify failure
+
+    }
+
+
 }
