@@ -1,5 +1,5 @@
 /*
- * Class Name: InputVariable
+ * Class Name: InputValidator
  * Date: 2024-11-08
  *
  *
