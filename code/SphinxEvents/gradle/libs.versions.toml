@@ -18,6 +18,8 @@ junitJupiter = "5.8.1"
 zxingver = "4.3.0"
 zxingAndroidEmbedded = "4.3.0"
 glide2ver = "7.2.0"
+firebaseDatabase = "21.0.0"
+
 
 [libraries]
 compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "compiler" }
@@ -39,6 +41,8 @@ junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.r
 zxing-android-embedded = { module = "com.journeyapps:zxing-android-embedded", version.ref = "zxingAndroidEmbedded" }
 zxing = { module = "com.journeyapps:zxing-android-embedded", version.ref = "zxingver"}
 glide2 = { module = "com.firebaseui:firebase-ui-storage", version.ref = "glide2ver"}
+firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

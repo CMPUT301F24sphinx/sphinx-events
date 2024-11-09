@@ -686,4 +686,84 @@ public class DatabaseManager {
                     }
                 });
     }
+
+    //---------------------------------------------------------------------------------------------
+    //Admin profile search handling:
+
+    /**
+     * Callback interface for profiles search
+     */
+    public interface ProfilesSearchCallback {
+        /**
+         * Called when profile search is successful
+         * @param users array of profiles that match query
+         */
+        void onSuccess(ArrayList<Entrant> users);
+
+        /**
+         * Called when error occurs during facility search
+         * @param e the exception that occurred
+         */
+        void onFailure(Exception e);
+    }
+
+    /**
+     * Searches database for users that match name
+     * @param query the profile name to find in database
+     * @param callback Callback to handle success or failure of searching database
+     */
+    public void searchProfiles(String query, ProfilesSearchCallback callback) {
+        // Query the users collection for documents with a matching name
+        database.collection("users")
+                .whereEqualTo("name", query)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        ArrayList<Entrant> users = new ArrayList<>();
+                        for (DocumentSnapshot document : task.getResult()) {
+                            Entrant user = document.toObject(Entrant.class);
+                            users.add(user);
+                        }
+                        callback.onSuccess(users);
+                    } else {
+                        callback.onFailure(task.getException());
+                    }
+                });
+    }
+
+    /**
+     * Callback interface for user deletion
+     */
+    public interface ProfileRemovalCallback {
+        /**
+         * Called when profile is successfully removed
+         */
+        void onSuccess();
+
+        /**
+         * Called when error occurs during facility deletion
+         * @param e the exception that occurred
+         */
+        void onFailure(Exception e);
+    }
+
+    /**
+     * Removes a user profile from database
+     * @param deviceId key for profile
+     * @param callback Callback to handle success or failure of profile deletion
+     */
+    public void removeProfile(String deviceId, ProfileRemovalCallback callback) {
+        // Remove the user from the Firestore collection
+        database.collection("users")
+                .document(deviceId)
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    // Call the callback on success
+                    callback.onSuccess();
+                })
+                .addOnFailureListener(callback::onFailure);  // Notify failure
+
+    }
 }
+
+

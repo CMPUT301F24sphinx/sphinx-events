@@ -40,6 +40,18 @@
             android:name=".ManageProfileActivity"
             android:exported="false" />
         <activity
+            android:name=".AdminSearchActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ProfilesAdapter"
+            android:exported="false" />
+        <activity
+            android:name=".ProfilesSearchActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RemoveProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".InitialLoginActivity"
             android:exported="false" />
         <activity

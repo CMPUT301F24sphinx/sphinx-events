@@ -242,7 +242,8 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
 
         // Sets OnClickListener for administrator actions
         administratorBtn.setOnClickListener(v -> {
-            // TODO: Go to administrator main search screen activity
+            Intent manageAdminIntent = new Intent(MainActivity.this, AdminSearchActivity.class);
+            startActivity(manageAdminIntent);
         });
 
         // Sets OnClickListener for create event actions

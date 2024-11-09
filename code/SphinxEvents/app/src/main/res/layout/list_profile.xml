@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp"
+    android:background="@drawable/list_facility_background">
+
+    <TextView
+        android:id="@+id/name_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Profile Name"
+        android:textSize="24sp"
+        android:textColor="@color/black"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/role_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="role"
+        android:textColor="@color/drawer_manage_facility_color"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/email_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="email"
+        android:textSize="18sp"
+        android:textColor="@color/black" />
+
+    <TextView
+        android:id="@+id/phoneNumber_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="phone number"
+        android:textSize="18sp"
+        android:textColor="@color/black" />
+
+    <TextView
+        android:id="@+id/deviceID_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="deviceID"
+        android:textSize="18sp"
+        android:textColor="@color/black" />
+
+</LinearLayout>
