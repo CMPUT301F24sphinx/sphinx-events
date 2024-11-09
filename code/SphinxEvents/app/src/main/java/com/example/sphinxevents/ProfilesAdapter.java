@@ -38,16 +38,14 @@ public class ProfilesAdapter extends ArrayAdapter<Entrant> {
         TextView profileRoleTextView = view.findViewById(R.id.role_text_view);
         TextView profileEmailTextView = view.findViewById(R.id.email_text_view);
         TextView profilePhoneTextView = view.findViewById(R.id.phoneNumber_text_view);
-        TextView profileJoinedEventsTextView = view.findViewById(R.id.joinedEvents_text_view);
-        TextView profilePendingEventsTextView = view.findViewById(R.id.pendingEvents_text_view);
+        TextView profiledeviceIDTextView = view.findViewById(R.id.deviceID_text_view);
 
 
         profileNameTextView.setText(entrant.getName());
         profileRoleTextView.setText(entrant.getRole());
         profileEmailTextView.setText(entrant.getEmail());
         profilePhoneTextView.setText(entrant.getPhoneNumber());
-        profileJoinedEventsTextView.setText(entrant.getJoinedEvents());
-        profilePendingEventsTextView.setText(entrant.getPendingEvents());
+        profiledeviceIDTextView.setText(entrant.getDeviceId());
 
 
         return view;
