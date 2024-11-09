@@ -15,6 +15,9 @@ import com.example.sphinxevents.ExListAdapter;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Adapter for expandable lists that holds events
+ */
 public class EventExListAdapter extends ExListAdapter {
 
     EventExListAdapter(Context context, List<String> headers, Map<String, List<Event>> events) {

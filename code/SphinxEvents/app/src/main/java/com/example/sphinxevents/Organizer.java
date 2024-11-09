@@ -1,5 +1,5 @@
 /*
- * Represents user when they add a facility to their profile and become an organizer
+ * Represents a user who adds a facility to their profile
  * Adds facility and createdEvents attributes to the already created Entrant class attributes
  */
 
@@ -7,6 +7,11 @@ package com.example.sphinxevents;
 
 import java.util.ArrayList;
 
+
+/**
+ * Represents a user who adds a facility to their profile
+ * Adds facility and createdEvents attributes to the already created Entrant class attributes
+ */
 public class Organizer extends Entrant {
 
     private ArrayList<String> createdEvents;

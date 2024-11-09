@@ -324,11 +324,7 @@ public class DatabaseManager {
                     if (task.isSuccessful()) {
                         ArrayList<Facility> facilities = new ArrayList<>();
                         for (DocumentSnapshot document : task.getResult()) {
-                            String name = document.getString("name");
-                            String location = document.getString("location");
-                            String phoneNumber = document.getString("phoneNumber");
-                            String ownerId = document.getId();
-                            Facility facility = new Facility(name, location, phoneNumber, ownerId);
+                            Facility facility = document.toObject(Facility.class);
                             facilities.add(facility);
                         }
                         callback.onSuccess(facilities);
@@ -417,4 +413,79 @@ public class DatabaseManager {
                     callback.onFailure();
                 });
     }
+
+    /**
+     * Callback interface for profile search
+     */
+    public interface ProfileSearchCallback {
+        /**
+         * Called when profile search is successful
+         * @param profiles array of profiles that match query
+         */
+        void onSuccess(ArrayList<Entrant> profiles);
+
+        /**
+         * Called when error occurs during profile search
+         * @param e the exception that occurred
+         */
+        void onFailure(Exception e);
+    }
+
+    /**
+     * Searches database for profiles that match name
+     * @param query the profile name to find in database
+     * @param callback Callback to handle success or failure of searching database
+     */
+    public void searchProfile(String query, ProfileSearchCallback callback) {
+        // Query the users collection for documents with a matching name
+        database.collection("users")
+                .whereEqualTo("name", query)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        ArrayList<Entrant> users = new ArrayList<>();
+                        for (DocumentSnapshot document : task.getResult()) {
+                            Entrant user = document.toObject(Entrant.class);
+                            users.add(user);
+                        }
+                        callback.onSuccess(users);
+                    } else {
+                        callback.onFailure(task.getException());
+                    }
+                });
+    }
+
+    /**
+     * Callback interface for profile deletion
+     */
+    public interface ProfileRemovalCallback {
+        /**
+         * Called when profile is successfully removed
+         */
+        void onSuccess();
+
+        /**
+         * Called when error occurs during profile deletion
+         * @param e the exception that occurred
+         */
+        void onFailure(Exception e);
+    }
+
+    /**
+     * Removes a user from database
+     * @param deviceId key for user
+     * @param callback Callback to handle success or failure of user deletion
+     */
+    public void removeProfile(String deviceId, ProfileRemovalCallback callback) {
+        // Remove the user document from the Firestore collection
+        database.collection("users")
+                .document(deviceId)
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    // Call the callback on success
+                    callback.onSuccess();
+                })
+                .addOnFailureListener(callback::onFailure);  // Notify failure
+    }
+
 }

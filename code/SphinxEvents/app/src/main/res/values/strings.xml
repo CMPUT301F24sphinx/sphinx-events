@@ -53,6 +53,6 @@
     <string name="no_result_found">No Result Found.</string>
     <string name="facility_results_for">Facility Results For:</string>
     <string name="facility_details">Facility Details</string>
-    <string name="facility_search_query">\"%s\"</string>
+    <string name="search_query">\"%s\"</string>
 
 </resources>

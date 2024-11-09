@@ -20,6 +20,10 @@ import androidx.core.view.WindowInsetsCompat;
 
 import java.util.ArrayList;
 
+/**
+ * Allows entrant to add/edit their facility
+ * User can input/edit name, location, and phone number of their facility
+ */
 public class AddFacilityActivity extends AppCompatActivity {
 
     // User and Database attributes
@@ -78,16 +82,15 @@ public class AddFacilityActivity extends AppCompatActivity {
 
         // Implements addButton on-click listener
         addButton.setOnClickListener(v -> {
-            addFacility();
+            validateInputs();
         });
     }
 
     /**
-     * Validates user input for facility
-     * Adds facility to database if input in valid
-     * updates user in UserManager
+     * Vailidates user inputs
+     * Adds facility if inputs are valid
      */
-    public void addFacility() {
+    public void validateInputs() {
         // Ensures name is entered
         String facilityName = nameEditText.getText().toString();
         if (facilityName.isEmpty()) {
@@ -122,7 +125,14 @@ public class AddFacilityActivity extends AppCompatActivity {
             }
         }
 
-        Facility newFacility = new Facility(facilityName, facilityLocation, facilityPhoneNumber, user.getDeviceId());
+        // All inputs valid -> add facility
+        addFacility(new Facility(facilityName, facilityLocation, facilityPhoneNumber, user.getDeviceId()));
+    }
+
+    /**
+     * Adds facility to user's profile
+     */
+    public void addFacility(Facility newFacility) {
 
         // Adds facility to database
         databaseManager.addFacility(user.getDeviceId(), newFacility, new DatabaseManager.FacilityCreationCallback() {
