@@ -450,18 +450,8 @@ public class DatabaseManager {
                     if (task.isSuccessful()) {
                         ArrayList<Entrant> users = new ArrayList<>();
                         for (DocumentSnapshot document : task.getResult()) {
-                            String deviceId = document.getId();
-                            String name = document.getString("name");
-                            String email = document.getString("email");
-                            String phoneNumber = document.getString("phoneNumber");
-                            String defaultPfpPath = document.getString("defaultPfpPath");
-                            String customPfpUrl = document.getString("customPfpUrl");
-                            ArrayList<String> joinedEvents = (ArrayList<String>) document.get("joinedEvents");
-                            ArrayList<String> pendingEvents = (ArrayList<String>) document.get("pendingEvents");
-
-                            Entrant entrant = new Entrant(deviceId, name, email, phoneNumber, defaultPfpPath,
-                                    customPfpUrl, joinedEvents, pendingEvents);
-                            users.add(entrant);
+                            Entrant user = document.toObject(Entrant.class);
+                            users.add(user);
                         }
                         callback.onSuccess(users);
                     } else {
@@ -476,9 +466,8 @@ public class DatabaseManager {
     public interface ProfileRemovalCallback {
         /**
          * Called when profile is successfully removed
-         * @param updatedUser the updated user object
          */
-        void onSuccess(Entrant updatedUser);
+        void onSuccess();
 
         /**
          * Called when error occurs during facility deletion
@@ -498,33 +487,8 @@ public class DatabaseManager {
                 .document(deviceId)
                 .delete()
                 .addOnSuccessListener(aVoid -> {
-                    // Remove user profile
-                    getUser(deviceId, new UserRetrievalCallback() {
-                        @Override
-                        public void onSuccess(Entrant user) {
-                            // Updates user to be an Entrant
-                            Entrant updatedUser = new Entrant(user.getDeviceId(), user.getName(), user.getEmail(),
-                                    user.getPhoneNumber(), user.getDefaultPfpPath(), user.getCustomPfpUrl(),
-                                    user.getJoinedEvents(), user.getPendingEvents());
-                            saveUser(updatedUser, new UserCreationCallback() {
-                                @Override
-                                public void onSuccess(String deviceId) {
-                                    callback.onSuccess(updatedUser);  // Notify success
-                                }
-
-                                @Override
-                                public void onFailure(Exception e) {
-                                    callback.onFailure(new Exception("Failed to remove facility from user"));
-                                }
-                            });
-                        }
-
-                        @Override
-                        public void onFailure(Exception e) {
-                            callback.onFailure(new Exception("Failed to remove facility from user"));
-                        }
-                    });
-
+                    // Call the callback on success
+                    callback.onSuccess();
                 })
                 .addOnFailureListener(callback::onFailure);  // Notify failure
 

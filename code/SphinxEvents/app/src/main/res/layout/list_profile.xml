@@ -40,17 +40,10 @@
         android:textColor="@color/black" />
 
     <TextView
-        android:id="@+id/joinedEvents_text_view"
+        android:id="@+id/deviceID_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Joined Events"
-        android:textSize="18sp"
-        android:textColor="@color/black" />
-    <TextView
-        android:id="@+id/pendingEvents_text_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Pending Events"
+        android:text="deviceID"
         android:textSize="18sp"
         android:textColor="@color/black" />
 

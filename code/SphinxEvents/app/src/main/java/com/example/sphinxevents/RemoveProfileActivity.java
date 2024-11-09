@@ -47,8 +47,7 @@ public class RemoveProfileActivity extends AppCompatActivity {
         TextView profileNameTextView = findViewById(R.id.profile_name_textview);
         TextView profileRoleTextView = findViewById(R.id.profile_role_textview);
         TextView profilePhoneNumberTextView = findViewById(R.id.profile_phone_number_textview);
-        TextView profileJoinedEventsTextView = findViewById(R.id.profile_joined_events_textview);
-        TextView profilePendingEventsTextView = findViewById(R.id.profile_pending_events_textview);
+        TextView profiledeviceIDTextView = findViewById(R.id.profile_deviceID_textview);
 
         Button removeButton = findViewById(R.id.remove_profile_button);
 
@@ -56,8 +55,7 @@ public class RemoveProfileActivity extends AppCompatActivity {
         profileNameTextView.setText(entrant.getName());
         profileRoleTextView.setText(entrant.getRole());
         profilePhoneNumberTextView.setText(entrant.getPhoneNumber());
-        profileJoinedEventsTextView.setText(entrant.getJoinedEvents());
-        profilePendingEventsTextView.setText(entrant.getPendingEvents());
+        profiledeviceIDTextView.setText(entrant.getDeviceId());
 
         // Set onClickListener for backButton
         backButton.setOnClickListener(v -> {
@@ -66,23 +64,56 @@ public class RemoveProfileActivity extends AppCompatActivity {
 
         // Sets onClickListener for removeButton
         removeButton.setOnClickListener(v -> {
-            databaseManager.removeProfile(entrant.getDeviceId(), new DatabaseManager.ProfileRemovalCallback() {
-                @Override
-                public void onSuccess(Entrant user) {
-                    setResult(ProfilesSearchActivity.PROFILES_REMOVED);
-                    Toast.makeText(getApplicationContext(), "Profile removed!", Toast.LENGTH_SHORT).show();
-                    finish();
-                }
+            if (entrant.getRole().equals("Organizer")) {
+                removeUserFacility();
+            }
+            if (!entrant.getCustomPfpUrl().isEmpty()) {
+                deleteCustomPfp();
+            }
+            removeProfile();
 
-                @Override
-                public void onFailure(Exception e) {
-                    if (e.getMessage().equals("Failed to remove profile")) {
-                        Toast.makeText(getApplicationContext(), "Error removing user account", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Error removing user from database", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
+        });
+
+    }
+
+    private void deleteCustomPfp() {
+        databaseManager.deleteProfilePicture(entrant.getDeviceId(), new DatabaseManager.DeleteProfilePictureCallback() {
+            @Override
+            public void onSuccess() {
+            }
+
+            @Override
+            public void onFailure() {
+                Toast.makeText(getApplicationContext(), "Error removing user's profile picture", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void removeUserFacility() {
+        databaseManager.removeFacility(entrant.getDeviceId(), new DatabaseManager.FacilityRemovalCallback() {
+            @Override
+            public void onSuccess(Entrant updatedUser) {
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(getApplicationContext(), "Error removing user's facility", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void removeProfile() {
+        databaseManager.removeProfile(entrant.getDeviceId(), new DatabaseManager.ProfileRemovalCallback() {
+            @Override
+            public void onSuccess() {
+                setResult(ProfilesSearchActivity.PROFILES_REMOVED);
+                Toast.makeText(getApplicationContext(), "Profile removed!", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(getApplicationContext(), "Error removing profile from database", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 }
