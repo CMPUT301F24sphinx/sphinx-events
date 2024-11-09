@@ -686,6 +686,7 @@ public class DatabaseManager {
                     }
                 });
     }
+
     //---------------------------------------------------------------------------------------------
     //Admin profile search handling:
 
@@ -763,8 +764,6 @@ public class DatabaseManager {
                 .addOnFailureListener(callback::onFailure);  // Notify failure
 
     }
-
-
 }
 
 

@@ -20,6 +20,7 @@ zxingAndroidEmbedded = "4.3.0"
 glide2ver = "7.2.0"
 firebaseDatabase = "21.0.0"
 
+
 [libraries]
 compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "compiler" }
 core = { module = "com.google.zxing:core", version.ref = "core" }
@@ -41,6 +42,7 @@ zxing-android-embedded = { module = "com.journeyapps:zxing-android-embedded", ve
 zxing = { module = "com.journeyapps:zxing-android-embedded", version.ref = "zxingver"}
 glide2 = { module = "com.firebaseui:firebase-ui-storage", version.ref = "glide2ver"}
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
