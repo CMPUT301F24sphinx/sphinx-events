@@ -1,3 +1,14 @@
+/*
+ * Class Name: ManageProfileActivity
+ * Date: 2024-11-06
+ *
+ * Description:
+ * ManageProfileActivity is an activity where users can view and edit their profile information.
+ * It lets users update their profile picture, name, email, and phone number, with quick access to
+ * options for enabling/disabling notifications. This activity also takes care of loading the user's
+ * current info, validating new entries, and saving changes to the database.
+ */
+
 package com.example.sphinxevents;
 
 import android.content.Intent;
@@ -23,9 +34,20 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.bumptech.glide.Glide;
 
+/**
+ * ManageProfileActivity provides a simple, user-friendly interface for editing profile details.
+ * Users can:
+ * - View and update their profile picture (or delete it to return to a default image).
+ * - Modify their name, email, and phone number.
+ * - Toggle notification preferences for organizers and administrators.
+ * Profile updates are validated before saving and sent to the database.
+ * The activity also supports image selection for the profile picture, and loads a default
+ * image with initials if no custom picture is chosen.
+ */
 public class ManageProfileActivity extends AppCompatActivity {
 
     private UserManager userManager;
+    private DatabaseManager databaseManager;
     private Entrant updatedUser;
 
     private Uri initialProfilePicUri;
@@ -42,8 +64,8 @@ public class ManageProfileActivity extends AppCompatActivity {
     private EditText emailEditText;
     private EditText phoneNumberEditText;
 
-    private CheckBox organizerNotifications;
-    private CheckBox adminNotifications;
+    private CheckBox orgNotificationsCheckbox;
+    private CheckBox adminNotificationsCheckbox;
 
     private Button cancelButton;
     private Button saveButton;
@@ -62,10 +84,11 @@ public class ManageProfileActivity extends AppCompatActivity {
 
         userManager = UserManager.getInstance();
         updatedUser = userManager.getCurrentUser();
+        databaseManager = DatabaseManager.getInstance();
 
         // Initialize variables that handle profile selection
         String profilePictureUrl = updatedUser.getCustomPfpUrl();
-        if (!profilePictureUrl.isEmpty()) {
+        if (profilePictureUrl != null && !profilePictureUrl.isEmpty()) {
             newProfilePicUri = initialProfilePicUri = Uri.parse(profilePictureUrl);
         }
 
@@ -78,8 +101,8 @@ public class ManageProfileActivity extends AppCompatActivity {
         nameEditText = findViewById(R.id.manage_profile_name_edit_text);
         emailEditText = findViewById(R.id.manage_profile_email_edit_text);
         phoneNumberEditText = findViewById(R.id.manage_profile_phone_edit_text);
-        organizerNotifications = findViewById(R.id.manage_profile_notifications_organizer);
-        adminNotifications = findViewById(R.id.manage_profile_notifications_admin);
+        orgNotificationsCheckbox = findViewById(R.id.manage_profile_notifications_organizer);
+        adminNotificationsCheckbox = findViewById(R.id.manage_profile_notifications_admin);
         cancelButton = findViewById(R.id.manage_profile_cancel);
         saveButton = findViewById(R.id.manage_profile_save);
 
@@ -121,9 +144,14 @@ public class ManageProfileActivity extends AppCompatActivity {
 
         setProfilePictureDisplay();
 
+        // load users profile information
         nameEditText.setText(currentUser.getName());
         emailEditText.setText(currentUser.getEmail());
         phoneNumberEditText.setText(currentUser.getPhoneNumber());
+
+        // load users notification preferences
+        orgNotificationsCheckbox.setChecked(currentUser.isOrgNotificationsEnabled());
+        adminNotificationsCheckbox.setChecked(currentUser.isAdminNotificationsEnabled());
     }
 
     /**
@@ -133,9 +161,12 @@ public class ManageProfileActivity extends AppCompatActivity {
         String updatedName = nameEditText.getText().toString().trim();
         String updatedEmail = emailEditText.getText().toString().trim();
         String updatedPhone = phoneNumberEditText.getText().toString().trim();
+        boolean updatedOrgNotificationsEnabled = orgNotificationsCheckbox.isChecked();
+        boolean updatedAdminNotificationsEnabled = adminNotificationsCheckbox.isChecked();
 
         // If nothing changed, finish activity and return
-        if (notChanged(updatedName, updatedEmail, updatedPhone)) {
+        if (notChanged(updatedName, updatedEmail, updatedPhone, updatedOrgNotificationsEnabled,
+                updatedAdminNotificationsEnabled)) {
             finish();
             return;
         }
@@ -147,6 +178,8 @@ public class ManageProfileActivity extends AppCompatActivity {
         updatedUser.setName(updatedName);
         updatedUser.setEmail(updatedEmail);
         updatedUser.setPhoneNumber(updatedPhone);
+        updatedUser.setOrgNotificationsEnabled(updatedOrgNotificationsEnabled);
+        updatedUser.setAdminNotificationsEnabled(updatedAdminNotificationsEnabled);
 
         // Determine if profile picture changed
         boolean profilePictureChanged = (initialProfilePicUri == null && newProfilePicUri != null) ||
@@ -154,7 +187,7 @@ public class ManageProfileActivity extends AppCompatActivity {
 
         if (profilePictureChanged) {
             if (newProfilePicUri != null) {  // Profile picture was either added or changed
-                DatabaseManager.getInstance().uploadProfilePicture(updatedUser.getDeviceId(), newProfilePicUri,
+                databaseManager.uploadProfilePicture(updatedUser.getDeviceId(), newProfilePicUri,
                         new DatabaseManager.UploadProfilePictureCallback() {
                             @Override
                             public void onSuccess(String url) {
@@ -169,7 +202,7 @@ public class ManageProfileActivity extends AppCompatActivity {
                             }
                         });
             } else {  // Profile Pic was deleted
-                DatabaseManager.getInstance().deleteProfilePicture(updatedUser.getDeviceId(),
+                databaseManager.deleteProfilePicture(updatedUser.getDeviceId(),
                         new DatabaseManager.DeleteProfilePictureCallback() {
                             @Override
                             public void onSuccess() {
@@ -220,7 +253,7 @@ public class ManageProfileActivity extends AppCompatActivity {
      * picture if the users name has changed.
      */
     private void saveUser() {
-        DatabaseManager.getInstance().saveUser(updatedUser, new DatabaseManager.UserCreationCallback() {
+        databaseManager.saveUser(updatedUser, new DatabaseManager.UserCreationCallback() {
             @Override
             public void onSuccess(String deviceId) {
                 userManager.setCurrentUser(updatedUser);
@@ -246,9 +279,12 @@ public class ManageProfileActivity extends AppCompatActivity {
      * @param name Name input
      * @param email Email input
      * @param phone Phone input
+     * @param orgNotificationsEnabled organizer notification preference input
+     * @param adminNotificationsEnabled administrator notification preference input
      * @return True if input contents do not differ from users current information, false otherwise
      */
-    public boolean notChanged(String name, String email, String phone) {
+    public boolean notChanged(String name, String email, String phone, boolean orgNotificationsEnabled,
+                              boolean adminNotificationsEnabled) {
         Entrant currentUser = userManager.getCurrentUser();
 
         boolean profilePicUnchanged = (initialProfilePicUri == null && newProfilePicUri == null) ||
@@ -257,7 +293,9 @@ public class ManageProfileActivity extends AppCompatActivity {
         return profilePicUnchanged &&
                 currentUser.getName().equals(name) &&
                 currentUser.getEmail().equals(email) &&
-                currentUser.getPhoneNumber().equals(phone);
+                currentUser.getPhoneNumber().equals(phone) &&
+                currentUser.isOrgNotificationsEnabled() == orgNotificationsEnabled &&
+                currentUser.isAdminNotificationsEnabled() == adminNotificationsEnabled;
     }
 
     /**

@@ -1,8 +1,29 @@
+/*
+ * Class Name: Entrant
+ * Date: 2024-11-06
+ *
+ * Description:
+ * The Entrant class represents a user who can join events. It stores the user's personal information,
+ * including their name, email, phone number, notification preferences, and profile picture details.
+ * It also keeps track of events the user has joined or is pending for. This class provides
+ * getter and setter methods to manage the user's data.
+ */
+
 package com.example.sphinxevents;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 
+/**
+ * The Entrant class represents a user participating in events.
+ * It holds the user's personal details such as name, email, phone number,
+ * notification preferences, and profile picture information, along with the events
+ * they are involved in. An Entrant can have a default profile picture stored locally
+ * or a custom profile picture in Firebase Storage. The class also keeps track of the events
+ * the user has joined and the events they are still waiting for approval or entry.
+ * This class provides methods for accessing and modifying the user's information
+ * and event participation.
+ */
 public class Entrant implements Serializable {
     private String deviceId;
     private String role;  // Role of the Entrant, either "Entrant" or "Organizer"
@@ -11,6 +32,8 @@ public class Entrant implements Serializable {
     private String phoneNumber;
     private String defaultPfpPath;  // Path to the default profile picture in local stroage
     private String customPfpUrl;  // Url of the custom profile picture in Firebase Storage
+    private boolean orgNotificationsEnabled; // Notifications from organizers preference
+    private boolean adminNotificationsEnabled; // Notifications from administrators preference
     private ArrayList<String> joinedEvents;  // List of events the user has accepted invitation to
     private ArrayList<String> pendingEvents;  // List of events the user has joined lottery for
 
@@ -33,7 +56,8 @@ public class Entrant implements Serializable {
      * @param pendingEvents  a list of event IDs that are pending for the entrant.
      */
     public Entrant(String deviceId, String name, String email, String phoneNumber, String defaultPfpPath,
-                   String customPfpUrl, ArrayList<String> joinedEvents, ArrayList<String> pendingEvents) {
+                   String customPfpUrl, boolean orgNotificationsEnabled, boolean adminNotificationsEnabled,
+                   ArrayList<String> joinedEvents, ArrayList<String> pendingEvents) {
         this.deviceId = deviceId;
         this.role = "Entrant";
         this.name = name;
@@ -41,6 +65,8 @@ public class Entrant implements Serializable {
         this.phoneNumber = phoneNumber;
         this.defaultPfpPath = defaultPfpPath;
         this.customPfpUrl = customPfpUrl;
+        this.orgNotificationsEnabled = orgNotificationsEnabled;
+        this.adminNotificationsEnabled = adminNotificationsEnabled;
         this.joinedEvents = joinedEvents != null ? joinedEvents : new ArrayList<>();
         this.pendingEvents = pendingEvents != null ? pendingEvents : new ArrayList<>();
     }
@@ -122,6 +148,38 @@ public class Entrant implements Serializable {
      * @param role the user's role.
      */
     public void setRole(String role) { this.role = role; }
+
+    /**
+     * Gets the user's notification preference of organizers
+     * @return the user's preference for organizers notifications
+     */
+    public boolean isOrgNotificationsEnabled() {
+        return orgNotificationsEnabled;
+    }
+
+    /**
+     * Sets the user's notification preference for organizers
+     * @param orgNotificationsEnabled the user's preference of organizers notifications
+     */
+    public void setOrgNotificationsEnabled(boolean orgNotificationsEnabled) {
+        this.orgNotificationsEnabled = orgNotificationsEnabled;
+    }
+
+    /**
+     * Gets the user's notification preference for administrators
+     * @return the user's preference for administrator notifications
+     */
+    public boolean isAdminNotificationsEnabled() {
+        return adminNotificationsEnabled;
+    }
+
+    /**
+     * Sets the user's notification preference for administrators
+     * @param adminNotificationsEnabled the user's preference of administrator notifications
+     */
+    public void setAdminNotificationsEnabled(boolean adminNotificationsEnabled) {
+        this.adminNotificationsEnabled = adminNotificationsEnabled;
+    }
 
     /**
      * Gets the list of joined event IDs.

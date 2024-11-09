@@ -54,5 +54,34 @@
     <string name="facility_results_for">Facility Results For:</string>
     <string name="facility_details">Facility Details</string>
     <string name="search_query">\"%s\"</string>
+    <string name="facility_search_query">\"%s\"</string>
+    <string name="Confirm">Confirm</string>
+    <string name="Cancel">Cancel</string>
+    <string name="upload_poster">Upload Poster*</string>
+    <string name="back_to_home">Back to Home</string>
+    <string name="entrant_limit_optional">Entrant Limit(optional)</string>
+    <string name="geo_location_requirement">Geo-Location Requirement:</string>
+    <string name="registration_deadline_yyyy_mm_dd">Registration Deadline(yyyy/MM/dd)*</string>
+    <string name="name">Name*</string>
+    <string name="create_an_event">Create an Event</string>
+    <string name="event_description">Event Description*</string>
+
+<!--    Managing Event String-->
+    <string name="manageevent_event_details">Event Details</string>
+    <string name="view_qrcode_button">View QR Code</string>
+    <string name="edit_event_details_button">Edit Event Details</string>
+    <string name="view_entrant_data_button">View Entrant Data</string>
+    <string name="notify_entrants_button">Send Message</string>
+
+<!--    Notifications-->
+    <string name="channel_name">NotificationChannel</string>
+    <string name="channel_description">NotificationChannelDesc</string>
+    <string name="CHANNEL_ID">NotificationChannelID</string>
+    <string name="notifications">Notifications</string>
+
+
+<!--    QR Code Scan Strings-->
+    <string name="qr_camera_scan">Camera</string>
+    <string name="qr_use_gallery">Gallery</string>
 
 </resources>

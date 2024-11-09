@@ -51,7 +51,7 @@ public class AdminFacilityProfileTest {
         onView(withId(R.id.facilities_radio_button)).perform(click());
 
         // Click Search button
-        onView(withId(R.id.search_button)).perform(click());
+        onView(withId(R.id.searchButton)).perform(click());
 
         // Checks if FacilitySearchActivity is launched
         intended(hasComponent(FacilitySearchActivity.class.getName()));
@@ -66,10 +66,10 @@ public class AdminFacilityProfileTest {
         onView(withId(R.id.profiles_radio_button)).perform(click());
 
         // Click Search button
-        onView(withId(R.id.search_button)).perform(click());
+        onView(withId(R.id.searchButton)).perform(click());
 
         // Checks if FacilitySearchActivity is launched
-        intended(hasComponent(ProfileSearchActivity.class.getName()));
+        intended(hasComponent(ProfilesSearchActivity.class.getName()));
     }
 
 }
