@@ -1,12 +1,27 @@
+/*
+ * Class Name: MainActivity
+ * Date: 2024-11-06
+ *
+ * Description:
+ * MainActivity serves as the entry point for the app's main user interface.
+ * It sets up the initial splash screen, handles the initialization of the user, and configures
+ * the expandable lists and navigation drawer. This activity also listens for updates to the current
+ * user profile and updates the display accordingly.
+ */
+
 package com.example.sphinxevents;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
@@ -18,6 +33,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.splashscreen.SplashScreen;
@@ -25,14 +41,25 @@ import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.DialogFragment;
+
+import com.google.firebase.firestore.DocumentReference;
+import com.journeyapps.barcodescanner.ScanContract;
+import com.journeyapps.barcodescanner.ScanOptions;
 
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * MainActivity handles the app's main UI setup, user data initialization, and navigation to various
+ * activities.
+ */
 public class MainActivity extends AppCompatActivity implements UserManager.UserUpdateListener {
 
     private DatabaseManager databaseManager;
@@ -42,11 +69,17 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
     private ExpandableListView expandableListView;  // expandable list of events
     private List<String> headers;  // headers/parents/group names
     private HashMap<String, List<Event>> events;  // map each group name to list of Event objects
+    private HashMap<String, List<String>> eventCodes;
     private ExpandableListAdapter listAdapter;
 
     private ImageButton profilePicBtn;
     private ImageView profilePicDrawerView;
 
+    /**
+     * Initializes the activity, sets up the splash screen, and configures layout and user data.
+     *
+     * @param savedInstanceState The saved instance state bundle.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         SplashScreen.installSplashScreen(this);
@@ -84,6 +117,44 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         initializeDrawer();  // initializes drawer display and functionalities
 
         expandableListView = findViewById(R.id.main_screen_expandable_listview);
+
+        // Show QR Scan choices fragment
+        ImageButton scanQRCode = findViewById(R.id.scan_qr_code_button);
+        scanQRCode.setOnClickListener(v -> {
+            scanQRFrag();
+        });
+    }
+
+    /**
+     * Makes a fragment to ask user how they want to scan the QR code.
+     * Opens the camera to scan a QR code if user chooses "Camera"
+     * Opens the gallery to scan a QR code if user chooses "Gallery"
+     */
+    public void scanQRFrag() {
+        AlertDialog.Builder builder  = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.scan_qr_code)
+            .setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    return;
+                }
+            })
+// Optional gallery scan, might do later it keeps breaking
+//            .setPositiveButton(R.string.qr_use_gallery, new DialogInterface.OnClickListener() {
+//                public void onClick(DialogInterface dialog, int id) {
+//                    Intent CamScanIntent = new Intent(MainActivity.this, ScanQRCode.class);
+//                    CamScanIntent.setAction("Gallery");
+//                    startActivity(CamScanIntent);
+//                    return;
+//                }
+//            })
+            .setNegativeButton(R.string.qr_camera_scan, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    Intent CamScanIntent = new Intent(MainActivity.this, ScanQRCode.class);
+                    CamScanIntent.setAction("Camera");
+                    startActivity(CamScanIntent);
+                    return;
+                }
+            }).show();
     }
 
     /**
@@ -92,14 +163,18 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
     public void retrieveUser() {
         deviceId = getDeviceId(this);
 
+        // Attempts to retrieve the user from the Firebase Firestore database.
         databaseManager.getUser(deviceId, new DatabaseManager.UserRetrievalCallback() {
+            // If the user is retrieved
             @Override
             public void onSuccess(Entrant user) {
                 userManager.setCurrentUser(user);  // Set user in UserManager
             }
 
+            // If the user is not retrieved
             @Override
             public void onFailure(Exception e) {
+                // Checks if the reason was that the user does not exist. If so, start InitialLoginActivity
                 if (Objects.requireNonNull(e.getMessage()).contains("User does not exist")) {
                     Intent loginIntent = new Intent(MainActivity.this,
                             InitialLoginActivity.class);
@@ -126,6 +201,7 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
         Button manageProfileBtn = findViewById(R.id.drawer_manage_profile_btn);
         Button manageFacilityBtn = findViewById(R.id.drawer_manage_facility_btn);
+        Button viewNotificationsBtn = findViewById(R.id.drawer_notifications_btn);
         Button administratorBtn = findViewById(R.id.drawer_administrator_btn);
         Button createEventBtn = findViewById(R.id.create_event_button);
 
@@ -156,13 +232,24 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
             startActivity(manageFacilityIntent);
         });
 
-        // Sets OnClickListener for administrator actions
-        administratorBtn.setOnClickListener(v -> {
-            // TODO: Go to administrator main search screen activity
+        // Set the Notification button to activate Notification page
+        viewNotificationsBtn.setOnClickListener(v -> {
+            Intent viewNotificationsIntent = new Intent(this,
+                    viewNotificationsActivity.class);
+            viewNotificationsIntent.putExtra("userID", userManager.getCurrentUser().getDeviceId().toString());
+            startActivity(viewNotificationsIntent);
         });
 
+        // Sets OnClickListener for administrator actions
+        administratorBtn.setOnClickListener(v -> {
+            Intent manageAdminIntent = new Intent(MainActivity.this, AdminSearchActivity.class);
+            startActivity(manageAdminIntent);
+        });
+
+        // Sets OnClickListener for create event actions
         createEventBtn.setOnClickListener(v -> {
             Intent createEventIntent = new Intent(this, CreateEventActivity.class);
+            createEventIntent.putExtra("DeviceID", deviceId);
             startActivity(createEventIntent);
         });
 
@@ -204,21 +291,48 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
 
         headers = new ArrayList<>();
         events = new HashMap<>();
+        eventCodes = new HashMap<>();
 
         headers.add("Joined Events");
         headers.add("Pending Events");
 
         List<Event> joinedEvents = new ArrayList<>();
         List<Event> pendingEvents = new ArrayList<>();
+        ArrayList<Event> createdEvents = new ArrayList<>();
 
         events.put(headers.get(0), joinedEvents);
         events.put(headers.get(1), pendingEvents);
 
-        // Add organizer stuff if needed
+        // Add organizer stuff if user is an Organizer
         if (currentUser.getRole().equals("Organizer")) {
             Organizer organizer = (Organizer) currentUser;
             headers.add("Created Events");
-            List<Event> createdEvents = new ArrayList<>();
+
+            databaseManager.getCreatedEvents(currentUser.getDeviceId(), new DatabaseManager.getCreatedEventsCallback() {
+                @Override
+                public void onSuccess(List<String> createdEventsID) {
+
+                    eventCodes.put(headers.get(2), createdEventsID);
+                    for(Integer i = 0; i < createdEventsID.size(); ++i){
+                        Log.d("Aniket", eventCodes.get(headers.get(2)).get(i));
+                        databaseManager.getEvent(createdEventsID.get(i), new DatabaseManager.eventRetrievalCallback() {
+                            @Override
+                            public void onSuccess(Event event) {
+                                createdEvents.add(event);
+                                Log.d("Aniket", event.getName());
+
+                            }
+                            @Override
+                            public void onFailure(Exception e) {
+                                Log.d("Aniket", "Cant retrieve created event with code");
+                            }
+                        });
+                    }
+                }
+                @Override
+                public void onFailure(Exception e) {
+                }
+            });
             events.put(headers.get(2), createdEvents);
         }
 
@@ -228,17 +342,22 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         // Clicking event in main screen -> allows user to view event details
         expandableListView.setOnChildClickListener((parent, view, groupPosition, childPosition, id) -> {
             // Code for new activity that views events goes here
+            Intent viewEnteredEvents = new Intent(this, ViewCreatedEvent.class);
+            viewEnteredEvents.putExtra("eventCode", eventCodes.get(headers.get(groupPosition)).get(childPosition));
+            startActivity(viewEnteredEvents);
             return true; // Indicating the event is handled
         });
-
     }
 
+    /**
+     * Updates the user profile picture to custom or default profile picture
+     */
     public void updateProfilePicture() {
         Entrant currentUser = userManager.getCurrentUser();
         String customPfpUrl = currentUser.getCustomPfpUrl();
-        if (customPfpUrl.isEmpty()) {
+        if (customPfpUrl != null && customPfpUrl.isEmpty()) {
             loadDefaultPfp();
-        } else {
+        } else {  // Load in custom profile picture using Glide
             Glide.with(this)
                     .load(customPfpUrl)
                     .centerCrop()
@@ -251,7 +370,7 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
     }
 
     /**
-     * Loads the default deterministic pfp of user
+     * Loads the default deterministic pfp of user from storage
      */
     public void loadDefaultPfp() {
         Entrant currentUser = userManager.getCurrentUser();
@@ -307,6 +426,9 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         updateExpandableLists();
     }
 
+    /**
+     * Cleans up resources by removing this activity as a listener when it is destroyed
+     */
     @Override
     protected void onDestroy() {
         userManager.removeUserUpdateListener(this);

@@ -32,7 +32,6 @@ android {
     }
 }
 
-
 dependencies {
     implementation(libs.core)
     implementation(libs.zxing.android.embedded)
@@ -49,9 +48,10 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-
-
-
+    implementation(libs.core.splashscreen)
+    implementation(libs.zxing)
+    implementation(libs.glide2)
     implementation(libs.glide)
     annotationProcessor(libs.compiler)
+    androidTestImplementation(libs.espresso.intents)
 }

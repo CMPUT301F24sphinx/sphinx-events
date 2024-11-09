@@ -1,17 +1,43 @@
+/*
+ * Class Name: DatabaseManager
+ * Date: 2024-11-06
+ *
+ * Description:
+ * This class is responsible for managing interactions with Firebase Firestore and Firebase Storage.
+ * It includes functionality for storing and retrieving data, as well as handling operations related to
+ * user and event management. Some methods are currently under development and will be added as needed.
+ */
+
 package com.example.sphinxevents;
 
 import android.net.Uri;
+import android.util.Log;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.protobuf.Value;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-import java.util.ArrayList;
-
+//TODO: Add a more descriptive comment for the class when more functionality is implemented.
+/**
+ * This class manages interactions with a Firebase Firestore database and Firebase Storage.
+ * It provides methods for handling data storage, retrieval, and other operations related to
+ * user and event management.
+ */
 public class DatabaseManager {
     private static DatabaseManager instance;
     private FirebaseFirestore database;
@@ -118,6 +144,11 @@ public class DatabaseManager {
         void onFailure(Exception e);
     }
 
+    /**
+     * Retrieves a user from the Firestore database using the users device ID
+     * @param deviceId The device ID of the user
+     * @param callback Callback to handle success or failure of user retrieval
+     */
     public void getUser(String deviceId, UserRetrievalCallback callback) {
         database.collection("users")
                 .document(deviceId)
@@ -126,13 +157,9 @@ public class DatabaseManager {
                     if (task.isSuccessful() && task.getResult() != null) {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
-
                             Entrant user = document.toObject(Entrant.class);
-
                             if (user != null) {
-
                                 String role = document.getString("role");
-                                // TODO: Admin role as well if needed
                                 switch (role) {
                                     case "Organizer":
                                         // If needed, you can cast to Organizer or handle it here
@@ -268,6 +295,7 @@ public class DatabaseManager {
                             // Updates user to be an Entrant
                             Entrant updatedUser = new Entrant(user.getDeviceId(), user.getName(), user.getEmail(),
                                     user.getPhoneNumber(), user.getDefaultPfpPath(), user.getCustomPfpUrl(),
+                                    user.isOrgNotificationsEnabled(), user.isAdminNotificationsEnabled(),
                                     user.getJoinedEvents(), user.getPendingEvents());
                             saveUser(updatedUser, new UserCreationCallback() {
                                 @Override
@@ -366,13 +394,28 @@ public class DatabaseManager {
                 });
     }
 
-    //---------------------------------------------------------------------------------------------
-
+    /**
+     * Callback interface for uploading a profile picture.
+     */
     public interface UploadProfilePictureCallback {
+        /**
+         * Called when the profile picture is successfully uploaded.
+         * @param url The download URL of the uploaded profile picture.
+         */
         void onSuccess(String url);
+
+        /**
+         * Called when the profile picture upload fails.
+         */
         void onFailure();
     }
 
+    /**
+     * Uploads a profile picture to Firebase Storage.
+     * @param deviceId The device ID of the user for whom the profile picture is being uploaded.
+     * @param pfpUri URI of the profile picture to upload
+     * @param callback Callback to handle success of failure of the upload.
+     */
     public void uploadProfilePicture(String deviceId, Uri pfpUri, UploadProfilePictureCallback callback) {
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
         StorageReference profilePicRef = storageRef.child("profile_pictures/" + deviceId + ".png");
@@ -395,11 +438,26 @@ public class DatabaseManager {
                 });
     }
 
+    /**
+     * Callback interface for deleting a profile picture.
+     */
     public interface DeleteProfilePictureCallback {
+        /**
+         * Called when the profile picture is successfully deleted.
+         */
         void onSuccess();
+
+        /**
+         * Called when profile picture deletion fails.
+         */
         void onFailure();
     }
 
+    /**
+     * Deletes a profile picture from Firebase Storage.
+     * @param deviceId The device ID of the user whose profile picture is being deleted.
+     * @param callback Callback to handle success or failure of the deletion.
+     */
     public void deleteProfilePicture(String deviceId, DeleteProfilePictureCallback callback) {
         // Create a reference to the profile picture in Firebase Storage
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
@@ -414,6 +472,218 @@ public class DatabaseManager {
                 .addOnFailureListener(e -> {
                     // Call the callback on failure
                     callback.onFailure();
+                });
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
+    /**
+     * Callback interface for event retrieval
+     */
+    public interface eventRetrievalCallback {
+        /**
+         * Called when event is retrieved successfully
+         * @param event the evnt that was retrieved
+         */
+        void onSuccess(Event event);
+
+        /**
+         * Called when error occurs during event retrieval
+         * @param e the exception that occurred
+         */
+        void onFailure(Exception e);
+    }
+
+    /**
+     * Retrieves a event from the database
+     * @param eventID ID of event, key of events in database
+     * @param callback Callback to handle success or failure of event retrieval
+     */
+    public void getEvent(String eventID, eventRetrievalCallback callback) {
+        database.collection("events")
+                .document(eventID)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            String name = document.getString("name");
+                            String description = document.getString("description");
+                            String poster = document.getString("poster");
+                            Timestamp dateTimestamp = document.getTimestamp("lotteryEndDate");
+                            Date lotteryEndDate = dateTimestamp.toDate();
+
+                            Integer entrantLimit;
+                            if(document.get("entrantLimit") != null) {
+                                entrantLimit = Integer.valueOf(document.get("entrantLimit").toString());
+                            } else{
+                                entrantLimit = null;
+                            }
+                            Boolean geolocationReq = document.getBoolean("geolocationReq");
+                            ArrayList<String> entrants = (ArrayList<String>) document.get("entrants");
+                            Event event = new Event(name, description, poster, lotteryEndDate, entrantLimit, geolocationReq, entrants);
+                            callback.onSuccess(event);
+                        } else {
+                            callback.onFailure(new Exception("Event does not exist."));
+                        }
+                    } else {
+                        callback.onFailure(task.getException());
+                    }
+                });
+    }
+
+    /**
+     * Adds Id of entree to entrants field of event
+     * @param userID ID of user being added
+     * @param eventID ID of event being updated
+     */
+    public void joinEvent(String userID, String eventID) {
+        database.collection("events")
+                .document(eventID)
+                .update("entrants", FieldValue.arrayUnion(userID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+    }
+
+    /**
+     * Adds Id of new created event to createdEvents field of user with userID
+     * @param userID The user who created the event
+     * @param eventID The event that is been uploaded
+     */
+    public void updateOrganizerCreatedEvents(String userID, String eventID) {
+        database.collection("users")
+                .document(userID)
+                .update("createdEvents", FieldValue.arrayUnion(eventID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+    }
+
+    /**
+     * Callback interface for created Events retrieval
+     */
+    public interface getCreatedEventsCallback {
+        /**
+         * Called when events are retrieved successfully
+         * @param createdEventsID List of Id's of events
+         */
+        void onSuccess(List<String> createdEventsID);
+
+        /**
+         * Called when error occurs during events retrival
+         * @param e the exception that occurred
+         */
+        void onFailure(Exception e);
+    }
+
+    /**
+     * Retrieves an Event from db
+     * @param userID ID of user who created event
+     */
+    public void getCreatedEvents(String userID, getCreatedEventsCallback callback) {
+        database.collection("users")
+                .document(userID)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            List<String> createdEvents = (List<String>) document.get("createdEvents");
+                            callback.onSuccess(createdEvents);
+                        } else {
+                            callback.onFailure(new Exception("Created Events does not exist."));
+                        }
+                    } else {
+                        callback.onFailure(task.getException());
+                    }
+                });
+    }
+
+    // --------------------------------------------------------------------------------------------------
+
+    /**
+     * Callback interface for createNotification
+     */
+    public interface NotificationCreationCallback {
+        /**
+         * Called when notification is created successfully
+         * @param notifRef DocumentReference object to new created notification
+         */
+        void onSuccess(DocumentReference notifRef);
+
+        /**
+         * Called when notification creation fails
+         * @param e Exception returned on failed notification retrieval
+         */
+        void onFailure(Exception e);
+    }
+
+    /**
+     * Adds notification object to "notification" collection in database
+     * @param notification The notification object being uploaded
+     * @param callback Call back function on weather upload succeeded or faulted
+     */
+    public void createNotification(Notification notification, NotificationCreationCallback callback) {
+        database.collection("notifications")
+                .add(notification)
+                .addOnSuccessListener(callback::onSuccess)
+                .addOnFailureListener(callback::onFailure);
+    }
+
+
+    /**
+     * Callback interface for getNotification
+     */
+    public interface getNotificationsCallback {
+        /**
+         * Callback for successful notification retrieval
+         * @param notificationIDs List of DocumentSnapShots of returned notifications
+         */
+        void onSuccess(List<DocumentSnapshot> notificationIDs);
+
+        /**
+         * Callback for failed notification retrieval
+         * @param e Exception for failed notification retrieval
+         */
+        void onFailure(Exception e);
+    }
+
+    /**
+     * Gets list of DocumentSnapshots of notifications sent to` userID
+     * @param userID The user who is the reviewer of notifications
+     * @param callback Success or Fail callback
+     */
+    public void getNotifications(String userID, getNotificationsCallback callback) {
+        database.collection("notifications")
+                .whereEqualTo("toUser", userID)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        QuerySnapshot query = task.getResult();
+                        if (!query.isEmpty()) {
+                            List<DocumentSnapshot> notifDocSnapshots =  query.getDocuments();
+                            callback.onSuccess(notifDocSnapshots);
+                        } else {
+                            callback.onFailure(task.getException());
+                        }
+                    } else {
+                        callback.onFailure(task.getException());
+                    }
                 });
     }
     //---------------------------------------------------------------------------------------------
@@ -496,3 +766,5 @@ public class DatabaseManager {
 
 
 }
+
+
