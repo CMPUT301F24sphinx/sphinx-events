@@ -351,11 +351,7 @@ public class DatabaseManager {
                     if (task.isSuccessful()) {
                         ArrayList<Facility> facilities = new ArrayList<>();
                         for (DocumentSnapshot document : task.getResult()) {
-                            String name = document.getString("name");
-                            String location = document.getString("location");
-                            String phoneNumber = document.getString("phoneNumber");
-                            String ownerId = document.getId();
-                            Facility facility = new Facility(name, location, phoneNumber, ownerId);
+                            Facility facility = document.toObject(Facility.class);
                             facilities.add(facility);
                         }
                         callback.onSuccess(facilities);

@@ -48,7 +48,7 @@
         android:background="@color/facility_search_query_color"
         android:gravity="center"
         android:padding="5dp"
-        android:text="@string/facility_search_query"
+        android:text="@string/search_query"
         android:textColor="@color/black"
         android:textSize="20sp" />
     

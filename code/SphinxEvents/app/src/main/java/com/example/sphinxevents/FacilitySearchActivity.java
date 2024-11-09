@@ -23,6 +23,10 @@ import androidx.core.view.WindowInsetsCompat;
 
 import java.util.ArrayList;
 
+/**
+ * Displays results of facilities whose name matches the administrator's query
+ * Allows administrator to click on facility in list in order to view all details and remove it
+ */
 public class FacilitySearchActivity extends AppCompatActivity {
 
     // Attributes for result list
@@ -69,7 +73,7 @@ public class FacilitySearchActivity extends AppCompatActivity {
         facilityList = findViewById(R.id.facilities_list_view);
         noResultsTextView = findViewById(R.id.no_results_text_view);
 
-        queryTextView.setText(getString(R.string.facility_search_query, query));
+        queryTextView.setText(getString(R.string.search_query, query));
 
         // Sets onClick listener for back button
         ImageButton backButton = findViewById(R.id.search_facility_back_btn);
