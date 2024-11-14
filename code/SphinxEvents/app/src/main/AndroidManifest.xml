@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -40,21 +41,35 @@
             android:name=".ManageProfileActivity"
             android:exported="false" />
         <activity
+            android:name=".AdminSearchActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ProfilesSearchActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RemoveProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".InitialLoginActivity"
             android:exported="false" />
         <activity
             android:name=".ScanQRCode"
             android:exported="false"  />
-        <activity android:name=".ViewEventDetails"
+        <activity
+            android:name=".ViewEventDetails"
             android:exported="false"/>
-        <activity android:name=".ScanWithCam"
+        <activity
+            android:name=".ScanWithCam"
             android:stateNotNeeded="true"
             android:theme="@style/zxing_CaptureTheme"/>
-        <activity android:name=".ViewCreatedEvent"
+        <activity
+            android:name=".ViewCreatedEvent"
             android:exported="false"/>
-        <activity android:name=".ViewEnteredEvent"
+        <activity
+            android:name=".ViewEnteredEvent"
             android:exported="false"/>
-        <activity android:name=".viewNotificationsActivity"
+        <activity
+            android:name=".viewNotificationsActivity"
             android:exported="false"/>
         <activity
             android:name=".MainActivity"

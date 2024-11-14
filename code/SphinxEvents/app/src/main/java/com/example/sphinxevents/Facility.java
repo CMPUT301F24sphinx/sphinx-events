@@ -1,12 +1,16 @@
 /*
  * Represents organizer's facility
- * Holds facility information
+ * Stores facility name, location, and phone number
  */
 
 package com.example.sphinxevents;
 
 import java.io.Serializable;
 
+/**
+ * Represents organizer's facility
+ * Stores facility name, location, and phone number
+ */
 public class Facility implements Serializable {
 
     private String name;

@@ -1,6 +1,7 @@
 /*
- * Allows user to add a facility to their profile
- * If they already have a facility, they can either remove or edit it
+ * Displays user's facility information if they have one
+ * Gives Entrants the option to add a facility to their profile
+ * Gives Organizers the option to remove or edit their facility
  */
 
 package com.example.sphinxevents;
@@ -20,12 +21,17 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-
+/**
+ * Displays user's facility information if they have one
+ * Gives Entrants the option to add a facility to their profile
+ * Gives Organizers the option to remove or edit their facility
+ */
 public class ManageFacilityActivity extends AppCompatActivity
         implements UserManager.UserUpdateListener {
 
     // Facility and user related attributes
     private DatabaseManager databaseManager;
+    private UserManager userManager;
     private Entrant user;
 
     // XML elements that change depending on user's role
@@ -53,7 +59,7 @@ public class ManageFacilityActivity extends AppCompatActivity
         });
 
         // Obtains current user and sets
-        UserManager userManager = UserManager.getInstance();
+        userManager = UserManager.getInstance();
         user = userManager.getCurrentUser();
         userManager.addUserUpdateListener(this);
         databaseManager = DatabaseManager.getInstance();
@@ -94,24 +100,31 @@ public class ManageFacilityActivity extends AppCompatActivity
             startActivity(editFacilityIntent);
         });
 
-        // Clicking removeFacilityButton -> remove facility from database and change user to Entrant
+        // Clicking removeFacilityButton -> remove facility from user's profile
         removeFacilityButton.setOnClickListener(v -> {
-            // Removes facility from database
-            databaseManager.removeFacility(user.getDeviceId(), new DatabaseManager.FacilityRemovalCallback() {
-                @Override
-                public void onSuccess(Entrant updatedUser) {
-                    userManager.setCurrentUser(updatedUser);
-                    Toast.makeText(getApplicationContext(), "Facility removed!", Toast.LENGTH_SHORT).show();
-                }
-
-                @Override
-                public void onFailure(Exception e) {
-                    Toast.makeText(getApplicationContext(), "Error adding facility.", Toast.LENGTH_SHORT).show();
-                    finish();
-                }
-            });
+            deleteFacility();
         });
     }
+
+    /**
+     * Removes facility from user's profile
+     */
+    public void deleteFacility() {
+        databaseManager.removeFacility(user.getDeviceId(), new DatabaseManager.FacilityRemovalCallback() {
+            @Override
+            public void onSuccess(Entrant updatedUser) {
+                userManager.setCurrentUser(updatedUser);
+                Toast.makeText(getApplicationContext(), "Facility removed!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(getApplicationContext(), "Error adding facility.", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        });
+    }
+
 
     /**
      * Removes this activity from UserUpdateListener list when activity closes

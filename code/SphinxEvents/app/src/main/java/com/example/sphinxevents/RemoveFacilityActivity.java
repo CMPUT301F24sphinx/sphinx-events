@@ -23,6 +23,10 @@ import com.example.sphinxevents.Entrant;
 import com.example.sphinxevents.Facility;
 import com.example.sphinxevents.FacilitySearchActivity;
 
+/**
+ * Displays all information of facility that was clicked by administrator in FacilitySearchActivity
+ * Allows administrator to remove facility
+ */
 public class RemoveFacilityActivity extends AppCompatActivity {
 
     private Facility facility;

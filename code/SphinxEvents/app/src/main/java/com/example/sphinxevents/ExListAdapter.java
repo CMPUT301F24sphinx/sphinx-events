@@ -15,6 +15,11 @@ import android.widget.TextView;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Adapter for expandable lists
+ * Implements all functionalities of expandable lists except the getChildView()
+ * @param <C> generic type parameter for children in expandable list
+ */
 public abstract class ExListAdapter<C> extends BaseExpandableListAdapter {
 
     Context context;

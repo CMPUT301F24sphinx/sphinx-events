@@ -1,6 +1,6 @@
 /*
- * Displays results of facilities whose name matches the administrator's query
- * Allows administrator to click on facility in list in order to view all details and remove it
+ * Displays results of profiles whose name matches the administrator's query
+ * Allows administrator to click on profile in list in order to view all details and remove it
  */
 
 package com.example.sphinxevents;
@@ -23,39 +23,35 @@ import androidx.core.view.WindowInsetsCompat;
 
 import java.util.ArrayList;
 
-/**
- * Displays results of facilities whose name matches the administrator's query
- * Allows administrator to click on facility in list in order to view all details and remove it
- */
-public class FacilitySearchActivity extends AppCompatActivity {
+public class ProfilesSearchActivity extends AppCompatActivity {
 
     // Attributes for result list
     private TextView noResultsTextView;
-    private ListView facilityList;
-    private FacilityAdapter facilityAdapter;
+    private ListView profilesList;
+    private ProfilesAdapter profilesAdapter;
 
     // Attributes for updating list
-    private ActivityResultLauncher<Intent> removeFacilityLauncher;
-    public static final int FACILITY_REMOVED = 1;
-    private Facility recentlyClickedFacility;
+    private ActivityResultLauncher<Intent> removeProfilesLauncher;
+    public static final int PROFILES_REMOVED = 1;
+    private Entrant recentlyClickedProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_facility_search);
+        setContentView(R.layout.activity_admin_search_profiles);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        // Sets up updating list if facility is removed
-        removeFacilityLauncher = registerForActivityResult(
+        // Sets up updating list if profile is removed
+        removeProfilesLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    // Called when RemoveFacilityActivity returns
-                    if (result.getResultCode() == FACILITY_REMOVED) {  // If facility removal occurred
+                    // Called when RemoveProfileActivity returns
+                    if (result.getResultCode() == PROFILES_REMOVED) {  // If profile removal occurred
                         refreshDisplay();  // update list display
                     }
                 }
@@ -70,35 +66,35 @@ public class FacilitySearchActivity extends AppCompatActivity {
 
         // Obtains XML elements
         TextView queryTextView = findViewById(R.id.search_query_text_view);
-        facilityList = findViewById(R.id.facilities_list_view);
+        profilesList = findViewById(R.id.profiles_list_view);
         noResultsTextView = findViewById(R.id.no_results_text_view);
 
-        queryTextView.setText(getString(R.string.search_query, query));
+        queryTextView.setText(getString(R.string.facility_search_query, query));
 
         // Sets onClick listener for back button
-        ImageButton backButton = findViewById(R.id.search_facility_back_btn);
+        ImageButton backButton = findViewById(R.id.manage_profiles_back_btn);
         backButton.setOnClickListener(v -> {
             finish();  // Go back to main search screen
         });
 
         // Displays search results
         DatabaseManager databaseManager = DatabaseManager.getInstance();
-        databaseManager.searchFacility(query, new DatabaseManager.FacilitySearchCallback() {
+        databaseManager.searchProfiles(query, new DatabaseManager.ProfilesSearchCallback() {
             @Override
-            public void onSuccess(ArrayList<Facility> facilities) {
-                if (facilities.isEmpty()) {
+            public void onSuccess(ArrayList<Entrant> users) {
+                if (users.isEmpty()) {
                     setNoResultsDisplay();  // No results found
                 }
                 else {  // displays results
-                    facilityAdapter = new FacilityAdapter(FacilitySearchActivity.this, facilities);
-                    facilityList.setAdapter(facilityAdapter);
+                    profilesAdapter = new ProfilesAdapter(ProfilesSearchActivity.this, users);
+                    profilesList.setAdapter(profilesAdapter);
 
                     // Clicking facility
-                    facilityList.setOnItemClickListener((parent, view, position, id) -> {
-                        recentlyClickedFacility = (Facility) parent.getItemAtPosition(position);
-                        Intent removeFacilityIntent = new Intent(FacilitySearchActivity.this, RemoveFacilityActivity.class);
-                        removeFacilityIntent.putExtra("facility", recentlyClickedFacility);
-                        removeFacilityLauncher.launch(removeFacilityIntent);
+                    profilesList.setOnItemClickListener((parent, view, position, id) -> {
+                        recentlyClickedProfile = (Entrant) parent.getItemAtPosition(position);
+                        Intent removeProfileIntent = new Intent(ProfilesSearchActivity.this, RemoveProfileActivity.class);
+                        removeProfileIntent.putExtra("profile", recentlyClickedProfile);
+                        removeProfilesLauncher.launch(removeProfileIntent);
                     });
                 }
             }
@@ -115,7 +111,7 @@ public class FacilitySearchActivity extends AppCompatActivity {
      * Shows proper display when no results found
      */
     public void setNoResultsDisplay() {
-        facilityList.setVisibility(View.GONE);
+        profilesList.setVisibility(View.GONE);
         noResultsTextView.setVisibility(View.VISIBLE);
     }
 
@@ -123,13 +119,13 @@ public class FacilitySearchActivity extends AppCompatActivity {
      * Refreshes the display after a facility is removed
      */
     public void refreshDisplay() {
-        facilityAdapter.remove(recentlyClickedFacility);  // Remove the clicked facility
+        profilesAdapter.remove(recentlyClickedProfile);  // Remove the clicked facility
 
-        if (facilityAdapter.getCount() == 0) {  // Check if the results list is now empty
+        if (profilesAdapter.getCount() == 0) {  // Check if the results list is now empty
             setNoResultsDisplay();
         }
         else {
-            facilityAdapter.notifyDataSetChanged();  // Refresh the results list display
+            profilesAdapter.notifyDataSetChanged();  // Refresh the results list display
         }
     }
 }
