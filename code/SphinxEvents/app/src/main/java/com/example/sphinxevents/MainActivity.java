@@ -44,8 +44,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.DialogFragment;
 
 import com.google.firebase.firestore.DocumentReference;
-import com.journeyapps.barcodescanner.ScanContract;
-import com.journeyapps.barcodescanner.ScanOptions;
+//import com.journeyapps.barcodescanner.ScanContract;
+//import com.journeyapps.barcodescanner.ScanOptions;
 
 import com.bumptech.glide.Glide;
 
