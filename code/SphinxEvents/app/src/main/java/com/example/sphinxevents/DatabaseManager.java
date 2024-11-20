@@ -343,9 +343,13 @@ public class DatabaseManager {
      * @param callback Callback to handle success or failure of searching database
      */
     public void searchFacility(String query, FacilitySearchCallback callback) {
-        // Query the facilities collection for documents with a matching name
+        // Ensure the query is not case-sensitive and add a termination character to simulate a "contains" query
+        String endQuery = query + "\uf8ff"; // \uf8ff is a high Unicode character
+
+        // Query the facilities collection for documents with names containing the query
         database.collection("facilities")
-                .whereEqualTo("name", query)
+                .whereGreaterThanOrEqualTo("name", query)
+                .whereLessThanOrEqualTo("name", endQuery)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -360,6 +364,7 @@ public class DatabaseManager {
                     }
                 });
     }
+
 
     /**
      * Callback interface for admin check
@@ -709,9 +714,13 @@ public class DatabaseManager {
      * @param callback Callback to handle success or failure of searching database
      */
     public void searchProfiles(String query, ProfilesSearchCallback callback) {
-        // Query the users collection for documents with a matching name
+        // Ensure the query is not case-sensitive and add a termination character to simulate a "contains" query
+        String endQuery = query + "\uf8ff"; // \uf8ff is a high Unicode character
+
+        // Query the users collection for documents with names containing the query
         database.collection("users")
-                .whereEqualTo("name", query)
+                .whereGreaterThanOrEqualTo("name", query)
+                .whereLessThanOrEqualTo("name", endQuery)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
