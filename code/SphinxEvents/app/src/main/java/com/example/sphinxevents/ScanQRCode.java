@@ -64,7 +64,7 @@ public class ScanQRCode extends AppCompatActivity {
         if (result.getContents() != null) {
             Intent LoadEventIntent = new Intent(ScanQRCode.this, ViewEventDetails.class);
             String QRResultStr = result.getContents();
-            LoadEventIntent.putExtra("eventCode", QRResultStr);
+            LoadEventIntent.putExtra("eventId", QRResultStr);
             startActivity(LoadEventIntent);
             finish();
         } else {

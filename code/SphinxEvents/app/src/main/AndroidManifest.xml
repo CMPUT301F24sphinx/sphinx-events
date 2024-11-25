@@ -69,7 +69,7 @@
             android:name=".ViewEnteredEvent"
             android:exported="false"/>
         <activity
-            android:name=".viewNotificationsActivity"
+            android:name=".ViewNotificationsActivity"
             android:exported="false"/>
         <activity
             android:name=".MainActivity"

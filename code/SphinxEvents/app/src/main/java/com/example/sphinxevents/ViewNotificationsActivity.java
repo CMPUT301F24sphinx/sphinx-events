@@ -4,7 +4,6 @@ import static android.widget.Toast.makeText;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -21,7 +20,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-public class viewNotificationsActivity extends AppCompatActivity {
+public class ViewNotificationsActivity extends AppCompatActivity {
 
     // declare userID, db, message and sender arrays
     private String userID;
