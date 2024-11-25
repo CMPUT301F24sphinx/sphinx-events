@@ -82,7 +82,6 @@ public class DatabaseManager {
      * @param event The event object containing details to be stored.
      * @param callback Callback to handle success or failure of the event creation.
      */
-    // TODO: Include all other fields an event should have
     public void createEvent(Event event, EventCreationCallback callback) {
         // Add the event to Firestore under the "events" collection
         database.collection("events")
@@ -296,7 +295,7 @@ public class DatabaseManager {
                             Entrant updatedUser = new Entrant(user.getDeviceId(), user.getName(), user.getEmail(),
                                     user.getPhoneNumber(), user.getDefaultPfpPath(), user.getCustomPfpUrl(),
                                     user.isOrgNotificationsEnabled(), user.isAdminNotificationsEnabled(),
-                                    user.getJoinedEvents(), user.getPendingEvents());
+                                    user.getJoinedEvents(), user.getPendingEvents(), user.getNotifications());
                             saveUser(updatedUser, new UserCreationCallback() {
                                 @Override
                                 public void onSuccess(String deviceId) {
@@ -623,9 +622,9 @@ public class DatabaseManager {
     public interface NotificationCreationCallback {
         /**
          * Called when notification is created successfully
-         * @param notifRef DocumentReference object to new created notification
+         * @param notificationRef DocumentReference object to new created notification
          */
-        void onSuccess(DocumentReference notifRef);
+        void onSuccess(DocumentReference notificationRef);
 
         /**
          * Called when notification creation fails
@@ -653,9 +652,9 @@ public class DatabaseManager {
     public interface getNotificationsCallback {
         /**
          * Callback for successful notification retrieval
-         * @param notificationIDs List of DocumentSnapShots of returned notifications
+         * @param notifications ArrayList of notifications directed to user
          */
-        void onSuccess(List<DocumentSnapshot> notificationIDs);
+        void onSuccess(ArrayList<Notification> notifications);
 
         /**
          * Callback for failed notification retrieval
@@ -665,23 +664,22 @@ public class DatabaseManager {
     }
 
     /**
-     * Gets list of DocumentSnapshots of notifications sent to` userID
-     * @param userID The user who is the reviewer of notifications
-     * @param callback Success or Fail callback
+     * Gets ArrayList of Notification objects sent to userID
+     * @param userID The user who to retrieve notifications for
+     * @param callback Success or Failure callback
      */
     public void getNotifications(String userID, getNotificationsCallback callback) {
         database.collection("notifications")
                 .whereEqualTo("toUser", userID)
                 .get()
                 .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null) {
-                        QuerySnapshot query = task.getResult();
-                        if (!query.isEmpty()) {
-                            List<DocumentSnapshot> notifDocSnapshots =  query.getDocuments();
-                            callback.onSuccess(notifDocSnapshots);
-                        } else {
-                            callback.onFailure(task.getException());
+                    if (task.isSuccessful()) {
+                        ArrayList<Notification> notifications = new ArrayList<>();
+                        for (DocumentSnapshot document : task.getResult()) {
+                            Notification notification = document.toObject(Notification.class);
+                            notifications.add(notification);
                         }
+                        callback.onSuccess(notifications);
                     } else {
                         callback.onFailure(task.getException());
                     }
