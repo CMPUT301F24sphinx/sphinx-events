@@ -34,7 +34,7 @@ import java.io.ByteArrayOutputStream;
 public class qrCodeActivity extends AppCompatActivity {
 
     private Bitmap qrBitmap;
-    private String posterId;
+    private String eventId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,10 +53,10 @@ public class qrCodeActivity extends AppCompatActivity {
 
         // Retrieve poster ID passed from previous activity
         Intent intent = getIntent();
-        posterId = intent.getStringExtra("poster_id");
+        eventId = intent.getStringExtra("eventId");
 
         // Generate and display QR code
-        generateQRCode(posterId, qrCodeBox);
+        generateQRCode(eventId, qrCodeBox);
 
         // Set up back-to-home button listener
         backToHomeButton.setOnClickListener(view -> finish());
@@ -65,14 +65,14 @@ public class qrCodeActivity extends AppCompatActivity {
     /**
      * Generates a QR code based on the provided poster ID and displays it in the specified ImageView.
      *
-     * @param posterId   The ID to encode in the QR code.
+     * @param eventId   The ID to encode in the QR code.
      * @param qrCodeBox  The ImageView where the QR code will be displayed.
      */
-    private void generateQRCode(String posterId, ImageView qrCodeBox) {
+    private void generateQRCode(String eventId, ImageView qrCodeBox) {
         MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
         try {
             // Create QR code bit matrix with specified dimensions
-            BitMatrix bitMatrix = multiFormatWriter.encode(posterId, BarcodeFormat.QR_CODE, 300, 300);
+            BitMatrix bitMatrix = multiFormatWriter.encode(eventId, BarcodeFormat.QR_CODE, 300, 300);
             BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
             qrBitmap = barcodeEncoder.createBitmap(bitMatrix);
 
@@ -100,7 +100,7 @@ public class qrCodeActivity extends AppCompatActivity {
         // Compress bitmap to JPEG format and retrieve bytes
         qrBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
         byte[] data = byteArrayOutputStream.toByteArray();
-        String filePath = "qr_codes/" + posterId + "QRCode.jpg";
+        String filePath = "qr_codes/" + eventId + "QRCode.jpg";
 
         StorageReference imageRef = storageReference.child(filePath);
         UploadTask uploadTask = imageRef.putBytes(data);

@@ -10,7 +10,7 @@ public class Notification {
     private String eventName; // The name of the event, to easily get name
     private String toUser; // The ID of user who revives the message
 
-    // Enum to denote weather notification is a message or lottery result
+    // Enum to denote whether notification is a message or lottery result
     public enum notifType {
         Message,
         LotteryResult

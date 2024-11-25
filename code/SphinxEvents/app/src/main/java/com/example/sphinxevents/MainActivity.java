@@ -12,7 +12,6 @@
 package com.example.sphinxevents;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -33,7 +32,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.splashscreen.SplashScreen;
@@ -41,17 +39,13 @@ import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.DialogFragment;
 
-import com.google.firebase.firestore.DocumentReference;
 //import com.journeyapps.barcodescanner.ScanContract;
 //import com.journeyapps.barcodescanner.ScanOptions;
 
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -235,7 +229,7 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         // Set the Notification button to activate Notification page
         viewNotificationsBtn.setOnClickListener(v -> {
             Intent viewNotificationsIntent = new Intent(this,
-                    viewNotificationsActivity.class);
+                    ViewNotificationsActivity.class);
             viewNotificationsIntent.putExtra("userID", userManager.getCurrentUser().getDeviceId().toString());
             startActivity(viewNotificationsIntent);
         });
@@ -249,10 +243,9 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         // Sets OnClickListener for create event actions
         createEventBtn.setOnClickListener(v -> {
             Intent createEventIntent = new Intent(this, CreateEventActivity.class);
-            createEventIntent.putExtra("DeviceID", deviceId);
+            createEventIntent.putExtra("organizerId", deviceId);
             startActivity(createEventIntent);
         });
-
     }
 
     /**
