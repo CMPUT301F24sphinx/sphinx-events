@@ -21,6 +21,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
@@ -230,7 +231,6 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         viewNotificationsBtn.setOnClickListener(v -> {
             Intent viewNotificationsIntent = new Intent(this,
                     ViewNotificationsActivity.class);
-            viewNotificationsIntent.putExtra("userID", userManager.getCurrentUser().getDeviceId().toString());
             startActivity(viewNotificationsIntent);
         });
 
@@ -242,10 +242,17 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
 
         // Sets OnClickListener for create event actions
         createEventBtn.setOnClickListener(v -> {
-            Intent createEventIntent = new Intent(this, CreateEventActivity.class);
-            createEventIntent.putExtra("organizerId", deviceId);
-            startActivity(createEventIntent);
+            // Checks whether user is able to create events
+            if (userManager.getCurrentUser().getRole().equals("Organizer")) {
+                Intent createEventIntent = new Intent(this, CreateEventActivity.class);
+                startActivity(createEventIntent);
+            } else {  // Entrant is attempting to create an event
+                Toast.makeText(this,
+                        "Add a facility to your profile to be able to create events!",
+                        Toast.LENGTH_LONG).show();
+            }
         });
+
     }
 
     /**

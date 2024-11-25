@@ -25,24 +25,22 @@ public class ViewNotificationsActivity extends AppCompatActivity {
     // declare userID, db, message and sender arrays
     private String userID;
     private DatabaseManager databaseManager;
+    private UserManager userManager;
     ArrayList<String> messages;
     ArrayList<String> sender;
 
     /**
      * Create the Activity to view notification
-     * @param savedInstanceState
+     * @param savedInstanceState Bundle with the activity's previously saved state, or null.
      */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Get userID form passed in info from caller Intent
-        Intent intent = getIntent();
-        if (intent != null ) {
-            userID = intent.getExtras().getString("userID");
-        }
+
 
         databaseManager = DatabaseManager.getInstance();
+        userManager = UserManager.getInstance();
 
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_view_notifications);
@@ -58,21 +56,21 @@ public class ViewNotificationsActivity extends AppCompatActivity {
             finish();  // close activity when back arrow is pressed
         });
 
-        // Get notifications with users who have userID
+        loadNotifications();  // load the users notifications from the database
+
+    }
+
+    public void loadNotifications() {
+        String userId = userManager.getCurrentUser().getDeviceId();
+
         databaseManager.getNotifications(userID, new DatabaseManager.getNotificationsCallback() {
             @Override
-            public void onSuccess(List<DocumentSnapshot> notificationIDs) {
+            public void onSuccess(ArrayList<Notification> notifications) {
                 ListView simpleList = findViewById(R.id.notifs_listview);
 
                 // Array of messages and senders
                 ArrayList<String> messages = new ArrayList<>();
                 ArrayList<String> sender = new ArrayList<>();
-
-                // for each DocumentSnapshot get the message and the name of the sender event
-                for(int i = 0; i < notificationIDs.size(); ++i){
-                    messages.add(notificationIDs.get(i).get("message").toString());
-                    sender.add(notificationIDs.get(i).get("eventName").toString());
-                }
 
                 // set the array adapter with the messages and senders
                 NotificationAdapter customAdapter = new NotificationAdapter(getApplicationContext(), messages, sender);

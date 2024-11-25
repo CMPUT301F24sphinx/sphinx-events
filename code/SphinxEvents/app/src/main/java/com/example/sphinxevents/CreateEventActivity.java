@@ -70,13 +70,7 @@ public class CreateEventActivity extends AppCompatActivity {
 
         databaseManager = DatabaseManager.getInstance();
 
-
-        Intent intent = getIntent();
-        if (intent != null ) {
-            organizerId = intent.getStringExtra("organizerId");
-        }
-
-
+        organizerId = UserManager.getInstance().getCurrentUser().getDeviceId();
         // Initialize UI components
         EditText eventNameText = findViewById(R.id.event_name);
         EditText eventDescText = findViewById(R.id.event_description);
