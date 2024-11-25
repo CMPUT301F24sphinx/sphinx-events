@@ -41,6 +41,9 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+//import com.journeyapps.barcodescanner.ScanContract;
+//import com.journeyapps.barcodescanner.ScanOptions;
+
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;

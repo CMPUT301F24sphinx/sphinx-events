@@ -53,6 +53,7 @@ public class CreateEventActivity extends AppCompatActivity {
     private Uri posterUri;
     private String dateString;
     private DatabaseManager databaseManager;
+    private String organizerId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +70,7 @@ public class CreateEventActivity extends AppCompatActivity {
 
         databaseManager = DatabaseManager.getInstance();
 
-
+        organizerId = UserManager.getInstance().getCurrentUser().getDeviceId();
         // Initialize UI components
         EditText eventNameText = findViewById(R.id.event_name);
         EditText eventDescText = findViewById(R.id.event_description);
@@ -195,13 +196,9 @@ public class CreateEventActivity extends AppCompatActivity {
             @Override
             public void onSuccess(DocumentReference eventRef) {
                 Toast.makeText(getApplicationContext(), "Event created successfully", Toast.LENGTH_SHORT).show();
-                Intent intent = getIntent();
-                if (intent != null ) {
-                    String CreatorID = intent.getExtras().getString("DeviceID");
-                    databaseManager.updateOrganizerCreatedEvents(CreatorID, eventRef.getId());
-                }
+                databaseManager.updateOrganizerCreatedEvents(organizerId, eventRef.getId());
                 uploadPosterImage(posterId);
-                startQrCodeActivity(posterRandKey);
+                startQrCodeActivity(eventRef.getId());
                 finish();
             }
 
@@ -229,11 +226,11 @@ public class CreateEventActivity extends AppCompatActivity {
     /**
      * Launches the QR code activity for the created event.
      *
-     * @param posterRandKey ID for the poster, passed to the QR code activity.
+     * @param eventId ID for the event, passed to the QR code activity.
      */
-    private void startQrCodeActivity(String posterRandKey) {
+    private void startQrCodeActivity(String eventId) {
         Intent qrEventIntent = new Intent(CreateEventActivity.this, qrCodeActivity.class);
-        qrEventIntent.putExtra("poster_id", posterRandKey);
+        qrEventIntent.putExtra("eventId", eventId);
         startActivity(qrEventIntent);
     }
 

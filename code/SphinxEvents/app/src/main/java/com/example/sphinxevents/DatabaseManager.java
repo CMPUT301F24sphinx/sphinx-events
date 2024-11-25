@@ -585,7 +585,7 @@ public class DatabaseManager {
         void onSuccess(List<String> createdEventsID);
 
         /**
-         * Called when error occurs during events retrival
+         * Called when error occurs during events retrieval
          * @param e the exception that occurred
          */
         void onFailure(Exception e);
