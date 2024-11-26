@@ -50,6 +50,10 @@ public class ViewEventDetails extends AppCompatActivity {
     private TextView eventLimitLayout;
     private TextView eventLocationReqLayout;
 
+    // Entrants in the event waiting list
+    private ArrayList<String> eventEntrants;
+    private Integer eventEntrantLimit;
+
     /**
      * On creation of activity
      * @param savedInstanceState
@@ -100,7 +104,7 @@ public class ViewEventDetails extends AppCompatActivity {
         eventEnterEventLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                joinEventCheck(getIntent().getExtras().getString("eventCode"));
+                joinEventCheck(getIntent().getExtras().getString("eventId"));
             }
         });
     }
@@ -111,43 +115,27 @@ public class ViewEventDetails extends AppCompatActivity {
      * @param eventCode ID of the event to join
      */
     public void joinEventCheck(String eventCode){
-        databaseManager.getEvent(eventCode, new DatabaseManager.eventRetrievalCallback() {
-            @Override
-            public void onSuccess(Event event) {
 
-                String currUser = UserManager.getInstance().getCurrentUser().getDeviceId();
-                ArrayList<String> eventEntrants = event.getEventEntrants();
-
-                if(eventEntrants == null){
-                    eventEntrants = new ArrayList<>();
-                }
-
-                if(eventEntrants != null){
-                    for (int i = 0; i < eventEntrants.size(); i++) {
-                        if (currUser.equals(eventEntrants.get(i))) {
-                            Toast.makeText(getApplicationContext(), "You have already joined this event!", Toast.LENGTH_LONG).show();
-                            return;
-                        }
-                    }
-                }
-
-                if(event.getEntrantLimit() == null){
-                    // no limit JOIN
-                    databaseManager.joinEvent(currUser, eventCode);
-                } else if(eventEntrants.size() < event.getEntrantLimit()){
-                    // Event not full and has limit
-                    databaseManager.joinEvent(currUser, eventCode);
-                } else if (eventEntrants.size() >= event.getEntrantLimit()){
-                    // Event full cant join
-                    Toast.makeText(getApplicationContext(), "The event is full cannot join", Toast.LENGTH_LONG).show();
+        String currUser = UserManager.getInstance().getCurrentUser().getDeviceId();
+        if(eventEntrants != null){
+            for (int i = 0; i < eventEntrants.size(); i++) {
+                if (currUser.equals(eventEntrants.get(i))) {
+                    Toast.makeText(getApplicationContext(), "You have already joined this event!", Toast.LENGTH_LONG).show();
+                    return;
                 }
             }
-            @Override
-            public void onFailure(Exception e) {
-                Toast.makeText(getApplicationContext(), "Error getting event. Please try again.", Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        });
+        }
+
+        if(eventEntrantLimit == null){
+            // no limit JOIN
+            databaseManager.joinEvent(currUser, eventCode);
+        } else if(eventEntrants.size() < eventEntrantLimit){
+            // Event not full and has limit
+            databaseManager.joinEvent(currUser, eventCode);
+        } else {
+            // Event full cant join
+            Toast.makeText(getApplicationContext(), "The event is full cannot join", Toast.LENGTH_LONG).show();
+        }
     }
 
     /**
@@ -165,6 +153,13 @@ public class ViewEventDetails extends AppCompatActivity {
                 String posterCode = event.getPoster();
                 SimpleDateFormat dateFormatter = new SimpleDateFormat("EEEE, MMMM d, yyyy 'at' h:m:s a z");
                 String formattedDate = dateFormatter.format(event.getLotteryEndDate());
+
+                // Set private var to event waitlist
+                eventEntrants = event.getEventEntrants();
+                if(eventEntrants == null){
+                    eventEntrants = new ArrayList<>();
+                }
+                eventEntrantLimit = event.getEntrantLimit();
 
                 // Set layout items to information gotten above
                 eventNameLayout.setText(event.getName());
