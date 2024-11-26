@@ -107,7 +107,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/add"
+            android:text="@string/leave_event_waitlist"
             android:textColor="@color/black"
             android:textSize="22sp"
             app:backgroundTint="@color/facility_positive_button_color"

@@ -72,6 +72,7 @@
     <string name="edit_event_details_button">Edit Event Details</string>
     <string name="view_entrant_data_button">View Entrant Data</string>
     <string name="notify_entrants_button">Send Message</string>
+    <string name="leave_event_waitlist">Leave Waitlist</string>
 
 <!--    Notifications-->
     <string name="channel_name">NotificationChannel</string>
