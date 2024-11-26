@@ -551,6 +551,20 @@ public class DatabaseManager {
                     public void onFailure(@NonNull Exception e) {
                     }
                 });
+
+        database.collection("users")
+                .document(userID)
+                .update("joinedEvents", FieldValue.arrayUnion(eventID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
     }
 
     /**
@@ -604,6 +618,44 @@ public class DatabaseManager {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
                             List<String> createdEvents = (List<String>) document.get("createdEvents");
+                            callback.onSuccess(createdEvents);
+                        } else {
+                            callback.onFailure(new Exception("Created Events does not exist."));
+                        }
+                    } else {
+                        callback.onFailure(task.getException());
+                    }
+                });
+    }
+
+
+    /**
+     * Callback interface for joined Events retrieval
+     */
+    public interface getJoinedEventsCallback {
+        /**
+         * Called when events are retrieved successfully
+         * @param joinedEventsID List of Id's of events
+         */
+        void onSuccess(List<String> joinedEventsID);
+
+        /**
+         * Called when error occurs during events retrieval
+         * @param e the exception that occurred
+         */
+        void onFailure(Exception e);
+    }
+
+    public void getJoinedEvents(String userID, getJoinedEventsCallback callback) {
+
+        database.collection("users")
+                .document(userID)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            List<String> createdEvents = (List<String>) document.get("joinedEvents");
                             callback.onSuccess(createdEvents);
                         } else {
                             callback.onFailure(new Exception("Created Events does not exist."));

@@ -303,6 +303,31 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         events.put(headers.get(0), joinedEvents);
         events.put(headers.get(1), pendingEvents);
 
+        databaseManager.getJoinedEvents(currentUser.getDeviceId(), new DatabaseManager.getJoinedEventsCallback() {
+            @Override
+            public void onSuccess(List<String> joinedEventsID) {
+                eventCodes.put(headers.get(0), joinedEventsID);
+                for(Integer i = 0; i < joinedEventsID.size(); ++i){
+                    Log.d("Aniket", eventCodes.get(headers.get(0)).get(i));
+                    databaseManager.getEvent(joinedEventsID.get(i), new DatabaseManager.eventRetrievalCallback() {
+                        @Override
+                        public void onSuccess(Event event) {
+                            joinedEvents.add(event);
+                            Log.d("Aniket", event.getName() + "joined");
+                        }
+                        @Override
+                        public void onFailure(Exception e) {
+                            Log.d("Aniket", "Cant retrieve created event with code");
+                        }
+                    });
+                }
+            }
+            @Override
+            public void onFailure(Exception e) {
+            }
+        });
+        events.put(headers.get(0), joinedEvents);
+
         // Add organizer stuff if user is an Organizer
         if (currentUser.getRole().equals("Organizer")) {
             Organizer organizer = (Organizer) currentUser;
@@ -314,17 +339,17 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
 
                     eventCodes.put(headers.get(2), createdEventsID);
                     for(Integer i = 0; i < createdEventsID.size(); ++i){
-                        Log.d("Aniket", eventCodes.get(headers.get(2)).get(i));
+//                        Log.d("Aniket", eventCodes.get(headers.get(2)).get(i));
                         databaseManager.getEvent(createdEventsID.get(i), new DatabaseManager.eventRetrievalCallback() {
                             @Override
                             public void onSuccess(Event event) {
                                 createdEvents.add(event);
-                                Log.d("Aniket", event.getName());
+//                                Log.d("Aniket", event.getName());
 
                             }
                             @Override
                             public void onFailure(Exception e) {
-                                Log.d("Aniket", "Cant retrieve created event with code");
+//                                Log.d("Aniket", "Cant retrieve created event with code");
                             }
                         });
                     }
@@ -344,7 +369,13 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
             // Code for new activity that views events goes here
             Intent viewEnteredEvents = new Intent(this, ViewCreatedEvent.class);
             viewEnteredEvents.putExtra("eventCode", eventCodes.get(headers.get(groupPosition)).get(childPosition));
-            startActivity(viewEnteredEvents);
+            Log.d("Aniket", groupPosition + " " + childPosition);
+            if(groupPosition == 0){
+
+            }
+            else if(groupPosition == 2) {
+                startActivity(viewEnteredEvents);
+            }
             return true; // Indicating the event is handled
         });
     }
