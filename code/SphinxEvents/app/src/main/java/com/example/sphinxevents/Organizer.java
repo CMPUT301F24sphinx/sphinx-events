@@ -23,11 +23,11 @@ public class Organizer extends Entrant {
 
     public Organizer(String deviceId, String name, String email, String phoneNumber, String defaultPfp, String customPfp,
                      boolean orgNotificationsEnabled, boolean adminNotificationsEnabled,
-                     ArrayList<String> joinedEvents, ArrayList<String> pendingEvents, Facility facility,
-                     ArrayList<String> createdEvents) {
+                     ArrayList<String> joinedEvents, ArrayList<String> pendingEvents, ArrayList<String> notifications,
+                     Facility facility, ArrayList<String> createdEvents) {
 
         super(deviceId, name, email, phoneNumber, defaultPfp, customPfp, orgNotificationsEnabled,
-                adminNotificationsEnabled, joinedEvents, pendingEvents);
+                adminNotificationsEnabled, joinedEvents, pendingEvents, notifications);
         this.facility = facility;
         setRole("Organizer");
         this.createdEvents = createdEvents;

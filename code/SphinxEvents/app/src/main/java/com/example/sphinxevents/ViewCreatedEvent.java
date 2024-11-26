@@ -85,7 +85,7 @@ public class ViewCreatedEvent extends AppCompatActivity {
 
     /**
      * Use database.createNotification() to upload a notification object to db
-     * @param event Event object of sender event/orginazer
+     * @param event Event object of sender event/organizer
      */
     private void sendMessageToEntrants(Event event) {
 
@@ -99,6 +99,7 @@ public class ViewCreatedEvent extends AppCompatActivity {
             database.createNotification(notif, new DatabaseManager.NotificationCreationCallback() {
                 @Override
                 public void onSuccess(DocumentReference notifRef) {
+
                 }
                 @Override
                 public void onFailure(Exception e) {
