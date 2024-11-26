@@ -85,7 +85,7 @@ public class ViewEventDetails extends AppCompatActivity {
         // Extract passed event code from previous activity and then query that Event from db
         Intent intent = getIntent();
         if (intent != null ) {
-            eventCode = intent.getStringExtra("eventId");
+            eventCode = intent.getStringExtra("eventID");
             getEvent(eventCode);
         } else{
             Toast.makeText(this, "QR Scan failed in ViewEventDetails", Toast.LENGTH_SHORT).show();
@@ -104,7 +104,7 @@ public class ViewEventDetails extends AppCompatActivity {
         eventEnterEventLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                joinEventCheck(getIntent().getExtras().getString("eventId"));
+                joinEventCheck(getIntent().getExtras().getString("eventID"));
             }
         });
     }

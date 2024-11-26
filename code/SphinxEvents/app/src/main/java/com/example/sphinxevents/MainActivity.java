@@ -369,12 +369,12 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
             // Code for new activity that views events goes here
             if(groupPosition == 0){
                 Intent viewEnteredEvents = new Intent(this, ViewEnteredEvent.class);
-                viewEnteredEvents.putExtra("eventCode", eventCodes.get(headers.get(groupPosition)).get(childPosition));
+                viewEnteredEvents.putExtra("eventID", eventCodes.get(headers.get(groupPosition)).get(childPosition));
                 startActivity(viewEnteredEvents);
             }
             else if(groupPosition == 2) {
                 Intent viewCreatedEvents = new Intent(this, ViewCreatedEvent.class);
-                viewCreatedEvents.putExtra("eventCode", eventCodes.get(headers.get(groupPosition)).get(childPosition));
+                viewCreatedEvents.putExtra("eventID", eventCodes.get(headers.get(groupPosition)).get(childPosition));
                 startActivity(viewCreatedEvents);
             }
             return true; // Indicating the event is handled

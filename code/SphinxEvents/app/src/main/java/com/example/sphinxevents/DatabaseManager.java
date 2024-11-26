@@ -568,6 +568,42 @@ public class DatabaseManager {
     }
 
     /**
+     * Removes userID from list of entrants in events document
+     * Removes EventID from list of joinedEvents in users document
+     * @param userID ID of user being removed
+     * @param eventID ID of event being removed
+     */
+    public void leaveEvent(String userID, String eventID) {
+        database.collection("events")
+                .document(eventID)
+                .update("entrants", FieldValue.arrayRemove(userID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+
+        database.collection("users")
+                .document(userID)
+                .update("joinedEvents", FieldValue.arrayRemove(eventID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+    }
+
+    /**
      * Adds Id of new created event to createdEvents field of user with userID
      * @param userID The user who created the event
      * @param eventID The event that is been uploaded
