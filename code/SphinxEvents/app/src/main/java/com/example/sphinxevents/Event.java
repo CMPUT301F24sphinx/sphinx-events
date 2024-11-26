@@ -3,10 +3,11 @@ package com.example.sphinxevents;
 
 import com.google.firebase.firestore.auth.User;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class Event {
+public class Event implements Serializable {
 
     private String name;
     private String description;
@@ -15,6 +16,10 @@ public class Event {
     private Integer entrantLimit;
     private Boolean geolocationReq;
     private ArrayList<String> entrants;
+
+    // Empty Constructor
+    public Event() {
+    }
 
     Event(String name, String description, String poster, Date lotteryEndDate, Integer entrantLimit, Boolean geolocationReq, ArrayList<String> joinedUsers) {
         this.name = name;

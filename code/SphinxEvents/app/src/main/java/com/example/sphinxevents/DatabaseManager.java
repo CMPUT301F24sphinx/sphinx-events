@@ -20,6 +20,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -578,12 +579,12 @@ public class DatabaseManager {
     /**
      * Callback interface for created Events retrieval
      */
-    public interface getCreatedEventsCallback {
+    public interface retrieveEventListCallback {
         /**
          * Called when events are retrieved successfully
-         * @param createdEventsID List of Id's of events
+         * @param events List of Event objects that were retrieved
          */
-        void onSuccess(List<String> createdEventsID);
+        void onSuccess(List<Event> events);
 
         /**
          * Called when error occurs during events retrieval
@@ -593,22 +594,30 @@ public class DatabaseManager {
     }
 
     /**
-     * Retrieves an Event from db
-     * @param userID ID of user who created event
+     * Retrieves events that match an ArrayList of event id's
+     * Used for displaying events in home screen
+     * @param eventsToRetrieve list of event id's to search for in database
+     * @param callback callback to handle success or failure of event list retrieval
      */
-    public void getCreatedEvents(String userID, getCreatedEventsCallback callback) {
-        database.collection("users")
-                .document(userID)
+    public void retrieveEventList(ArrayList<String> eventsToRetrieve, retrieveEventListCallback callback) {
+        // Handles empty list of events to search for
+        if (eventsToRetrieve.isEmpty()) {
+            callback.onSuccess(new ArrayList<>());
+            return;
+        }
+
+        // Searches database for events whose id's are in the eventsToRetrieve array
+        database.collection("events")
+                .whereIn(FieldPath.documentId(), eventsToRetrieve)
                 .get()
                 .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document.exists()) {
-                            List<String> createdEvents = (List<String>) document.get("createdEvents");
-                            callback.onSuccess(createdEvents);
-                        } else {
-                            callback.onFailure(new Exception("Created Events does not exist."));
+                    if (task.isSuccessful()) {
+                        ArrayList<Event> events = new ArrayList<>();
+                        for (DocumentSnapshot document : task.getResult()) {
+                            Event event = document.toObject(Event.class);
+                            events.add(event);
                         }
+                        callback.onSuccess(events);
                     } else {
                         callback.onFailure(task.getException());
                     }
