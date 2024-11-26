@@ -97,7 +97,7 @@ public class ViewCreatedEvent extends AppCompatActivity {
         notification.setMessage(messageTextLayout.getText().toString());
         database.createNotification(notification, entrants, new DatabaseManager.NotificationCreationCallback() {
             @Override
-            public void onSuccess(DocumentReference notificationRef) {
+            public void onSuccess() {
             }
             @Override
             public void onFailure(Exception e) {
