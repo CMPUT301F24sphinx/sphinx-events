@@ -2,7 +2,6 @@ package com.example.sphinxevents;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -93,19 +92,17 @@ public class ViewCreatedEvent extends AppCompatActivity {
 
         // For all entrants in event make a new notification object and send to db
         ArrayList<String> entrants = event.getEventEntrants();
-        for(String entrant: entrants){
-            Notification notif = new Notification(eventCode, eventName, entrant, Notification.notifType.Message);
-            notif.setMessage(messageTextLayout.getText().toString());
-            database.createNotification(notif, new DatabaseManager.NotificationCreationCallback() {
-                @Override
-                public void onSuccess(DocumentReference notifRef) {
 
-                }
-                @Override
-                public void onFailure(Exception e) {
-                    Toast.makeText(getApplicationContext(), "Failed to send message to entrants", Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
+        Notification notification = new Notification(eventCode, eventName, Notification.notificationType.Message);
+        notification.setMessage(messageTextLayout.getText().toString());
+        database.createNotification(notification, entrants, new DatabaseManager.NotificationCreationCallback() {
+            @Override
+            public void onSuccess(DocumentReference notificationRef) {
+            }
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(getApplicationContext(), "Failed to send message to entrants", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

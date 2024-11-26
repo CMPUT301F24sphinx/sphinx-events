@@ -6,48 +6,43 @@ package com.example.sphinxevents;
  */
 public class Notification {
 
-    private String fromEvent; // The ID of the event/organizer who sends the message
-    private String eventName; // The name of the event, to easily get name
-    private String toUser; // The ID of user who revives the message
-
     // Enum to denote whether notification is a message or lottery result
-    public enum notifType {
+    public enum notificationType {
         Message,
         LotteryResult
     }
-    private notifType notificationType; // Set it to enum value
-    private String message; // String of message sent by organizer/event
 
-    // Constructor
+    private String eventID; // The ID of the event message pertains to
+    private String eventName; // The name of the event, to easily get name
+    private notificationType type; // The type of the notification
+    private String message; // String of message sent by organizer/event
 
     /**
      * The constructor of a notification object
      * @param from the ID of the event that is sending the notification
      * @param eventName The name of the event
-     * @param to the ID of the user receiving notification
-     * @param notifT The notification type of the notificaion, chosen from enum of this class
+     * @param notificationType The notification type of the notification, chosen from enum of this class
      */
-    Notification(String from, String eventName, String to, notifType notifT){
-        this.fromEvent = from;
+    Notification(String from, String eventName, notificationType notificationType) {
+        this.eventID = from;
         this.eventName = eventName;
-        this.toUser = to;
-        this.notificationType = notifT;
+        this.type = notificationType;
     }
 
     /**
      * Get the ID of the sender
      * @return The eventID of the sender
      */
-    public String getFromEvent(){
-        return fromEvent;
+    public String getEventID(){
+        return eventID;
     }
 
     /**
      * Set the ID of the event sender
      * @param from ID of the event sending the notification
      */
-    public void setFromEvent(String from){
-        this.fromEvent = from;
+    public void setEventID(String from){
+        this.eventID = from;
     }
 
     /**
@@ -67,35 +62,19 @@ public class Notification {
     }
 
     /**
-     * Return the userID of the notification receiver
-     * @return
-     */
-    public String getToUser(){
-        return toUser;
-    }
-
-    /**
-     * Set the userId of the notification receiver
-     * @param to the new userID of the receiver
-     */
-    public void setToUser(String to){
-        this.toUser = to;
-    }
-
-    /**
      * Getter for notification type of notificaiton object
      * @return the type of notification object is, made from enum notiftype
      */
-    public notifType getNotificationType(){
-        return notificationType;
+    public Notification.notificationType getType(){
+        return type;
     }
 
     /**
      * Setter for notification type
      * @param type new notification type of obj, made from enum notifytype
      */
-    public void setNotificationType(notifType type){
-        this.notificationType = type;
+    public void setType(Notification.notificationType type){
+        this.type = type;
     }
 
     /**

@@ -20,6 +20,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -636,15 +637,33 @@ public class DatabaseManager {
     /**
      * Adds notification object to "notification" collection in database
      * @param notification The notification object being uploaded
+     * @param recipients The recipients of the notification
      * @param callback Call back function on weather upload succeeded or faulted
      */
-    public void createNotification(Notification notification, NotificationCreationCallback callback) {
+    public void createNotification(Notification notification, ArrayList<String> recipients,
+                                   NotificationCreationCallback callback) {
         database.collection("notifications")
                 .add(notification)
-                .addOnSuccessListener(callback::onSuccess)
+                .addOnSuccessListener(notificationRef -> {
+                    String notificationID = notificationRef.getId();
+                    addNotificationForRecipients(notificationID, recipients);
+                    callback.onSuccess(notificationRef);
+                })
                 .addOnFailureListener(callback::onFailure);
     }
 
+    /**
+     * Adds a notification ID to the notifications list of each specified recipient in Firestore.
+     * @param notificationID the ID of the notification to add
+     * @param recipients a list of user IDs to whom the notification will be sent
+     */
+    public void addNotificationForRecipients(String notificationID, ArrayList<String> recipients) {
+        for (String userID : recipients ) {
+            database.collection("users")
+                    .document(userID)
+                    .update("notifications", FieldValue.arrayUnion(notificationID));
+        }
+    }
 
     /**
      * Callback interface for getNotification
@@ -665,25 +684,27 @@ public class DatabaseManager {
 
     /**
      * Gets ArrayList of Notification objects sent to userID
-     * @param userID The user who to retrieve notifications for
+     * @param notificationIDs The list of notification IDs to retrieve
      * @param callback Success or Failure callback
      */
-    public void getNotifications(String userID, getNotificationsCallback callback) {
+    public void getNotifications(ArrayList<String> notificationIDs, getNotificationsCallback callback) {
+        if (notificationIDs == null || notificationIDs.isEmpty()) {
+            callback.onSuccess(new ArrayList<>());
+            return;
+        }
+
+        // Query the notifications collection with the provided IDs
         database.collection("notifications")
-                .whereEqualTo("toUser", userID)
+                .whereIn(FieldPath.documentId(), notificationIDs)
                 .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        ArrayList<Notification> notifications = new ArrayList<>();
-                        for (DocumentSnapshot document : task.getResult()) {
-                            Notification notification = document.toObject(Notification.class);
-                            notifications.add(notification);
-                        }
-                        callback.onSuccess(notifications);
-                    } else {
-                        callback.onFailure(task.getException());
+                .addOnSuccessListener(querySnapshot -> {
+                    ArrayList<Notification> notifications = new ArrayList<>();
+                    for (DocumentSnapshot notificationDoc : querySnapshot.getDocuments()) {
+                        notifications.add(notificationDoc.toObject(Notification.class));
                     }
-                });
+                    callback.onSuccess(notifications);
+                })
+                .addOnFailureListener(callback::onFailure);
     }
 
     //---------------------------------------------------------------------------------------------
