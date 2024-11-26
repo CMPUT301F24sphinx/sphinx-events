@@ -24,6 +24,7 @@ import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.protobuf.Value;
@@ -623,9 +624,8 @@ public class DatabaseManager {
     public interface NotificationCreationCallback {
         /**
          * Called when notification is created successfully
-         * @param notificationRef DocumentReference object to new created notification
          */
-        void onSuccess(DocumentReference notificationRef);
+        void onSuccess();
 
         /**
          * Called when notification creation fails
@@ -642,27 +642,20 @@ public class DatabaseManager {
      */
     public void createNotification(Notification notification, ArrayList<String> recipients,
                                    NotificationCreationCallback callback) {
-        database.collection("notifications")
-                .add(notification)
-                .addOnSuccessListener(notificationRef -> {
-                    String notificationID = notificationRef.getId();
-                    addNotificationForRecipients(notificationID, recipients);
-                    callback.onSuccess(notificationRef);
-                })
-                .addOnFailureListener(callback::onFailure);
-    }
+        WriteBatch batch = database.batch();
 
-    /**
-     * Adds a notification ID to the notifications list of each specified recipient in Firestore.
-     * @param notificationID the ID of the notification to add
-     * @param recipients a list of user IDs to whom the notification will be sent
-     */
-    public void addNotificationForRecipients(String notificationID, ArrayList<String> recipients) {
-        for (String userID : recipients ) {
-            database.collection("users")
+        // Add the notification to each recipient's notifications subcollection
+        for (String userID : recipients) {
+            DocumentReference notificationRef = database.collection("users")
                     .document(userID)
-                    .update("notifications", FieldValue.arrayUnion(notificationID));
+                    .collection("notifications")
+                    .document();
+            batch.set(notificationRef, notification);
         }
+        batch.commit()
+                .addOnSuccessListener(unused -> callback.onSuccess())
+                .addOnFailureListener(callback::onFailure);
+
     }
 
     /**
@@ -684,18 +677,13 @@ public class DatabaseManager {
 
     /**
      * Gets ArrayList of Notification objects sent to userID
-     * @param notificationIDs The list of notification IDs to retrieve
+     * @param userID The list of the user to retrieve notifications for
      * @param callback Success or Failure callback
      */
-    public void getNotifications(ArrayList<String> notificationIDs, getNotificationsCallback callback) {
-        if (notificationIDs == null || notificationIDs.isEmpty()) {
-            callback.onSuccess(new ArrayList<>());
-            return;
-        }
-
-        // Query the notifications collection with the provided IDs
-        database.collection("notifications")
-                .whereIn(FieldPath.documentId(), notificationIDs)
+    public void getNotifications(String userID, getNotificationsCallback callback) {
+        database.collection("users")
+                .document(userID)
+                .collection("notifications")
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     ArrayList<Notification> notifications = new ArrayList<>();

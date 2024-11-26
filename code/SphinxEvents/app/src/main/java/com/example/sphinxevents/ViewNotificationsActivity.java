@@ -50,16 +50,15 @@ public class ViewNotificationsActivity extends AppCompatActivity {
         });
 
         loadNotifications();  // load the users notifications from the database
-
     }
 
     /**
      * Loads the notifications for the current user
      */
     public void loadNotifications() {
-        ArrayList<String> notificationIDs = userManager.getCurrentUser().getNotifications();
+        String userID = userManager.getCurrentUser().getDeviceId();
 
-        databaseManager.getNotifications(notificationIDs, new DatabaseManager.getNotificationsCallback() {
+        databaseManager.getNotifications(userID, new DatabaseManager.getNotificationsCallback() {
             @Override
             public void onSuccess(ArrayList<Notification> notifications) {
                 ListView simpleList = findViewById(R.id.notifications_listview);
