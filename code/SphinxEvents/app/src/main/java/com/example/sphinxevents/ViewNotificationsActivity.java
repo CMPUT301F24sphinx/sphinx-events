@@ -2,10 +2,11 @@ package com.example.sphinxevents;
 
 import static android.widget.Toast.makeText;
 
-import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -15,19 +16,12 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.google.firebase.firestore.DocumentSnapshot;
-
 import java.util.ArrayList;
-import java.util.List;
 
 public class ViewNotificationsActivity extends AppCompatActivity {
 
-    // declare userID, db, message and sender arrays
-    private String userID;
     private DatabaseManager databaseManager;
     private UserManager userManager;
-    ArrayList<String> messages;
-    ArrayList<String> sender;
 
     /**
      * Create the Activity to view notification
@@ -37,11 +31,6 @@ public class ViewNotificationsActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-
-        databaseManager = DatabaseManager.getInstance();
-        userManager = UserManager.getInstance();
-
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_view_notifications);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -49,6 +38,10 @@ public class ViewNotificationsActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        // Initialize managers
+        databaseManager = DatabaseManager.getInstance();
+        userManager = UserManager.getInstance();
 
         // Exit activity
         ImageButton backButton = findViewById(R.id.view_notifications_back_button);
@@ -60,26 +53,38 @@ public class ViewNotificationsActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Loads the notifications for the current user
+     */
     public void loadNotifications() {
-        String userId = userManager.getCurrentUser().getDeviceId();
+        ArrayList<String> notificationIDs = userManager.getCurrentUser().getNotifications();
 
-        databaseManager.getNotifications(userID, new DatabaseManager.getNotificationsCallback() {
+        databaseManager.getNotifications(notificationIDs, new DatabaseManager.getNotificationsCallback() {
             @Override
             public void onSuccess(ArrayList<Notification> notifications) {
-                ListView simpleList = findViewById(R.id.notifs_listview);
+                ListView simpleList = findViewById(R.id.notifications_listview);
+                // Get the no notifications TextView
+                TextView noNotificationsTextView = findViewById(R.id.no_notifications_msg);
 
-                // Array of messages and senders
-                ArrayList<String> messages = new ArrayList<>();
-                ArrayList<String> sender = new ArrayList<>();
+                // If there are notifications, display them in the ListView
+                if (notifications != null && !notifications.isEmpty()) {
+                    simpleList.setVisibility(View.VISIBLE); // Show the ListView
+                    noNotificationsTextView.setVisibility(View.GONE); // Hide the "No Notifications" message
 
-                // set the array adapter with the messages and senders
-                NotificationAdapter customAdapter = new NotificationAdapter(getApplicationContext(), messages, sender);
-                simpleList.setAdapter(customAdapter);
+                    // Set the adapter for the ListView with notifications
+                    NotificationsAdapter customAdapter = new NotificationsAdapter(getApplicationContext(), notifications);
+                    simpleList.setAdapter(customAdapter);
+                } else {
+                    // If there are no notifications, show the "No Notifications" message
+                    simpleList.setVisibility(View.GONE); // Hide the ListView
+                    noNotificationsTextView.setVisibility(View.VISIBLE); // Show the "No Notifications" message
+                }
             }
+
             @Override
             public void onFailure(Exception e) {
                 Toast.makeText(getApplicationContext(), "Error loading notifications", Toast.LENGTH_SHORT).show();
-                finish(); // exit on fail
+                finish(); // Exit on failure
             }
         });
     }
