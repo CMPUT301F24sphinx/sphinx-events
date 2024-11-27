@@ -18,9 +18,13 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.firebase.firestore.DocumentReference;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class ViewCreatedEvent extends AppCompatActivity {
 
+    private Event currEvent;
     private String eventCode; // ID of event
     private EditText messageTextLayout; // The textbox for the message being sent
     DatabaseManager database;
@@ -46,8 +50,24 @@ public class ViewCreatedEvent extends AppCompatActivity {
         // Get the eventID from intent that started this Activity
         Intent intent = getIntent();
         if (intent != null ) {
-            eventCode = intent.getExtras().getString("eventCode");
+            eventCode = intent.getExtras().getString("eventID");
         }
+
+        // sets currEvent to event retrieved from db
+        getCurrentEvent(eventCode);
+
+        Button drawLotteryButton = findViewById(R.id.draw_lottery_button);
+        drawLotteryButton.setOnClickListener(v ->{
+
+            Log.d("Aniket", "DrawLotteryPressed");
+
+            // TODO: This is supposed to be chosen by the organizer I just didn't get to making the edittext to enter a number to lottery
+            // TODO: The app will break if the number of entrants is less than this n value
+            int n = 3;
+
+            Collections.shuffle(currEvent.getEventEntrants());
+            List<String> sample = currEvent.getEventEntrants().subList(0, n);
+        });
 
         // If the message entered into the textbox is nonempty send that message to entrants
         // Pass eventID to function
@@ -63,6 +83,18 @@ public class ViewCreatedEvent extends AppCompatActivity {
         ImageButton backButton = findViewById(R.id.manage_event_back_button);
         backButton.setOnClickListener(v -> {
             finish();  // close activity when back arrow is pressed
+        });
+    }
+
+    private void getCurrentEvent(String eventCode){
+        database.getEvent(eventCode, new DatabaseManager.eventRetrievalCallback() {
+            @Override
+            public void onSuccess(Event event) {
+                currEvent = event;
+            }
+            @Override
+            public void onFailure(Exception e) {
+            }
         });
     }
 

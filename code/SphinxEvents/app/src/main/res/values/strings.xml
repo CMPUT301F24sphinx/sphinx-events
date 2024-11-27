@@ -73,6 +73,7 @@
     <string name="view_entrant_data_button">View Entrant Data</string>
     <string name="notify_entrants_button">Send Message</string>
     <string name="leave_event_waitlist">Leave Waitlist</string>
+    <string name="do_event_draw">Draw Lottery</string>
 
 <!--    Notifications-->
     <string name="channel_name">NotificationChannel</string>

@@ -301,7 +301,6 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         ArrayList<Event> createdEvents = new ArrayList<>();
 
         events.put(headers.get(0), joinedEvents);
-        events.put(headers.get(1), pendingEvents);
 
         databaseManager.getJoinedEvents(currentUser.getDeviceId(), new DatabaseManager.getJoinedEventsCallback() {
             @Override
@@ -326,7 +325,7 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
             public void onFailure(Exception e) {
             }
         });
-        events.put(headers.get(0), joinedEvents);
+        events.put(headers.get(1), joinedEvents);
 
         // Add organizer stuff if user is an Organizer
         if (currentUser.getRole().equals("Organizer")) {
@@ -367,10 +366,10 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         // Clicking event in main screen -> allows user to view event details
         expandableListView.setOnChildClickListener((parent, view, groupPosition, childPosition, id) -> {
             // Code for new activity that views events goes here
-            if(groupPosition == 0){
-                Intent viewEnteredEvents = new Intent(this, ViewEnteredEvent.class);
-                viewEnteredEvents.putExtra("eventID", eventCodes.get(headers.get(groupPosition)).get(childPosition));
-                startActivity(viewEnteredEvents);
+            if(groupPosition == 1){
+                Intent viewPendingEvents = new Intent(this, ViewEnteredEvent.class);
+                viewPendingEvents.putExtra("eventID", eventCodes.get(headers.get(groupPosition)).get(childPosition));
+                startActivity(viewPendingEvents);
             }
             else if(groupPosition == 2) {
                 Intent viewCreatedEvents = new Intent(this, ViewCreatedEvent.class);
