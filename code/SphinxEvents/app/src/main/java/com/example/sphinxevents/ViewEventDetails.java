@@ -41,6 +41,7 @@ public class ViewEventDetails extends AppCompatActivity {
     private FirebaseStorage storage;
     private StorageReference storageReference;
     private DatabaseManager databaseManager;
+    private UserManager userManager;
 
     // Layout items
     private ImageView eventPosterLayout;
@@ -67,6 +68,7 @@ public class ViewEventDetails extends AppCompatActivity {
         // ID of event being viewed
         String eventCode;
         databaseManager = DatabaseManager.getInstance();
+        userManager = UserManager.getInstance();
 
         // Connect layout stuff to xml views
         eventPosterLayout = findViewById(R.id.eventPoster);
@@ -115,7 +117,7 @@ public class ViewEventDetails extends AppCompatActivity {
             @Override
             public void onSuccess(Event event) {
 
-                String currUser = UserManager.getInstance().getCurrentUser().getDeviceId();
+                String currUser = userManager.getCurrentUser().getDeviceId();
                 ArrayList<String> eventEntrants = event.getEventEntrants();
 
                 if(eventEntrants == null){

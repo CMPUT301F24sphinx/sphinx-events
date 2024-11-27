@@ -45,6 +45,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 //import com.journeyapps.barcodescanner.ScanOptions;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.firestore.auth.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,14 +58,13 @@ import java.util.Objects;
  */
 public class MainActivity extends AppCompatActivity implements UserManager.UserUpdateListener {
 
-    private DatabaseManager databaseManager;
     private UserManager userManager;
+    private DatabaseManager databaseManager;
     private String deviceId;
 
     private ExpandableListView expandableListView;  // expandable list of events
     private List<String> headers;  // headers/parents/group names
     private HashMap<String, List<Event>> events;  // map each group name to list of Event objects
-    private HashMap<String, List<String>> eventCodes;
     private ExpandableListAdapter listAdapter;
 
     private ImageButton profilePicBtn;
@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         content.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
             public boolean onPreDraw() {
-                if (userManager.getCurrentUser() != null) {
+                if (UserManager.getInstance().getCurrentUser() != null) {
                     content.getViewTreeObserver().removeOnPreDrawListener(this);
                     return true;
                 }
@@ -103,10 +103,10 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
 
 
         // Register as a listener for currentUser updates
-        UserManager.getInstance().addUserUpdateListener(this);
+        userManager = UserManager.getInstance();
+        userManager.addUserUpdateListener(this);
 
         databaseManager = DatabaseManager.getInstance();
-        userManager = UserManager.getInstance();
         retrieveUser();
 
         initializeDrawer();  // initializes drawer display and functionalities
@@ -291,7 +291,6 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
 
         headers = new ArrayList<>();
         events = new HashMap<>();
-        eventCodes = new HashMap<>();
 
         headers.add(getString(R.string.joined_events_header, currentUser.getJoinedEvents().size()));
         headers.add(getString(R.string.pending_events_header, currentUser.getPendingEvents().size()));
@@ -349,11 +348,23 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
 
         // Clicking event in main screen -> allows user to view event details
         expandableListView.setOnChildClickListener((parent, view, groupPosition, childPosition, id) -> {
-            // Code for new activity that views events goes here
-            Intent viewEnteredEvents = new Intent(this, ViewCreatedEvent.class);
-            viewEnteredEvents.putExtra("eventCode", eventCodes.get(headers.get(groupPosition)).get(childPosition));
-            startActivity(viewEnteredEvents);
-            return true; // Indicating the event is handled
+            Event clickedEvent = (Event) listAdapter.getChild(groupPosition, childPosition);
+            switch (groupPosition) {
+                case 0:
+                    //TODO: Go to viewJoinedEvent activity
+                    break;
+
+                case 1:
+                    //TODO: Got to viewPendingEvent activity
+                    break;
+
+                case 2:
+                    Intent viewCreatedEventIntent = new Intent(MainActivity.this, ViewCreatedEvent.class);
+                    viewCreatedEventIntent.putExtra("eventToView", clickedEvent);
+                    startActivity(viewCreatedEventIntent);
+                    break;
+            }
+            return true;
         });
     }
 

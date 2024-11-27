@@ -21,9 +21,8 @@ import java.util.ArrayList;
 
 public class ViewCreatedEvent extends AppCompatActivity {
 
-    private String eventCode; // ID of event
+    private Event createdEvent; // The created event to view
     private EditText messageTextLayout; // The textbox for the message being sent
-    DatabaseManager database;
 
     /**
      * On creation of activity
@@ -40,15 +39,13 @@ public class ViewCreatedEvent extends AppCompatActivity {
             return insets;
         });
 
-        // Get instance of database
-        database = DatabaseManager.getInstance();
-
         // Get the eventID from intent that started this Activity
         Intent intent = getIntent();
         if (intent != null ) {
-            eventCode = intent.getExtras().getString("eventCode");
+            createdEvent = (Event) intent.getSerializableExtra("eventToView");
         }
 
+        /*
         // If the message entered into the textbox is nonempty send that message to entrants
         // Pass eventID to function
         messageTextLayout = findViewById(R.id.message_to_entrants);
@@ -58,6 +55,7 @@ public class ViewCreatedEvent extends AppCompatActivity {
                 getEventForNotification(eventCode);
             }
         });
+        */
 
         // Exit activity
         ImageButton backButton = findViewById(R.id.manage_event_back_button);
@@ -67,26 +65,10 @@ public class ViewCreatedEvent extends AppCompatActivity {
     }
 
     /**
-     * Get the Event obj sender event
-     * @param eventCode
-     */
-    private void getEventForNotification(String eventCode) {
-        database.getEvent(eventCode, new DatabaseManager.eventRetrievalCallback() {
-            @Override
-            public void onSuccess(Event event) {
-                sendMessageToEntrants(event); // Call send message with event obj
-//                ArrayList<String> entrants = event.getEventEntrants();
-            }
-            @Override
-            public void onFailure(Exception e) {
-            }
-        });
-    }
-
-    /**
      * Use database.createNotification() to upload a notification object to db
      * @param event Event object of sender event/organizer
      */
+    /*
     private void sendMessageToEntrants(Event event) {
 
         String eventName = event.getName(); // name of event
@@ -108,4 +90,5 @@ public class ViewCreatedEvent extends AppCompatActivity {
             });
         }
     }
+     */
 }

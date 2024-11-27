@@ -8,6 +8,9 @@
     <string name="joined_events_header">Joined Events (%d)</string>
     <string name="pending_events_header">Pending Events (%d)</string>
     <string name="created_events_header">Created Events (%d)</string>
+    <string name="days_until_lottery">%d Days</string>
+    <string name="number_of_entrants">Number of Entrants: %d</string>
+    <string name="entrant_limit">/ %d</string>
 
     <!--Drawer strings-->
     <string name="close_drawer_speakable_text">Close side drawer button</string>
@@ -88,5 +91,8 @@
 <!--    QR Code Scan Strings-->
     <string name="qr_camera_scan">Camera</string>
     <string name="qr_use_gallery">Gallery</string>
+    <string name="lottery_drawn">Lottery Drawn!</string>
+    <string name="awaiting_lottery">Awaiting Lottery</string>
+    <string name="join">Join</string>
 
 </resources>

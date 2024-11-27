@@ -20,6 +20,8 @@ public class Event implements Serializable {
     private Boolean geolocationReq;  // Boolean indicating if geolocation is required
     private ArrayList<String> entrants;  // The list of entrants who have joined the event
 
+    private boolean lotteryDrawn = false;  // Boolean indicating if lottery has been drawn
+
     // Empty Constructor
     public Event() {
     }
@@ -140,5 +142,21 @@ public class Event implements Serializable {
      * @param entrants The list of entrants.
      */
     public void setEventEntrants(ArrayList<String> entrants) {this.entrants = entrants;}
+
+    /**
+     * Sets whether lottery for event has been drawn
+     * @param lotteryDrawn new boolean indicating if lottery was drawn
+     */
+    public void setWasLotteryDrawn(boolean lotteryDrawn) {
+        this.lotteryDrawn = lotteryDrawn;
+    }
+
+    /**
+     * Gets whether lottery for event has been drawn
+     * @return boolean indicating if lottery was drawn
+     */
+    public boolean isLotteryDrawn() {
+        return lotteryDrawn;
+    }
 }
 

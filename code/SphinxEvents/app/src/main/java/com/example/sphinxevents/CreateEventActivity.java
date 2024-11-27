@@ -30,6 +30,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.auth.User;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -195,10 +196,19 @@ public class CreateEventActivity extends AppCompatActivity {
         databaseManager.createEvent(newEvent, new DatabaseManager.EventCreationCallback() {
             @Override
             public void onSuccess(DocumentReference eventRef) {
-                Toast.makeText(getApplicationContext(), "Event created successfully", Toast.LENGTH_SHORT).show();
-                databaseManager.updateOrganizerCreatedEvents(organizerId, eventRef.getId());
+                // Adds Event to user and updates current user
+                String eventId = eventRef.getId();
+                UserManager userManager = UserManager.getInstance();
+                Organizer currentUser = (Organizer) userManager.getCurrentUser();
+                currentUser.addCreatedEvent(eventId);
+                userManager.setCurrentUser(currentUser);
+
+                // Updates user in database
+                databaseManager.updateOrganizerCreatedEvents(organizerId, eventId);
                 uploadPosterImage(posterId);
-                startQrCodeActivity(eventRef.getId());
+                Toast.makeText(getApplicationContext(), "Event created successfully", Toast.LENGTH_SHORT).show();
+
+                startQrCodeActivity(eventId);
                 finish();
             }
 
