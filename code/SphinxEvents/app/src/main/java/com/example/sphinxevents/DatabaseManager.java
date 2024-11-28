@@ -769,6 +769,91 @@ public class DatabaseManager {
                 .addOnFailureListener(callback::onFailure);  // Notify failure
 
     }
+
+
+    //---------------------------------------------------------------------------------------------
+    //Admin events search handling:
+
+    /**
+     * Callback interface for events search
+     */
+    public interface EventsSearchCallback {
+        /**
+         * Called when event search is successful
+         * @param users array of events that match query
+         */
+        void onSuccess(ArrayList<Event> events);
+
+        /**
+         * Called when error occurs during events search
+         * @param e the exception that occurred
+         */
+        void onFailure(Exception e);
+    }
+
+    /**
+     * Searches database for events that match name
+     * @param query the event name to find in database
+     * @param callback Callback to handle success or failure of searching database
+     */
+    public void searchEvents(String query, EventsSearchCallback callback) {
+        // Ensure the query is not case-sensitive and add a termination character to simulate a "contains" query
+        String endQuery = query + "\uf8ff"; // \uf8ff is a high Unicode character
+
+        // Query the users collection for documents with names containing the query
+        database.collection("events")
+                .whereGreaterThanOrEqualTo("name", query)
+                .whereLessThanOrEqualTo("name", endQuery)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        ArrayList<Event> events = new ArrayList<>();
+                        for (DocumentSnapshot document : task.getResult()) {
+                            Event event = document.toObject(Event.class);
+                            events.add(event);
+                        }
+                        callback.onSuccess(events);
+                    } else {
+                        callback.onFailure(task.getException());
+                    }
+                });
+    }
+
+    /**
+     * Callback interface for event deletion
+     */
+    public interface EventRemovalCallback {
+        /**
+         * Called when event is successfully removed
+         */
+        void onSuccess();
+
+        /**
+         * Called when error occurs during event deletion
+         * @param e the exception that occurred
+         */
+        void onFailure(Exception e);
+    }
+
+    /**
+     * Removes an event from database
+     * @param deviceId key for profile
+     * @param callback Callback to handle success or failure of event deletion
+     */
+    public void removeEvent(String deviceId, EventRemovalCallback callback) {
+        // Remove the event from the Firestore collection
+        database.collection("events")
+                .document(deviceId)
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    // Call the callback on success
+                    callback.onSuccess();
+                })
+                .addOnFailureListener(callback::onFailure);  // Notify failure
+
+    }
+
+
 }
 
 
