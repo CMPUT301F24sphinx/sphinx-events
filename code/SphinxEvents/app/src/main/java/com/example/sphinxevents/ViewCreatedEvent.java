@@ -48,15 +48,6 @@ public class ViewCreatedEvent extends AppCompatActivity {
             eventCode = intent.getExtras().getString("eventCode");
         }
 
-        // If the message entered into the textbox is nonempty send that message to entrants
-        // Pass eventID to function
-        messageTextLayout = findViewById(R.id.message_to_entrants);
-        Button notifyEntrantsBtn = findViewById(R.id.notify_entrants_button);
-        notifyEntrantsBtn.setOnClickListener(v -> {
-            if(!messageTextLayout.getText().toString().equals("")){
-                getEventForNotification(eventCode);
-            }
-        });
 
         // Exit activity
         ImageButton backButton = findViewById(R.id.manage_event_back_button);
@@ -65,44 +56,4 @@ public class ViewCreatedEvent extends AppCompatActivity {
         });
     }
 
-    /**
-     * Get the Event obj sender event
-     * @param eventCode
-     */
-    private void getEventForNotification(String eventCode) {
-        database.getEvent(eventCode, new DatabaseManager.eventRetrievalCallback() {
-            @Override
-            public void onSuccess(Event event) {
-                sendMessageToEntrants(event); // Call send message with event obj
-//                ArrayList<String> entrants = event.getEventEntrants();
-            }
-            @Override
-            public void onFailure(Exception e) {
-            }
-        });
-    }
-
-    /**
-     * Use database.createNotification() to upload a notification object to db
-     * @param event Event object of sender event/organizer
-     */
-    private void sendMessageToEntrants(Event event) {
-
-        String eventName = event.getName(); // name of event
-
-        // For all entrants in event make a new notification object and send to db
-        ArrayList<String> entrants = event.getEventEntrants();
-
-        Notification notification = new Notification(eventCode, eventName, Notification.notificationType.Message);
-        notification.setMessage(messageTextLayout.getText().toString());
-        database.createNotification(notification, entrants, new DatabaseManager.NotificationCreationCallback() {
-            @Override
-            public void onSuccess() {
-            }
-            @Override
-            public void onFailure(Exception e) {
-                Toast.makeText(getApplicationContext(), "Failed to send message to entrants", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
 }

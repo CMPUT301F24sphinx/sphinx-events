@@ -69,9 +69,6 @@
             android:name=".ViewEnteredEvent"
             android:exported="false"/>
         <activity
-            android:name=".ViewNotificationsActivity"
-            android:exported="false"/>
-        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/SplashScreen">
