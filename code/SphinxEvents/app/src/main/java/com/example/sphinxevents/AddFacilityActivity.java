@@ -146,7 +146,6 @@ public class AddFacilityActivity extends AppCompatActivity {
                 databaseManager.saveUser(user, new DatabaseManager.UserCreationCallback() {
                     @Override
                     public void onSuccess(String deviceId) {
-                        userManager.setCurrentUser(user);
                         if (context.equals("Add Facility")) {
                             Toast.makeText(getApplicationContext(), "Facility added!", Toast.LENGTH_SHORT).show();
                         }

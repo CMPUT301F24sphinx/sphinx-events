@@ -8,6 +8,7 @@ package com.example.sphinxevents;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -62,6 +63,7 @@ public class ManageFacilityActivity extends AppCompatActivity
         userManager = UserManager.getInstance();
         user = userManager.getCurrentUser();
         userManager.addUserUpdateListener(this);
+        userManager.startListeningForUserChanges(user.getDeviceId());
         databaseManager = DatabaseManager.getInstance();
 
         // Obtains relevant XML elements
@@ -113,7 +115,6 @@ public class ManageFacilityActivity extends AppCompatActivity
         databaseManager.removeFacility(user.getDeviceId(), new DatabaseManager.FacilityRemovalCallback() {
             @Override
             public void onSuccess(Entrant updatedUser) {
-                userManager.setCurrentUser(updatedUser);
                 Toast.makeText(getApplicationContext(), "Facility removed!", Toast.LENGTH_SHORT).show();
             }
 
@@ -137,11 +138,10 @@ public class ManageFacilityActivity extends AppCompatActivity
 
     /**
      * Updates display when user facility is added, edited, or removed
-     * @param updatedUser updated user
      */
     @Override
-    public void onUserUpdated(Entrant updatedUser) {
-        user = updatedUser;
+    public void onUserUpdated() {
+        user = userManager.getCurrentUser();
         setDisplay();
     }
 

@@ -7,7 +7,6 @@
  * This class follows a singleton pattern to ensure there is only one instance managing the
  * current user and notifying listeners about any user updates.
  */
-
 package com.example.sphinxevents;
 
 import android.content.Context;
@@ -16,13 +15,14 @@ import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.util.Log;
 
-import com.example.sphinxevents.Entrant;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Singleton class to manage user data and interactions with user updates
@@ -31,6 +31,8 @@ public class UserManager {
     private static UserManager instance;
     private Entrant currentUser;
     private final ArrayList<UserUpdateListener> listeners = new ArrayList<>();
+    private ListenerRegistration userListener;
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     /**
      * Initializes the UserManager instance
@@ -92,15 +94,54 @@ public class UserManager {
      */
     private void notifyUserUpdate() {
         for (UserUpdateListener listener : listeners) {
-            listener.onUserUpdated(currentUser);
+            listener.onUserUpdated();
         }
     }
 
     /**
-     * Listener interface for receiving user update notifications.
+     * Starts listening for changes in the user's Firestore document.
+     *
+     * @param userId The user ID to listen for changes.
      */
-    public interface UserUpdateListener {
-        void onUserUpdated(Entrant updatedUser);
+    public void startListeningForUserChanges(String userId) {
+        DocumentReference userRef = db.collection("users").document(userId);
+
+        // Listen for real-time changes in the user's document
+        userListener = userRef.addSnapshotListener((documentSnapshot, e) -> {
+            if (e != null) {
+                Log.e("UserManager", "Error listening to user document", e);
+                return;
+            }
+            if (documentSnapshot != null && documentSnapshot.exists()) {
+                // Retrieve role from the document
+                String role = documentSnapshot.getString("role");
+
+                // Conditionally map to either Entrant or Organizer based on the role
+                if ("Organizer".equals(role)) {
+                    // Map to Organizer if role is "Organizer"
+                    currentUser = documentSnapshot.toObject(Organizer.class);
+                } else {
+                    // Otherwise, map to Entrant (default case)
+                    currentUser = documentSnapshot.toObject(Entrant.class);
+                }
+
+                if (currentUser != null) {
+                    // Notify listeners about the updated user data
+                    notifyUserUpdate();
+                }
+            } else {
+                Log.w("UserManager", "User document not found.");
+            }
+        });
+    }
+
+    /**
+     * Stops listening for changes to the user's Firestore document.
+     */
+    public void stopListeningForUserChanges() {
+        if (userListener != null) {
+            userListener.remove(); // Remove the listener
+        }
     }
 
     /**
@@ -157,4 +198,14 @@ public class UserManager {
         return null;
     }
 
+    /**
+     * Listener interface for receiving user update notifications.
+     */
+    public interface UserUpdateListener {
+        /**
+         * Called when the user data is updated.
+         */
+        void onUserUpdated();
+    }
 }
+

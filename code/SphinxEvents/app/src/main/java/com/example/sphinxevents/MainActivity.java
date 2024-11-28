@@ -109,8 +109,6 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
 
         deviceId = getDeviceId(this);
 
-        // Register as a listener for currentUser updates
-        UserManager.getInstance().addUserUpdateListener(this);
 
         createNotificationChannels();
         notificationListener = new NotificationListener(this);
@@ -118,6 +116,9 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
 
         databaseManager = DatabaseManager.getInstance();
         userManager = UserManager.getInstance();
+        // Register as a listener for currentUser updates
+        userManager.addUserUpdateListener(this);
+        userManager.startListeningForUserChanges(deviceId);
         retrieveUser();
 
         initializeDrawer();  // initializes drawer display and functionalities
@@ -421,7 +422,7 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
      * Listener method for user updates from UserManager
      */
     @Override
-    public void onUserUpdated(Entrant updatedUser) {
+    public void onUserUpdated() {
         // Update UI elements based on the new currentUser data
         updateProfilePicture();
         updateDrawer();
@@ -433,7 +434,7 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
      */
     @Override
     protected void onDestroy() {
-        userManager.removeUserUpdateListener(this);
+        userManager.stopListeningForUserChanges();
         if (notificationListener != null) {
             notificationListener.stopListeningForNotifications();
         }
