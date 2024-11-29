@@ -599,8 +599,9 @@ public class DatabaseManager {
 
     /**
      * Changes the poster of an event
-     * Generates new posterId, uploads poster, updates poster field for event
+     * Uploads poster, updates poster field for event
      * @param eventId the ID of the event to change the poster for
+     * @param posterId the path of the poster in the database
      * @param posterUri  the Uri of the new poster
      * @param callback  the callback to handle success or failure of changing poster
      */
