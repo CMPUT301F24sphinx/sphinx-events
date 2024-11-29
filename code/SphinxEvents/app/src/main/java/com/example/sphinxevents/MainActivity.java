@@ -49,6 +49,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 //import com.journeyapps.barcodescanner.ScanOptions;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.firestore.auth.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,8 +62,8 @@ import java.util.Objects;
  */
 public class MainActivity extends AppCompatActivity implements UserManager.UserUpdateListener {
 
-    private DatabaseManager databaseManager;
     private UserManager userManager;
+    private DatabaseManager databaseManager;
     private String deviceId;
 
     private NotificationListener notificationListener;
@@ -70,7 +71,6 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
     private ExpandableListView expandableListView;  // expandable list of events
     private List<String> headers;  // headers/parents/group names
     private HashMap<String, List<Event>> events;  // map each group name to list of Event objects
-    private HashMap<String, List<String>> eventCodes;
     private ExpandableListAdapter listAdapter;
 
     private ImageButton profilePicBtn;
@@ -294,73 +294,56 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
 
         headers = new ArrayList<>();
         events = new HashMap<>();
-        eventCodes = new HashMap<>();
 
-        headers.add("Joined Events");
-        headers.add("Pending Events");
+        headers.add(getString(R.string.joined_events_header, currentUser.getJoinedEvents().size()));
+        headers.add(getString(R.string.pending_events_header, currentUser.getPendingEvents().size()));
 
-        List<Event> joinedEvents = new ArrayList<>();
-        List<Event> pendingEvents = new ArrayList<>();
-        ArrayList<Event> createdEvents = new ArrayList<>();
-
-        events.put(headers.get(0), joinedEvents);
-
-        databaseManager.getJoinedEvents(currentUser.getDeviceId(), new DatabaseManager.getJoinedEventsCallback() {
+        // Displays joined events
+        databaseManager.retrieveEventList(currentUser.getJoinedEvents(), new DatabaseManager.retrieveEventListCallback() {
             @Override
-            public void onSuccess(List<String> joinedEventsID) {
-                eventCodes.put(headers.get(0), joinedEventsID);
-                for(Integer i = 0; i < joinedEventsID.size(); ++i){
-                    Log.d("Aniket", eventCodes.get(headers.get(0)).get(i));
-                    databaseManager.getEvent(joinedEventsID.get(i), new DatabaseManager.eventRetrievalCallback() {
-                        @Override
-                        public void onSuccess(Event event) {
-                            joinedEvents.add(event);
-                            Log.d("Aniket", event.getName() + "joined");
-                        }
-                        @Override
-                        public void onFailure(Exception e) {
-                            Log.d("Aniket", "Cant retrieve created event with code");
-                        }
-                    });
-                }
+            public void onSuccess(List<Event> joinedEvents) {
+                events.put(headers.get(0), joinedEvents);
             }
+
             @Override
             public void onFailure(Exception e) {
+                Toast.makeText(MainActivity.this, "Error Displaying Joined Events",
+                        Toast.LENGTH_SHORT).show();
             }
         });
-        events.put(headers.get(1), joinedEvents);
 
-        // Add organizer stuff if user is an Organizer
+        // Displays pending events
+        databaseManager.retrieveEventList(currentUser.getPendingEvents(), new DatabaseManager.retrieveEventListCallback() {
+            @Override
+            public void onSuccess(List<Event> pendingEvents) {
+                events.put(headers.get(1), pendingEvents);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(MainActivity.this, "Error Displaying Pending Events",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Displays created events if user is Organizer
         if (currentUser.getRole().equals("Organizer")) {
             Organizer organizer = (Organizer) currentUser;
-            headers.add("Created Events");
+            headers.add(getString(R.string.created_events_header, organizer.getCreatedEvents().size()));
 
-            databaseManager.getCreatedEvents(currentUser.getDeviceId(), new DatabaseManager.getCreatedEventsCallback() {
+            databaseManager.retrieveEventList(organizer.getCreatedEvents(), new DatabaseManager.retrieveEventListCallback() {
                 @Override
-                public void onSuccess(List<String> createdEventsID) {
-
-                    eventCodes.put(headers.get(2), createdEventsID);
-                    for(Integer i = 0; i < createdEventsID.size(); ++i){
-//                        Log.d("Aniket", eventCodes.get(headers.get(2)).get(i));
-                        databaseManager.getEvent(createdEventsID.get(i), new DatabaseManager.eventRetrievalCallback() {
-                            @Override
-                            public void onSuccess(Event event) {
-                                createdEvents.add(event);
-//                                Log.d("Aniket", event.getName());
-
-                            }
-                            @Override
-                            public void onFailure(Exception e) {
-//                                Log.d("Aniket", "Cant retrieve created event with code");
-                            }
-                        });
-                    }
+                public void onSuccess(List<Event> createdEvents) {
+                    headers.set(2, getString(R.string.created_events_header, createdEvents.size()));
+                    events.put(headers.get(2), createdEvents);
                 }
+
                 @Override
                 public void onFailure(Exception e) {
+                    Toast.makeText(MainActivity.this, "Error Displaying Created Events",
+                            Toast.LENGTH_SHORT).show();
                 }
             });
-            events.put(headers.get(2), createdEvents);
         }
 
         listAdapter = new EventExListAdapter(this, headers, events);
@@ -368,18 +351,23 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
 
         // Clicking event in main screen -> allows user to view event details
         expandableListView.setOnChildClickListener((parent, view, groupPosition, childPosition, id) -> {
-            // Code for new activity that views events goes here
-            if(groupPosition == 1){
-                Intent viewPendingEvents = new Intent(this, ViewEnteredEvent.class);
-                viewPendingEvents.putExtra("eventID", eventCodes.get(headers.get(groupPosition)).get(childPosition));
-                startActivity(viewPendingEvents);
+            Event clickedEvent = (Event) listAdapter.getChild(groupPosition, childPosition);
+            switch (groupPosition) {
+                case 0:
+                    //TODO: Go to viewJoinedEvent activity
+                    break;
+
+                case 1:
+                    //TODO: Got to viewPendingEvent activity
+                    break;
+
+                case 2:
+                    Intent viewCreatedEventIntent = new Intent(MainActivity.this, ViewCreatedEvent.class);
+                    viewCreatedEventIntent.putExtra("eventToView", clickedEvent);
+                    startActivity(viewCreatedEventIntent);
+                    break;
             }
-            else if(groupPosition == 2) {
-                Intent viewCreatedEvents = new Intent(this, ViewCreatedEvent.class);
-                viewCreatedEvents.putExtra("eventID", eventCodes.get(headers.get(groupPosition)).get(childPosition));
-                startActivity(viewCreatedEvents);
-            }
-            return true; // Indicating the event is handled
+            return true;
         });
     }
 

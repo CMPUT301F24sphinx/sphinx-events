@@ -3,13 +3,14 @@ package com.example.sphinxevents;
 
 import com.google.firebase.firestore.auth.User;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
 /**
  * Represents an event object
  */
-public class Event {
+public class Event implements Serializable {
 
     private String name;  // The name of the event
     private String description;  // The description of the event
@@ -18,6 +19,18 @@ public class Event {
     private Integer entrantLimit;  // The entrant limit for the event
     private Boolean geolocationReq;  // Boolean indicating if geolocation is required
     private ArrayList<String> entrants;  // The list of entrants who have joined the event
+    private UserLocation facilityLocation;  // The location of the facility event belongs to
+
+    //---------------------------------------------------------------------------------------
+    // TODO: Change these variables to match what Aniket has implemented
+
+    private ArrayList<String> waitingList;
+    private boolean lotteryWasDrawn = false;  // Boolean indicating if lottery has been drawn
+    //---------------------------------------------------------------------------------------
+
+    // Empty Constructor
+    public Event() {
+    }
 
     /**
      * Constructs an Event with the specified attributes.
@@ -29,8 +42,10 @@ public class Event {
      * @param entrantLimit The maximum number of entrants.
      * @param geolocationReq True if geolocation is required, false otherwise.
      * @param joinedUsers The list of users who have joined the event.
+     * @param facilityLocation The location of the event's facility.
      */
-    Event(String name, String description, String poster, Date lotteryEndDate, Integer entrantLimit, Boolean geolocationReq, ArrayList<String> joinedUsers) {
+    Event(String name, String description, String poster, Date lotteryEndDate, Integer entrantLimit,
+          Boolean geolocationReq, ArrayList<String> joinedUsers, UserLocation facilityLocation) {
         this.name = name;
         this.description = description;
         this.poster = poster;
@@ -38,6 +53,8 @@ public class Event {
         this.entrantLimit = entrantLimit;
         this.geolocationReq = geolocationReq;
         this.entrants = joinedUsers;
+        this.facilityLocation = facilityLocation;
+        this.waitingList = new ArrayList<>();
     }
 
     /**
@@ -135,5 +152,79 @@ public class Event {
      * @param entrants The list of entrants.
      */
     public void setEventEntrants(ArrayList<String> entrants) {this.entrants = entrants;}
+
+    /**
+     * Returns location of facility that event belongs to
+     * @return location of facility
+     */
+    public UserLocation getFacilityLocation() {
+        return this.facilityLocation;
+    }
+
+    //----------------------------------------------------------------------------------------
+    // TODO: Determine which of these functions are used / useful
+
+
+    public ArrayList<String> getWaitingList() {
+        return waitingList;
+    }
+
+    public void setWaitingList(ArrayList<String> waitingList) {
+        this.waitingList = waitingList;
+    }
+
+    /**
+     * Sets whether lottery for event has been drawn
+     * @param lotteryWasDrawn new boolean indicating if lottery was drawn
+     */
+    public void setLotteryWasDrawn(boolean lotteryWasDrawn) {
+        this.lotteryWasDrawn = lotteryWasDrawn;
+    }
+
+    /**
+     * Gets whether lottery for event has been drawn
+     * @return boolean indicating if lottery was drawn
+     */
+    public boolean wasLotteryDrawn() {
+        return lotteryWasDrawn;
+    }
+
+    /**
+     * Returns whether the lottery end date has passed
+     * Which means that the lottery is ready to be drawn
+     * @return boolean indicating whether lottery end date has passed
+     */
+    public boolean canLotteryBeDrawn() {
+        if (lotteryWasDrawn) {
+            return false;  // Lottery has already occurred, cannot be drawn again
+        }
+        return hasRegistrationDeadlinePassed();  // Returns if registration deadline has passed
+    }
+
+    /**
+     * Returns whether current date is after lottery registration deadline
+     * @return whether registration deadline has passed
+     */
+    public boolean hasRegistrationDeadlinePassed() {
+        Date currentDate = new Date();
+        return currentDate.after(lotteryEndDate);
+    }
+
+    /**
+     * Returns number of people in waiting list
+     * @return size of waiting list
+     */
+    public int retrieveNumInWaitingList() {
+        return waitingList != null ? waitingList.size() : 0;
+    }
+    /**
+     * Returns whether waiting list is full
+     * @return boolean representing whether waiting list is full
+     */
+    public boolean checkIfWaitingListFull() {
+        return this.entrantLimit != null && this.waitingList.size() == this.entrantLimit;
+    }
+
+    //-------------------------------------------------------------------------------------------
 }
 
