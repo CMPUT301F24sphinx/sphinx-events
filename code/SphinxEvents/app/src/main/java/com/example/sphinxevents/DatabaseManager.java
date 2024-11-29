@@ -14,6 +14,7 @@ package com.example.sphinxevents;
 import android.location.Location;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -37,6 +38,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 //TODO: Add a more descriptive comment for the class when more functionality is implemented.
 /**
@@ -577,6 +579,34 @@ public class DatabaseManager {
                 });
     }
 
+    public interface changeEventPosterCallback {
+        void onSuccess();
+        void onFailure(Exception e);
+    }
+
+    public void changeEventPoster(String eventId, Uri posterUri, changeEventPosterCallback callback) {
+        // Generate a random key for the poster file
+        String posterRandKey = UUID.randomUUID().toString();
+        String posterId = "EventPosters/" + posterRandKey + ".jpg";
+
+        // Get Firebase Storage reference
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference().child(posterId);
+
+        // Upload the poster file
+        storageRef.putFile(posterUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // Handle failure to update the database
+                    database.collection("events").document(eventId)
+                            .update("poster", posterId)
+                            .addOnSuccessListener(aVoid -> {
+                                callback.onSuccess();
+                            })
+                            .addOnFailureListener(callback::onFailure);
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
+
     /**
      * Callback interface for created Events retrieval
      */
@@ -741,7 +771,7 @@ public class DatabaseManager {
     }
 
     //---------------------------------------------------------------------------------------------
-    //Admin profile search handling:
+    // Admin profile search handling:
 
     /**
      * Callback interface for profiles search
