@@ -1,28 +1,18 @@
 package com.example.sphinxevents;
 
-import static java.sql.Types.NULL;
-import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -49,11 +39,23 @@ import java.util.UUID;
  */
 public class CreateEventActivity extends AppCompatActivity {
 
+    // Manager attributes
+    private DatabaseManager databaseManager;
+    private UserManager userManager;
+    private String organizerId;
+
+    // UI elements
+    private EditText eventNameEditText;
+    private EditText eventDescriptionEditText;
+    private EditText registrationDeadlineEditText;
+    private EditText entrantLimitEditText;
+    private CheckBox geolocationReqCheckbox;
+
+
+    // Event poster attributes
     private ImageView posterImage;
     private Uri posterUri;
     private String dateString;
-    private DatabaseManager databaseManager;
-    private String organizerId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,58 +71,45 @@ public class CreateEventActivity extends AppCompatActivity {
         });
 
         databaseManager = DatabaseManager.getInstance();
+        userManager = UserManager.getInstance();
+        organizerId = userManager.getCurrentUser().getDeviceId();
 
-        organizerId = UserManager.getInstance().getCurrentUser().getDeviceId();
         // Initialize UI components
-        EditText eventNameText = findViewById(R.id.event_name);
-        EditText eventDescText = findViewById(R.id.event_description);
-        EditText regDateText = findViewById(R.id.reg_deadline);
-        EditText entrantLimitText = findViewById(R.id.entrant_limit);
-        CheckBox geolocationReqCheckbox = findViewById(R.id.geolocation_checkbox);
+        eventNameEditText = findViewById(R.id.event_name_edit_text);
+        eventDescriptionEditText = findViewById(R.id.event_description_edit_text);
+        registrationDeadlineEditText = findViewById(R.id.registration_deadline_edit_text);
+        posterImage = findViewById(R.id.poster_img);
+        Button uploadPosterButton = findViewById(R.id.poster_upload_btn);
+        entrantLimitEditText = findViewById(R.id.entrant_limit_edit_text);
+        geolocationReqCheckbox = findViewById(R.id.geolocation_checkbox);
         Button cancelButton = findViewById(R.id.cancel_btn);
         Button createConfirmButton = findViewById(R.id.confirm_btn);
-        Button uploadPosterButton = findViewById(R.id.poster_upload_btn);
-        posterImage = findViewById(R.id.poster_img);
 
         // Set up date picker for registration deadline
-        regDateText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showDatePicker(regDateText);
-            }
+        registrationDeadlineEditText.setOnClickListener(v -> {
+            showDatePicker();
         });
 
         // Set up button for poster upload
-        uploadPosterButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                selectImage();
-            }
+        uploadPosterButton.setOnClickListener(v -> {
+            selectImage();
         });
 
         // Set up button to create the event
-        createConfirmButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                createEvent(eventNameText, eventDescText, entrantLimitText, geolocationReqCheckbox);
-            }
+        createConfirmButton.setOnClickListener(v -> {
+            createEvent();
         });
 
         // Set up button to cancel and exit the activity
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
+        cancelButton.setOnClickListener(v -> {
+            finish();
         });
     }
 
     /**
      * Displays a date picker dialog and sets the selected date to the EditText.
-     *
-     * @param regDateText EditText to display selected date.
      */
-    private void showDatePicker(EditText regDateText) {
+    private void showDatePicker() {
         final Calendar date = Calendar.getInstance();
         int year = date.get(Calendar.YEAR);
         int month = date.get(Calendar.MONTH);
@@ -130,7 +119,7 @@ public class CreateEventActivity extends AppCompatActivity {
                 CreateEventActivity.this,
                 (view, selectedYear, selectedMonth, selectedDay) -> {
                     dateString = selectedYear + "/" + (selectedMonth + 1) + "/" + selectedDay;
-                    regDateText.setText(dateString);
+                    registrationDeadlineEditText.setText(dateString);
                 },
                 year, month, day
         );
@@ -152,27 +141,24 @@ public class CreateEventActivity extends AppCompatActivity {
 
     /**
      * Creates a new event using the input fields and uploads the poster image if selected.
-     *
-     * @param eventNameText      EditText for event name.
-     * @param eventDescText      EditText for event description.
-     * @param entrantLimitText   EditText for entrant limit.
-     * @param geolocationReqCheckbox CheckBox for geolocation requirement.
      */
-    private void createEvent(EditText eventNameText, EditText eventDescText,
-                             EditText entrantLimitText, CheckBox geolocationReqCheckbox) {
-        String eventName = eventNameText.getText().toString().trim();
-        String eventDesc = eventDescText.getText().toString().trim();
-        String entrantLimitString = entrantLimitText.getText().toString().trim();
+    private void createEvent() {
+        // Obtains user input
+        String eventName = eventNameEditText.getText().toString().trim();
+        String eventDesc = eventDescriptionEditText.getText().toString().trim();
+        String entrantLimitString = entrantLimitEditText.getText().toString().trim();
         boolean geolocationReq = geolocationReqCheckbox.isChecked();
 
+        // Checks if all required input is entered
         if (eventName.isEmpty() || eventDesc.isEmpty() || dateString == null || posterUri == null) {
             Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show();
             return;
         }
 
+        // Converts input into proper types
         Integer entrantLimit;
         try {
-            entrantLimit = entrantLimitString.isEmpty() ? NULL : Integer.valueOf(entrantLimitString);
+            entrantLimit = entrantLimitString.isEmpty() ? null : Integer.valueOf(entrantLimitString);
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Invalid entrant limit", Toast.LENGTH_SHORT).show();
             return;
@@ -190,15 +176,26 @@ public class CreateEventActivity extends AppCompatActivity {
         ArrayList<String> entrants = new ArrayList<String>();
 
         // Create a new Event object
-        Event newEvent = new Event(eventName, eventDesc, posterId, regDate, entrantLimit, geolocationReq, entrants);
+        Organizer organizer = (Organizer) userManager.getCurrentUser();
+        UserLocation facilityLocation = organizer.getFacility().getLocation();
+        Event newEvent = new Event(eventName, eventDesc, posterId, regDate, entrantLimit,
+                geolocationReq, new ArrayList<String>(), facilityLocation);
 
         databaseManager.createEvent(newEvent, new DatabaseManager.EventCreationCallback() {
             @Override
             public void onSuccess(DocumentReference eventRef) {
-                Toast.makeText(getApplicationContext(), "Event created successfully", Toast.LENGTH_SHORT).show();
-                databaseManager.updateOrganizerCreatedEvents(organizerId, eventRef.getId());
+                // Adds Event to user and updates current user
+                String eventId = eventRef.getId();
+                Organizer currentUser = (Organizer) userManager.getCurrentUser();
+                currentUser.addCreatedEvent(eventId);
+                userManager.setCurrentUser(currentUser);
+
+                // Updates user in database
+                databaseManager.updateOrganizerCreatedEvents(organizerId, eventId);
                 uploadPosterImage(posterId);
-                startQrCodeActivity(eventRef.getId());
+                Toast.makeText(getApplicationContext(), "Event created successfully", Toast.LENGTH_SHORT).show();
+
+                startQrCodeActivity(eventId);
                 finish();
             }
 

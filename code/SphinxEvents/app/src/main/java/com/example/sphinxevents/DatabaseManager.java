@@ -10,6 +10,7 @@
 
 package com.example.sphinxevents;
 
+import android.location.Location;
 import android.net.Uri;
 import android.util.Log;
 
@@ -92,7 +93,6 @@ public class DatabaseManager {
                 .add(event)
                 .addOnSuccessListener(callback::onSuccess)
                 .addOnFailureListener(callback::onFailure);
-
     }
 
     /**
@@ -248,10 +248,7 @@ public class DatabaseManager {
                     if (task.isSuccessful() && task.getResult() != null) {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
-                            String name = document.getString("name");
-                            String location = document.getString("location");
-                            String phoneNumber = document.getString("phoneNumber");
-                            Facility facility = new Facility(name, location, phoneNumber, deviceId);
+                            Facility facility = document.toObject(Facility.class);
                             callback.onSuccess(facility);
                         } else {
                             callback.onFailure(new Exception("Facility does not exist."));
@@ -511,21 +508,13 @@ public class DatabaseManager {
                     if (task.isSuccessful() && task.getResult() != null) {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
-                            String name = document.getString("name");
-                            String description = document.getString("description");
-                            String poster = document.getString("poster");
-                            Timestamp dateTimestamp = document.getTimestamp("lotteryEndDate");
-                            Date lotteryEndDate = dateTimestamp.toDate();
+                            Event event = document.toObject(Event.class);
 
-                            Integer entrantLimit;
-                            if(document.get("entrantLimit") != null) {
-                                entrantLimit = Integer.valueOf(document.get("entrantLimit").toString());
-                            } else{
-                                entrantLimit = null;
+                            // Ensure that the waitingList is initialized
+                            if (event != null && event.getWaitingList() == null) {
+                                event.setWaitingList(new ArrayList<>());  // Initialize waitingList if null
                             }
-                            Boolean geolocationReq = document.getBoolean("geolocationReq");
-                            ArrayList<String> entrants = (ArrayList<String>) document.get("entrants");
-                            Event event = new Event(name, description, poster, lotteryEndDate, entrantLimit, geolocationReq, entrants);
+
                             callback.onSuccess(event);
                         } else {
                             callback.onFailure(new Exception("Event does not exist."));
@@ -581,12 +570,12 @@ public class DatabaseManager {
     /**
      * Callback interface for created Events retrieval
      */
-    public interface getCreatedEventsCallback {
+    public interface retrieveEventListCallback {
         /**
          * Called when events are retrieved successfully
-         * @param createdEventsID List of Id's of events
+         * @param events List of Event objects that were retrieved
          */
-        void onSuccess(List<String> createdEventsID);
+        void onSuccess(List<Event> events);
 
         /**
          * Called when error occurs during events retrieval
@@ -596,22 +585,30 @@ public class DatabaseManager {
     }
 
     /**
-     * Retrieves an Event from db
-     * @param userID ID of user who created event
+     * Retrieves events that match an ArrayList of event id's
+     * Used for displaying events in home screen
+     * @param eventsToRetrieve list of event id's to search for in database
+     * @param callback callback to handle success or failure of event list retrieval
      */
-    public void getCreatedEvents(String userID, getCreatedEventsCallback callback) {
-        database.collection("users")
-                .document(userID)
+    public void retrieveEventList(ArrayList<String> eventsToRetrieve, retrieveEventListCallback callback) {
+        // Handles empty list of events to search for
+        if (eventsToRetrieve.isEmpty()) {
+            callback.onSuccess(new ArrayList<>());
+            return;
+        }
+
+        // Searches database for events whose id's are in the eventsToRetrieve array
+        database.collection("events")
+                .whereIn(FieldPath.documentId(), eventsToRetrieve)
                 .get()
                 .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document.exists()) {
-                            List<String> createdEvents = (List<String>) document.get("createdEvents");
-                            callback.onSuccess(createdEvents);
-                        } else {
-                            callback.onFailure(new Exception("Created Events does not exist."));
+                    if (task.isSuccessful()) {
+                        ArrayList<Event> events = new ArrayList<>();
+                        for (DocumentSnapshot document : task.getResult()) {
+                            Event event = document.toObject(Event.class);
+                            events.add(event);
                         }
+                        callback.onSuccess(events);
                     } else {
                         callback.onFailure(task.getException());
                     }

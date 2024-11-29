@@ -47,4 +47,8 @@ public class Organizer extends Entrant {
     public void setFacility(Facility facility) {
         this.facility = facility;
     }
+
+    public void addCreatedEvent(String eventId) {
+        this.createdEvents.add(eventId);
+    }
 }

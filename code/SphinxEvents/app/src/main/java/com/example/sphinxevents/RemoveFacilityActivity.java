@@ -54,13 +54,11 @@ public class RemoveFacilityActivity extends AppCompatActivity {
         // Obtains XML elements
         ImageButton backButton = findViewById(R.id.removing_facility_back_btn);
         TextView facilityNameTextView = findViewById(R.id.facility_name_textview);
-        TextView facilityLocationTextView = findViewById(R.id.facility_location_textview);
         TextView facilityPhoneNumberTextView = findViewById(R.id.facility_phone_number_textview);
         Button removeButton = findViewById(R.id.remove_facility_button);
 
         // Sets display
         facilityNameTextView.setText(facility.getName());
-        facilityLocationTextView.setText(facility.getLocation());
         facilityPhoneNumberTextView.setText(facility.getPhoneNumber());
 
         // Set onClickListener for backButton

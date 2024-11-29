@@ -3,11 +3,11 @@
 
     <item>
         <shape>
-            <solid android:color="@color/list_facility_background_color" />
+            <solid android:color="@color/list_created_event_color" />
         </shape>
     </item>
 
-    <item android:top="0dp" android:left="0dp" android:right="0dp" android:height="3dp">
+    <item android:top="0dp" android:left="0dp" android:right="0dp" android:height="2dp">
         <shape>
             <solid android:color="@color/black" />
         </shape>
