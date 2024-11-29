@@ -1,12 +1,16 @@
 package com.example.sphinxevents;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
@@ -91,6 +95,11 @@ public class ViewCreatedEvent extends AppCompatActivity {
         sendMsgToEntrantsButton.setOnClickListener(v -> {
             // TODO: Display fragment that allows organizer to send message
         });
+
+        // Allow organizer to draw a lottery
+        drawLotteryButton.setOnClickListener(v -> {
+            drawInputFragment();
+        });
     }
 
     /**
@@ -118,6 +127,39 @@ public class ViewCreatedEvent extends AppCompatActivity {
             drawLotteryButton.setVisibility(View.GONE);
             lotteryStatusTextView.setText("Waiting for registration deadline");
         }
+    }
+
+    public void drawInputFragment(){
+
+        final EditText sampleSize = new EditText(this);
+        new AlertDialog.Builder(this)
+                .setTitle("Draw Event Lottery")
+                .setMessage("Sample number of users")
+                .setView(sampleSize)
+                .setPositiveButton("Draw", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+
+                        String nStr = sampleSize.getText().toString().trim();
+
+                        try {
+                            Integer n = Integer.valueOf(nStr);
+
+                            if(n <= 0){
+                                Toast.makeText(ViewCreatedEvent.this, "Enter non-zero positive count", Toast.LENGTH_SHORT).show();
+                            } else {
+                                //TODO: call lottery draw
+                                Log.d("Aniket", String.valueOf(n));
+                            }
+                        } catch (NumberFormatException e){
+                            Toast.makeText(ViewCreatedEvent.this, "Sample count was non-numeric", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                    }
+                })
+                .show();
     }
 
 }
