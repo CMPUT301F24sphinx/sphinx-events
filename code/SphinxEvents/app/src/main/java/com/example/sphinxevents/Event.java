@@ -12,6 +12,7 @@ import java.util.Date;
  */
 public class Event implements Serializable {
 
+    private String eventId;  // The id of the event in the database
     private String name;  // The name of the event
     private String description;  // The description of the event
     private String poster;  // The url of the poster location
@@ -46,6 +47,7 @@ public class Event implements Serializable {
      */
     Event(String name, String description, String poster, Date lotteryEndDate, Integer entrantLimit,
           Boolean geolocationReq, ArrayList<String> joinedUsers, UserLocation facilityLocation) {
+        this.eventId = null;
         this.name = name;
         this.description = description;
         this.poster = poster;
@@ -55,6 +57,14 @@ public class Event implements Serializable {
         this.entrants = joinedUsers;
         this.facilityLocation = facilityLocation;
         this.waitingList = new ArrayList<>();
+    }
+
+    public String getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
     }
 
     /**

@@ -1,3 +1,4 @@
+
 /*
  * Class Name: DatabaseManager
  * Date: 2024-11-06
@@ -88,12 +89,21 @@ public class DatabaseManager {
      * @param callback Callback to handle success or failure of the event creation.
      */
     public void createEvent(Event event, EventCreationCallback callback) {
-        // Add the event to Firestore under the "events" collection
-        database.collection("events")
-                .add(event)
-                .addOnSuccessListener(callback::onSuccess)
+        // Create a new document reference with an auto-generated ID
+        DocumentReference docRef = database.collection("events").document();
+
+        // Set the generated document ID as the eventId in the Event object
+        event.setEventId(docRef.getId());
+
+        // Add the event to Firestore with the generated ID
+        docRef.set(event)
+                .addOnSuccessListener(aVoid -> {
+                    // Pass the DocumentReference to the callback onSuccess method
+                    callback.onSuccess(docRef);
+                })
                 .addOnFailureListener(callback::onFailure);
     }
+
 
     /**
      * Callback interface for handling the result of a user creation operation.
@@ -812,5 +822,3 @@ public class DatabaseManager {
 
     }
 }
-
-

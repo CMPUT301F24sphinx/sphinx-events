@@ -41,8 +41,6 @@ public class ViewEventDetails extends AppCompatActivity {
 
     // Database and manager related attributes
     private EventListener eventListener;
-    private StorageReference storageReference;
-    private DatabaseManager databaseManager;
     private UserManager userManager;
     private String eventId;
     private Event event;
@@ -53,7 +51,6 @@ public class ViewEventDetails extends AppCompatActivity {
     private TextView eventDescriptionTextView;
     private TextView registrationDeadlineTextView;
     private TextView waitingListCountTextView;
-    private Button goBackButton;
     private Button joinWaitingListButton;
 
     // Warning/Indicator UI elements
@@ -70,7 +67,7 @@ public class ViewEventDetails extends AppCompatActivity {
 
     /**
      * On creation of activity
-     * @param savedInstanceState
+     * @param savedInstanceState savedInstanceState
      */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -92,7 +89,6 @@ public class ViewEventDetails extends AppCompatActivity {
             finish(); // exit activity
         }
 
-        databaseManager = DatabaseManager.getInstance();
         userManager = UserManager.getInstance();
 
         // Obtain xml elements
@@ -102,7 +98,7 @@ public class ViewEventDetails extends AppCompatActivity {
         registrationDeadlineTextView = findViewById(R.id.registration_deadline_text_view);
         waitingListCountTextView = findViewById(R.id.waiting_list_count_text_view);
         waitingListFullWarning = findViewById(R.id.waiting_list_full_warning);
-        goBackButton = findViewById(R.id.go_back_button);
+        Button goBackButton = findViewById(R.id.go_back_button);
         joinWaitingListButton = findViewById(R.id.join_waiting_list_button);
         alreadyJoinedEvent = findViewById(R.id.already_joined_event);
         geolocationRequiredWarning = findViewById(R.id.geolocation_required_warning);
@@ -118,9 +114,10 @@ public class ViewEventDetails extends AppCompatActivity {
             finish();
         });
 
-        // Try to join event if join button clicked
+        // Join event waiting list
         joinWaitingListButton.setOnClickListener(v -> {
             // TODO: ADD LOGIC FOR JOINING WAIT LIST OF EVENT
+            // ALL CHECKS WERE COMPLETE, IF THE USER CAN CLICK THIS BUTTON THEN THEY ARE ABLE TO JOIN THE EVENT
         });
 
         // Create the EventListener and start listening for updates to the event
@@ -137,41 +134,8 @@ public class ViewEventDetails extends AppCompatActivity {
                 finish();
             }
         });
-        eventListener.startListening();
+        eventListener.startListening();  // Start listening for changes to event
     }
-
-    /**
-     * Retrieves event to join from database
-     */
-    /*
-    private void retrieveEventFromDatabase() {
-        databaseManager.getEvent(eventId, new DatabaseManager.eventRetrievalCallback() {
-            @Override
-            public void onSuccess(Event retrievedEvent) {
-                event = retrievedEvent;
-                setDisplay();
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                Toast.makeText(getApplicationContext(), "Error retrieving event. Please try again.", Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        });
-    }
-     */
-
-
-
-    /**
-     * Initializes the display of viewing the event details
-     * Sets display of event information that cannot change
-     */
-    /*
-    private void initializeDisplay() {
-
-    }
-    */
 
     /**
      * Sets display of event details
@@ -198,7 +162,7 @@ public class ViewEventDetails extends AppCompatActivity {
      * Displays the event poster
      */
     private void displayEventPoster() {
-        storageReference = FirebaseStorage.getInstance().getReference().child(event.getPoster());
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference().child(event.getPoster());
         final long ONE_MEGABYTE = 2048 * 2048;
         storageReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
             @Override
