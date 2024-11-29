@@ -72,9 +72,12 @@ public class EventExListAdapter extends ExListAdapter {
         }
 
         // Sets XML elements that are common in all type of events
+        // TODO: Set other common elements
         TextView eventTextView = view.findViewById(R.id.event_name_text_view);
         eventTextView.setText(event.getName());
 
+
+        //TODO: Set unique pending and joined event layout elements
 
         // Set unique created event layout elements
         if (groupPosition == 2) {
