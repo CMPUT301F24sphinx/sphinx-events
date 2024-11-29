@@ -579,11 +579,29 @@ public class DatabaseManager {
                 });
     }
 
+    /**
+     * Callback for changing the poster of an event
+     */
     public interface changeEventPosterCallback {
+        /**
+         * Called when poster is successfully changed
+         */
         void onSuccess();
+
+        /**
+         * Called when failure occurs when changing poster
+         * @param e the exception that occurred
+         */
         void onFailure(Exception e);
     }
 
+    /**
+     * Changes the poster of an event
+     * Generates new posterId, uploads poster, updates poster field for event
+     * @param eventId the ID of the event to change the poster for
+     * @param posterUri  the Uri of the new poster
+     * @param callback  the callback to handle success or failure of changing poster
+     */
     public void changeEventPoster(String eventId, Uri posterUri, changeEventPosterCallback callback) {
         // Generate a random key for the poster file
         String posterRandKey = UUID.randomUUID().toString();
