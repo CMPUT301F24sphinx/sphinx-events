@@ -12,12 +12,15 @@
 package com.example.sphinxevents;
 
 import android.app.AlertDialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
@@ -34,6 +37,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.splashscreen.SplashScreen;
 import androidx.core.view.GravityCompat;
@@ -60,6 +64,8 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
     private DatabaseManager databaseManager;
     private UserManager userManager;
     private String deviceId;
+
+    private NotificationListener notificationListener;
 
     private ExpandableListView expandableListView;  // expandable list of events
     private List<String> headers;  // headers/parents/group names
@@ -101,12 +107,18 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
             return insets;
         });
 
+        deviceId = getDeviceId(this);
 
-        // Register as a listener for currentUser updates
-        UserManager.getInstance().addUserUpdateListener(this);
+
+        createNotificationChannels();
+        notificationListener = new NotificationListener(this);
+        notificationListener.startListeningForNotifications(deviceId);
 
         databaseManager = DatabaseManager.getInstance();
         userManager = UserManager.getInstance();
+        // Register as a listener for currentUser updates
+        userManager.addUserUpdateListener(this);
+        userManager.startListeningForUserChanges(deviceId);
         retrieveUser();
 
         initializeDrawer();  // initializes drawer display and functionalities
@@ -156,7 +168,6 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
      * Retrieves the user from the Firestore database
      */
     public void retrieveUser() {
-        deviceId = getDeviceId(this);
 
         // Attempts to retrieve the user from the Firebase Firestore database.
         databaseManager.getUser(deviceId, new DatabaseManager.UserRetrievalCallback() {
@@ -196,7 +207,6 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
         Button manageProfileBtn = findViewById(R.id.drawer_manage_profile_btn);
         Button manageFacilityBtn = findViewById(R.id.drawer_manage_facility_btn);
-        Button viewNotificationsBtn = findViewById(R.id.drawer_notifications_btn);
         Button administratorBtn = findViewById(R.id.drawer_administrator_btn);
         Button createEventBtn = findViewById(R.id.create_event_button);
 
@@ -225,13 +235,6 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         manageFacilityBtn.setOnClickListener(v -> {
             Intent manageFacilityIntent = new Intent(MainActivity.this, ManageFacilityActivity.class);
             startActivity(manageFacilityIntent);
-        });
-
-        // Set the Notification button to activate Notification page
-        viewNotificationsBtn.setOnClickListener(v -> {
-            Intent viewNotificationsIntent = new Intent(this,
-                    ViewNotificationsActivity.class);
-            startActivity(viewNotificationsIntent);
         });
 
         // Sets OnClickListener for administrator actions
@@ -450,7 +453,7 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
      * Listener method for user updates from UserManager
      */
     @Override
-    public void onUserUpdated(Entrant updatedUser) {
+    public void onUserUpdated() {
         // Update UI elements based on the new currentUser data
         updateProfilePicture();
         updateDrawer();
@@ -462,7 +465,53 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
      */
     @Override
     protected void onDestroy() {
-        userManager.removeUserUpdateListener(this);
+        userManager.stopListeningForUserChanges();
+        if (notificationListener != null) {
+            notificationListener.stopListeningForNotifications();
+        }
         super.onDestroy();
     }
+
+    /**
+     * Creates notification channels for organizers and administrator notifications.
+     */
+    public void createNotificationChannels() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Organizer Notifications Channel
+            String organizerChannelId = NotificationsHelper.ORGANIZER_CHANNEL_ID;
+            String organizerChannelName = "Organizer Notifications";
+            String organizerChannelDescription = "Notifications from event organizers";
+            int organizerImportance = NotificationManager.IMPORTANCE_HIGH;
+
+            NotificationChannel organizerChannel = new NotificationChannel(
+                    organizerChannelId,
+                    organizerChannelName,
+                    organizerImportance
+            );
+            organizerChannel.setDescription(organizerChannelDescription);
+
+
+            // Administrator Notifications Channel
+            String adminChannelId = NotificationsHelper.ADMIN_CHANNEL_ID;
+            String adminChannelName = "Administrator Notifications";
+            String adminChannelDescription = "Notifications from administrators";
+            int adminImportance = NotificationManager.IMPORTANCE_HIGH;
+
+            NotificationChannel adminChannel = new NotificationChannel(
+                    adminChannelId,
+                    adminChannelName,
+                    adminImportance
+            );
+            adminChannel.setDescription(adminChannelDescription);
+
+            // Register channels with the system
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(organizerChannel);
+                notificationManager.createNotificationChannel(adminChannel);
+            }
+        }
+    }
+
+
 }

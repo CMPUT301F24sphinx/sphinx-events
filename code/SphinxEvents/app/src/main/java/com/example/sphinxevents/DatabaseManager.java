@@ -17,6 +17,8 @@ import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -723,28 +725,64 @@ public class DatabaseManager {
     }
 
     /**
-     * Adds notification object to "notification" collection in database
-     * @param notification The notification object being uploaded
-     * @param recipients The recipients of the notification
-     * @param callback Call back function on weather upload succeeded or faulted
+     * Adds notification object to "notification" collection in the database.
+     *
+     * @param notification The notification object being uploaded.
+     * @param recipients   The recipients of the notification.
+     * @param callback     Callback function on whether upload succeeded or faulted.
      */
     public void createNotification(Notification notification, ArrayList<String> recipients,
                                    NotificationCreationCallback callback) {
         WriteBatch batch = database.batch();
+        List<Task<DocumentSnapshot>> tasks = new ArrayList<>();
 
-        // Add the notification to each recipient's notifications subcollection
+        // Determine notification type based on channel ID
+        String channelID = notification.getChannelID();
+        boolean isOrganizerNotification = channelID.equals(NotificationsHelper.ORGANIZER_CHANNEL_ID);
+        boolean isAdminNotification = channelID.equals(NotificationsHelper.ADMIN_CHANNEL_ID);
+
         for (String userID : recipients) {
-            DocumentReference notificationRef = database.collection("users")
-                    .document(userID)
-                    .collection("notifications")
-                    .document();
-            batch.set(notificationRef, notification);
-        }
-        batch.commit()
-                .addOnSuccessListener(unused -> callback.onSuccess())
-                .addOnFailureListener(callback::onFailure);
+            DocumentReference userRef = database.collection("users").document(userID);
 
+            // Fetch user preferences
+            Task<DocumentSnapshot> task = userRef.get().addOnSuccessListener(userDoc -> {
+                if (userDoc.exists()) {
+                    boolean orgNotificationsEnabled = userDoc.getBoolean("orgNotificationsEnabled") != null
+                            && Boolean.TRUE.equals(userDoc.getBoolean("orgNotificationsEnabled"));
+                    boolean adminNotificationsEnabled = userDoc.getBoolean("adminNotificationsEnabled") != null
+                            && Boolean.TRUE.equals(userDoc.getBoolean("adminNotificationsEnabled"));
+
+                    // Check if the notification should be sent based on preferences
+                    if ((isOrganizerNotification && orgNotificationsEnabled)
+                            || (isAdminNotification && adminNotificationsEnabled)) {
+                        DocumentReference notificationRef = userRef.collection("notifications").document();
+                        batch.set(notificationRef, notification);
+                    }
+                }
+            }).addOnFailureListener(callback::onFailure);
+
+            // Add the task to the list
+            tasks.add(task);
+        }
+
+        // After all tasks are completed, commit the batch
+        Tasks.whenAllSuccess(tasks).addOnSuccessListener(aVoid -> {
+            batch.commit()
+                    .addOnSuccessListener(unused -> callback.onSuccess())
+                    .addOnFailureListener(callback::onFailure);
+        }).addOnFailureListener(e -> {
+            callback.onFailure(e); // Handle failure
+        });
+
+        // Edge case: if no recipients, commit immediately
+        if (recipients.isEmpty()) {
+            batch.commit()
+                    .addOnSuccessListener(unused -> callback.onSuccess())
+                    .addOnFailureListener(callback::onFailure);
+        }
     }
+
+
 
     /**
      * Callback interface for getNotification

@@ -68,15 +68,6 @@ public class ViewCreatedEvent extends AppCompatActivity {
             List<String> sample = currEvent.getEventEntrants().subList(0, n);
         });
 
-        // If the message entered into the textbox is nonempty send that message to entrants
-        // Pass eventID to function
-        messageTextLayout = findViewById(R.id.message_to_entrants);
-        Button notifyEntrantsBtn = findViewById(R.id.notify_entrants_button);
-        notifyEntrantsBtn.setOnClickListener(v -> {
-            if(!messageTextLayout.getText().toString().equals("")){
-                getEventForNotification(eventCode);
-            }
-        });
 
         // Exit activity
         ImageButton backButton = findViewById(R.id.manage_event_back_button);
