@@ -131,7 +131,8 @@ public class ViewCreatedEvent extends AppCompatActivity {
 
     public void drawInputFragment(){
 
-        final EditText sampleSize = new EditText(this);
+        EditText sampleSize = new EditText(this);
+        sampleSize.setInputType(2);
         new AlertDialog.Builder(this)
                 .setTitle("Draw Event Lottery")
                 .setMessage("Sample number of users")
