@@ -30,7 +30,7 @@ import java.util.UUID;
 public class ViewEventPosterActivity extends AppCompatActivity {
 
     private String eventId;
-    private String eventPoster;
+    private String posterId;
     private ImageView eventPosterImageView;
     private DatabaseManager databaseManager;
 
@@ -49,7 +49,7 @@ public class ViewEventPosterActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent != null ) {
             eventId = intent.getStringExtra("eventId");
-            eventPoster = intent.getStringExtra("eventPoster");
+            posterId = intent.getStringExtra("posterId");
         }
 
         databaseManager = DatabaseManager.getInstance();
@@ -75,7 +75,7 @@ public class ViewEventPosterActivity extends AppCompatActivity {
      * Displays the event poster
      */
     private void displayEventPoster() {
-        StorageReference storageReference = FirebaseStorage.getInstance().getReference().child(eventPoster);
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference().child(posterId);
         final long ONE_MEGABYTE = 2048 * 2048;
         storageReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
             @Override
@@ -118,7 +118,7 @@ public class ViewEventPosterActivity extends AppCompatActivity {
                 InputStream imageStream = getContentResolver().openInputStream(posterUri);
                 Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
 
-                databaseManager.changeEventPoster(eventId, posterUri, new DatabaseManager.changeEventPosterCallback() {
+                databaseManager.changeEventPoster(eventId, posterId, posterUri, new DatabaseManager.changeEventPosterCallback() {
                     @Override
                     public void onSuccess() {
                         eventPosterImageView.setImageBitmap(selectedImage);

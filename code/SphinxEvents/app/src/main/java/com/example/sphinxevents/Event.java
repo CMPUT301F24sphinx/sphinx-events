@@ -38,19 +38,18 @@ public class Event implements Serializable {
      *
      * @param name The name of the event.
      * @param description The description of the event.
-     * @param poster The URL of the event's poster.
      * @param lotteryEndDate The end date of the lottery.
      * @param entrantLimit The maximum number of entrants.
      * @param geolocationReq True if geolocation is required, false otherwise.
      * @param joinedUsers The list of users who have joined the event.
      * @param facilityLocation The location of the event's facility.
      */
-    Event(String name, String description, String poster, Date lotteryEndDate, Integer entrantLimit,
+    Event(String name, String description, Date lotteryEndDate, Integer entrantLimit,
           Boolean geolocationReq, ArrayList<String> joinedUsers, UserLocation facilityLocation) {
         this.eventId = null;
         this.name = name;
         this.description = description;
-        this.poster = poster;
+        this.poster = null;
         this.lotteryEndDate = lotteryEndDate;
         this.entrantLimit = entrantLimit;
         this.geolocationReq = geolocationReq;
@@ -59,10 +58,18 @@ public class Event implements Serializable {
         this.waitingList = new ArrayList<>();
     }
 
+    /**
+     * gGets ID of Event
+     * @return ID of event
+     */
     public String getEventId() {
         return eventId;
     }
 
+    /**
+     * Sets ID of Event
+     * @param eventId the new ID
+     */
     public void setEventId(String eventId) {
         this.eventId = eventId;
     }

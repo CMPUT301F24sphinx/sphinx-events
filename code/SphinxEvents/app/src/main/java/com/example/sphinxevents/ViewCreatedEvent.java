@@ -102,7 +102,7 @@ public class ViewCreatedEvent extends AppCompatActivity {
         viewEventPosterButton.setOnClickListener(v -> {
             Intent viewPosterIntent = new Intent(ViewCreatedEvent.this, ViewEventPosterActivity.class);
             viewPosterIntent.putExtra("eventId", eventId);
-            viewPosterIntent.putExtra("eventPoster", event.getPoster());
+            viewPosterIntent.putExtra("posterId", event.getPoster());
             startActivity(viewPosterIntent);
         });
 

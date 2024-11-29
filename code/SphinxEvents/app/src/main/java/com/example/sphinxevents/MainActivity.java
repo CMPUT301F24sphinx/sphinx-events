@@ -256,7 +256,6 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
                         Toast.LENGTH_LONG).show();
             }
         });
-
     }
 
     /**
@@ -341,11 +340,11 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
             Event clickedEvent = (Event) listAdapter.getChild(groupPosition, childPosition);
             switch (groupPosition) {
                 case 0:
-                    //TODO: Go to viewJoinedEvent activity
+                    // TODO: Go to viewJoinedEvent activity
                     break;
 
                 case 1:
-                    //TODO: Got to viewPendingEvent activity
+                    // TODO: Got to viewPendingEvent activity
                     break;
 
                 case 2:

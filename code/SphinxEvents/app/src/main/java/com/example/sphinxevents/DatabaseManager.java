@@ -96,6 +96,8 @@ public class DatabaseManager {
 
         // Set the generated document ID as the eventId in the Event object
         event.setEventId(docRef.getId());
+        String posterId = "EventPosters/" + docRef.getId() + ".jpg";
+        event.setPoster(posterId);
 
         // Add the event to Firestore with the generated ID
         docRef.set(event)
@@ -602,10 +604,7 @@ public class DatabaseManager {
      * @param posterUri  the Uri of the new poster
      * @param callback  the callback to handle success or failure of changing poster
      */
-    public void changeEventPoster(String eventId, Uri posterUri, changeEventPosterCallback callback) {
-        // Generate a random key for the poster file
-        String posterRandKey = UUID.randomUUID().toString();
-        String posterId = "EventPosters/" + posterRandKey + ".jpg";
+    public void changeEventPoster(String eventId, String posterId, Uri posterUri, changeEventPosterCallback callback) {
 
         // Get Firebase Storage reference
         StorageReference storageRef = FirebaseStorage.getInstance().getReference().child(posterId);
@@ -623,7 +622,6 @@ public class DatabaseManager {
                 })
                 .addOnFailureListener(callback::onFailure);
     }
-
 
     /**
      * Callback interface for created Events retrieval
