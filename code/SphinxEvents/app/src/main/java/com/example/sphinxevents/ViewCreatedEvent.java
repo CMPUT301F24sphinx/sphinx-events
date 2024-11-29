@@ -101,14 +101,16 @@ public class ViewCreatedEvent extends AppCompatActivity {
         // Sets click listener for changing event poster
         viewEventPosterButton.setOnClickListener(v -> {
             Intent viewPosterIntent = new Intent(ViewCreatedEvent.this, ViewEventPosterActivity.class);
-            viewPosterIntent.putExtra("eventId", event.getEventId());
+            viewPosterIntent.putExtra("eventId", eventId);
             viewPosterIntent.putExtra("eventPoster", event.getPoster());
             startActivity(viewPosterIntent);
         });
 
         // Display QR code button pressed -> show QR code
         viewQRCodeButton.setOnClickListener(v -> {
-            // TODO: DISPLAY QR CODE
+            Intent viewQRCodeIntent = new Intent(ViewCreatedEvent.this, ViewQRCodeActivity.class);
+            viewQRCodeIntent.putExtra("eventId", eventId);
+            startActivity(viewQRCodeIntent);
         });
 
         // Allow organizer to view entrant data
