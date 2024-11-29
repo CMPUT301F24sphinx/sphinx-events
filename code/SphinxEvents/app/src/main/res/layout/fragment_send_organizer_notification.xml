@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Title Input -->
+    <TextView
+        android:id="@+id/tvNotificationTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Notification Title"
+        android:labelFor="@id/etNotificationTitle"
+        android:textSize="18sp"
+        tools:ignore="HardcodedText" />
+
+    <EditText
+        android:id="@+id/etNotificationTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:hint="Enter title"
+        android:inputType="text"
+        tools:ignore="HardcodedText" />
+
+    <!-- Message Input -->
+    <TextView
+        android:id="@+id/tvNotificationMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:labelFor="@id/etNotificationMessage"
+        android:text="Notification Message"
+        android:textSize="18sp"
+        tools:ignore="HardcodedText" />
+
+    <EditText
+        android:id="@+id/etNotificationMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter message"
+        android:inputType="textMultiLine"
+        android:gravity="top"
+        android:minLines="3"
+        tools:ignore="HardcodedText" />
+
+    <!-- Radio Buttons for Recipient Group -->
+    <TextView
+        android:id="@+id/tvRecipientGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Send To"
+        android:textSize="18sp"
+        tools:ignore="HardcodedText" />
+
+    <LinearLayout
+        android:id="@+id/checkboxContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <CheckBox
+            android:id="@+id/cbWaitingList"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Waiting List"
+            android:textSize="18sp"
+            tools:ignore="HardcodedText" />
+
+        <CheckBox
+            android:id="@+id/cbCancelled"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancelled"
+            android:textSize="18sp"
+            tools:ignore="HardcodedText" />
+
+        <CheckBox
+            android:id="@+id/cbJoined"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Joined"
+            android:textSize="18sp"
+            tools:ignore="HardcodedText" />
+
+    </LinearLayout>
+
+</LinearLayout>
