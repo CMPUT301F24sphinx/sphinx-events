@@ -39,12 +39,14 @@
     <color name="list_created_event_color">#55DDFF</color>
 
     <!-- Manage Event Colors -->
+    <color name="event_details_background">#EDEDED</color>
     <color name="edit_event_details_button_color">#55DDFF</color>
     <color name="view_qr_code_button_color">#55DDFF</color>
     <color name="view_entrant_data_button_color">#55DDFF</color>
     <color name="send_message_button_color">#55DDFF</color>
-    <color name="draw_lottery_button_color">#FF7777</color>
-    <color name="lottery_result_header_color">#D7D7D7</color>
-    <color name="lottery_result_color">#F6F6F6</color>
+    <color name="draw_lottery_button_color">#FF7BFD</color>
+    <color name="lottery_result_header_color">#FFBCFE</color>
+    <color name="lottery_result_color">#F0F0F0</color>
+    <color name="change_poster_button_color">#B0E771</color>
 
 </resources>

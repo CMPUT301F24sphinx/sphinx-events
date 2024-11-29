@@ -163,8 +163,7 @@ public class CreateEventActivity extends AppCompatActivity {
             Toast.makeText(this, "Invalid entrant limit", Toast.LENGTH_SHORT).show();
             return;
         }
-        String posterRandKey = UUID.randomUUID().toString();
-        String posterId = "EventPosters/" + posterRandKey + ".jpg";
+
         Date regDate;
         try {
             regDate = new SimpleDateFormat("yyyy/MM/dd").parse(dateString);
@@ -178,7 +177,7 @@ public class CreateEventActivity extends AppCompatActivity {
         // Create a new Event object
         Organizer organizer = (Organizer) userManager.getCurrentUser();
         UserLocation facilityLocation = organizer.getFacility().getLocation();
-        Event newEvent = new Event(eventName, eventDesc, posterId, regDate, entrantLimit,
+        Event newEvent = new Event(eventName, eventDesc, regDate, entrantLimit,
                 geolocationReq, new ArrayList<String>(), facilityLocation);
 
         databaseManager.createEvent(newEvent, new DatabaseManager.EventCreationCallback() {
@@ -186,6 +185,9 @@ public class CreateEventActivity extends AppCompatActivity {
             public void onSuccess(DocumentReference eventRef) {
                 // Adds Event to user and updates current user
                 String eventId = eventRef.getId();
+                String posterId = "EventPosters/" + eventId + ".jpg";
+                newEvent.setEventId(eventId);
+                newEvent.setPoster(posterId);
                 Organizer currentUser = (Organizer) userManager.getCurrentUser();
                 currentUser.addCreatedEvent(eventId);
                 userManager.setCurrentUser(currentUser);

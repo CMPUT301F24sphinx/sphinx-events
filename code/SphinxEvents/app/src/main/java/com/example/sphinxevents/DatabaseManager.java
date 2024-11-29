@@ -1,3 +1,4 @@
+
 /*
  * Class Name: DatabaseManager
  * Date: 2024-11-06
@@ -13,6 +14,7 @@ package com.example.sphinxevents;
 import android.location.Location;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -36,6 +38,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 //TODO: Add a more descriptive comment for the class when more functionality is implemented.
 /**
@@ -88,12 +91,23 @@ public class DatabaseManager {
      * @param callback Callback to handle success or failure of the event creation.
      */
     public void createEvent(Event event, EventCreationCallback callback) {
-        // Add the event to Firestore under the "events" collection
-        database.collection("events")
-                .add(event)
-                .addOnSuccessListener(callback::onSuccess)
+        // Create a new document reference with an auto-generated ID
+        DocumentReference docRef = database.collection("events").document();
+
+        // Set the generated document ID as the eventId in the Event object
+        event.setEventId(docRef.getId());
+        String posterId = "EventPosters/" + docRef.getId() + ".jpg";
+        event.setPoster(posterId);
+
+        // Add the event to Firestore with the generated ID
+        docRef.set(event)
+                .addOnSuccessListener(aVoid -> {
+                    // Pass the DocumentReference to the callback onSuccess method
+                    callback.onSuccess(docRef);
+                })
                 .addOnFailureListener(callback::onFailure);
     }
+
 
     /**
      * Callback interface for handling the result of a user creation operation.
@@ -618,6 +632,49 @@ public class DatabaseManager {
     }
 
     /**
+     * Callback for changing the poster of an event
+     */
+    public interface changeEventPosterCallback {
+        /**
+         * Called when poster is successfully changed
+         */
+        void onSuccess();
+
+        /**
+         * Called when failure occurs when changing poster
+         * @param e the exception that occurred
+         */
+        void onFailure(Exception e);
+    }
+
+    /**
+     * Changes the poster of an event
+     * Uploads poster, updates poster field for event
+     * @param eventId the ID of the event to change the poster for
+     * @param posterId the path of the poster in the database
+     * @param posterUri  the Uri of the new poster
+     * @param callback  the callback to handle success or failure of changing poster
+     */
+    public void changeEventPoster(String eventId, String posterId, Uri posterUri, changeEventPosterCallback callback) {
+
+        // Get Firebase Storage reference
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference().child(posterId);
+
+        // Upload the poster file
+        storageRef.putFile(posterUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // Handle failure to update the database
+                    database.collection("events").document(eventId)
+                            .update("poster", posterId)
+                            .addOnSuccessListener(aVoid -> {
+                                callback.onSuccess();
+                            })
+                            .addOnFailureListener(callback::onFailure);
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
+    /**
      * Callback interface for created Events retrieval
      */
     public interface retrieveEventListCallback {
@@ -819,7 +876,7 @@ public class DatabaseManager {
     }
 
     //---------------------------------------------------------------------------------------------
-    //Admin profile search handling:
+    // Admin profile search handling:
 
     /**
      * Callback interface for profiles search
@@ -900,5 +957,3 @@ public class DatabaseManager {
 
     }
 }
-
-
