@@ -40,156 +40,176 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingBottom="10dp"
+        android:scrollbars="vertical"
+        android:fadeScrollbars="false" >
+
+        <LinearLayout
+            android:id="@+id/event_info_linear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:layout_marginTop="10dp">
+
+                <TextView
+                    android:id="@+id/event_name_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/facility_name_label"
+                    android:textSize="20sp"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:visibility="visible"/>
+
+                <TextView
+                    android:id="@+id/event_name_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:textSize="20sp"
+                    android:textColor="@color/black"
+                    android:text="Event Name"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp">
+
+                <TextView
+                    android:id="@+id/event_description_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:gravity="center_vertical"
+                    android:text="Description:"
+                    android:textSize="20sp"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:visibility="visible"/>
+
+                <TextView
+                    android:id="@+id/event_description_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:textSize="20sp"
+                    android:textColor="@color/black"
+                    android:text="Event Description" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/registration_deadline_linear_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp">
+
+                <TextView
+                    android:id="@+id/registration_deadline_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:gravity="center_vertical"
+                    android:text="Registration Deadline:"
+                    android:textSize="20sp"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:visibility="visible"/>
+
+                <TextView
+                    android:id="@+id/registration_deadline_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:textSize="20sp"
+                    android:textColor="@color/black"
+                    android:text="Deadline Date"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/num_of_lottery_entrants_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp">
+
+                <TextView
+                    android:id="@+id/num_of_lottery_entrants_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="8dp"
+                    android:gravity="center_vertical"
+                    android:text="# of Lottery Entrants:"
+                    android:textSize="20sp"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:visibility="visible"/>
+
+                <TextView
+                    android:id="@+id/num_of_lottery_entrants_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:textSize="20sp"
+                    android:textColor="@color/black"
+                    android:text="# Entrants"
+                    android:maxLines="3"
+                    android:ellipsize="end" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp">
+
+                <TextView
+                    android:id="@+id/lottery_status_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:gravity="center_vertical"
+                    android:text="Lottery Status:"
+                    android:textSize="20sp"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:visibility="visible"/>
+
+                <TextView
+                    android:id="@+id/lottery_status_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:textSize="20sp"
+                    android:textColor="@color/black"
+                    android:text="Status"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
     <LinearLayout
-        android:id="@+id/event_info_linear_layout"
+        android:id="@+id/lottery_data_table"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:layout_marginTop="10dp">
-
-            <TextView
-                android:id="@+id/event_name_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:gravity="center_vertical"
-                android:text="@string/facility_name_label"
-                android:textSize="20sp"
-                android:textColor="@color/black"
-                android:textStyle="bold"
-                android:visibility="visible"/>
-
-            <TextView
-                android:id="@+id/event_name_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:textSize="20sp"
-                android:textColor="@color/black"
-                android:text="Event Name"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp">
-
-            <TextView
-                android:id="@+id/event_description_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:gravity="center_vertical"
-                android:text="Description:"
-                android:textSize="20sp"
-                android:textColor="@color/black"
-                android:textStyle="bold"
-                android:visibility="visible"/>
-
-            <TextView
-                android:id="@+id/event_description_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:textSize="20sp"
-                android:textColor="@color/black"
-                android:text="Event Description"
-                android:maxLines="3"
-                android:ellipsize="end" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp">
-
-            <TextView
-                android:id="@+id/num_of_lottery_entrants_label"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginEnd="8dp"
-                android:gravity="center_vertical"
-                android:text="# of Lottery Entrants:"
-                android:textSize="20sp"
-                android:textColor="@color/black"
-                android:textStyle="bold"
-                android:visibility="visible"/>
-
-            <TextView
-                android:id="@+id/num_of_lottery_entrants_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:textSize="20sp"
-                android:textColor="@color/black"
-                android:text="# Entrants"
-                android:maxLines="3"
-                android:ellipsize="end" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp">
-
-            <TextView
-                android:id="@+id/registration_deadline_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:gravity="center_vertical"
-                android:text="Registration Deadline:"
-                android:textSize="20sp"
-                android:textColor="@color/black"
-                android:textStyle="bold"
-                android:visibility="visible"/>
-
-            <TextView
-                android:id="@+id/registration_deadline_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:textSize="20sp"
-                android:textColor="@color/black"
-                android:text="Deadline Date"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp">
-
-            <TextView
-                android:id="@+id/lottery_status_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:gravity="center_vertical"
-                android:text="Lottery Status:"
-                android:textSize="20sp"
-                android:textColor="@color/black"
-                android:textStyle="bold"
-                android:visibility="visible"/>
-
-            <TextView
-                android:id="@+id/lottery_status_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:textSize="20sp"
-                android:textColor="@color/black"
-                android:text="Status"/>
-
-        </LinearLayout>
+        android:layout_margin="3dp"
+        android:padding="3dp"
+        android:background="@drawable/square_border">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -202,11 +222,11 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="Lottery Result"
-                android:paddingVertical="2dp"
+                android:padding="2dp"
                 android:textSize="20sp"
                 android:textColor="@color/black"
                 android:textStyle="bold"
-                android:background="@drawable/lottery_result_top_bottom_border"/>
+                android:background="@color/lottery_result_header_color"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -224,13 +244,15 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:paddingVertical="2dp"
+                        android:padding="2dp"
                         android:text="Losers"
                         android:textSize="20sp"
+                        android:textStyle="bold"
                         android:textColor="@color/black"
-                        android:background="@drawable/lottery_result_bottom_right_border"/>
+                        android:background="@drawable/lottery_result_bottom_right_top_border"/>
 
                     <TextView
+                        android:id="@+id/num_of_losers_text_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
@@ -238,7 +260,7 @@
                         android:text="%d"
                         android:textSize="20sp"
                         android:textColor="@color/black"
-                        android:background="@drawable/lottery_result_bottom_right_border"/>
+                        android:background="@drawable/lottery_result_right_border"/>
 
                 </LinearLayout>
 
@@ -256,10 +278,12 @@
                         android:paddingVertical="2dp"
                         android:text="Winners"
                         android:textSize="20sp"
+                        android:textStyle="bold"
                         android:textColor="@color/black"
-                        android:background="@drawable/lottery_result_bottom_right_border"/>
+                        android:background="@drawable/lottery_result_bottom_right_top_border"/>
 
                     <TextView
+                        android:id="@+id/num_of_winners_text_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
@@ -267,7 +291,7 @@
                         android:text="%d"
                         android:textSize="20sp"
                         android:textColor="@color/black"
-                        android:background="@drawable/lottery_result_bottom_right_border"/>
+                        android:background="@drawable/lottery_result_right_border"/>
 
                 </LinearLayout>
 
@@ -285,18 +309,20 @@
                         android:paddingVertical="2dp"
                         android:text="Confirmed"
                         android:textSize="20sp"
+                        android:textStyle="bold"
                         android:textColor="@color/black"
-                        android:background="@drawable/lottery_result_bottom_right_border"/>
+                        android:background="@drawable/lottery_result_top_bottom_border"/>
 
                     <TextView
+                        android:id="@+id/num_of_confirmed_text_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:paddingVertical="2dp"
-                        android:text="@string/entrants_and_limit"
+                        android:text="%d"
                         android:textSize="20sp"
                         android:textColor="@color/black"
-                        android:background="@drawable/lottery_result_bottom_right_border"/>
+                        android:background="@color/lottery_result_color"/>
 
                 </LinearLayout>
 
@@ -306,12 +332,14 @@
 
     </LinearLayout>
 
+
     <LinearLayout
         android:id="@+id/button_options_linear_layout"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:paddingBottom="30dp"
+        android:paddingTop="10dp"
         android:gravity="center">
 
         <com.google.android.material.button.MaterialButton

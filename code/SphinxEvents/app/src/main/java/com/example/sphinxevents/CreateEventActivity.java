@@ -186,6 +186,7 @@ public class CreateEventActivity extends AppCompatActivity {
             public void onSuccess(DocumentReference eventRef) {
                 // Adds Event to user and updates current user
                 String eventId = eventRef.getId();
+                newEvent.setEventId(eventId);
                 Organizer currentUser = (Organizer) userManager.getCurrentUser();
                 currentUser.addCreatedEvent(eventId);
                 userManager.setCurrentUser(currentUser);
