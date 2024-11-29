@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -32,10 +31,7 @@ public class ViewCreatedEvent extends AppCompatActivity {
     private TextView numOfLotteryEntrantsTextView;
     private TextView registrationDeadlineTextView;
     private TextView lotteryStatusTextView;
-    private Button changeEventPosterButton;
-    private Button viewQRCodeButton;
-    private Button viewEntrantDataButton;
-    private Button sendMsgToEntrantsButton;  // TODO: Determine if this button is required
+    private Button viewEventPosterButton;
     private Button drawLotteryButton;
     private LinearLayout lotteryDataTable;
     private TextView numOfLosersTextView;
@@ -60,7 +56,7 @@ public class ViewCreatedEvent extends AppCompatActivity {
         // Get the eventID from the intent
         Intent intent = getIntent();
         if (intent != null ) {
-            eventId =  intent.getStringExtra("eventId");
+            eventId = intent.getStringExtra("eventId");
         }
 
         // Obtain XML elements
@@ -70,10 +66,10 @@ public class ViewCreatedEvent extends AppCompatActivity {
         numOfLotteryEntrantsTextView = findViewById(R.id.num_of_lottery_entrants_text_view);
         registrationDeadlineTextView = findViewById(R.id.registration_deadline_text_view);
         lotteryStatusTextView = findViewById(R.id.lottery_status_text_view);
-        changeEventPosterButton = findViewById(R.id.change_event_poster_button);
-        viewQRCodeButton = findViewById(R.id.view_qr_code_button);
-        viewEntrantDataButton = findViewById(R.id.view_entrant_data_button);
-        sendMsgToEntrantsButton = findViewById(R.id.send_msg_to_entrants_button);
+        viewEventPosterButton = findViewById(R.id.view_event_poster_button);
+        Button viewQRCodeButton = findViewById(R.id.view_qr_code_button);
+        Button viewEntrantDataButton = findViewById(R.id.view_entrant_data_button);
+        Button sendMsgToEntrantsButton = findViewById(R.id.send_msg_to_entrants_button);
         drawLotteryButton = findViewById(R.id.draw_lottery_button);
         lotteryDataTable = findViewById(R.id.lottery_data_table);
         numOfLosersTextView = findViewById(R.id.num_of_losers_text_view);
@@ -84,26 +80,6 @@ public class ViewCreatedEvent extends AppCompatActivity {
         ImageButton backButton = findViewById(R.id.manage_event_back_button);
         backButton.setOnClickListener(v -> {
             finish();  // close activity when back arrow is pressed
-        });
-
-        // Sets click listener for changing event poster
-        changeEventPosterButton.setOnClickListener(v -> {
-            // TODO: ADD LOGIC FOR CHANGING THE EVENT POSTER
-        });
-
-        // Display QR code button pressed -> show QR code
-        viewQRCodeButton.setOnClickListener(v -> {
-            // TODO: DISPLAY QR CODE
-        });
-
-        // Allow organizer to view entrant data
-        viewEntrantDataButton.setOnClickListener(v -> {
-            // TODO: GO TO ACTIVITY THAT DISPLAYS USER DATA
-        });
-
-        // Allow organizer to send custom message to entrants
-        sendMsgToEntrantsButton.setOnClickListener(v -> {
-            // TODO: ALLOW ORGANIZER TO SENT MSG TO ENTRANTS MAYBE ???
         });
 
         // Create the EventListener and start listening for updates to the event
@@ -121,6 +97,29 @@ public class ViewCreatedEvent extends AppCompatActivity {
             }
         });
         eventListener.startListening();  // Start listening for changes to event
+
+        // Sets click listener for changing event poster
+        viewEventPosterButton.setOnClickListener(v -> {
+            Intent viewPosterIntent = new Intent(ViewCreatedEvent.this, ViewEventPosterActivity.class);
+            viewPosterIntent.putExtra("eventId", event.getEventId());
+            viewPosterIntent.putExtra("eventPoster", event.getPoster());
+            startActivity(viewPosterIntent);
+        });
+
+        // Display QR code button pressed -> show QR code
+        viewQRCodeButton.setOnClickListener(v -> {
+            // TODO: DISPLAY QR CODE
+        });
+
+        // Allow organizer to view entrant data
+        viewEntrantDataButton.setOnClickListener(v -> {
+            // TODO: GO TO ACTIVITY THAT DISPLAYS USER DATA
+        });
+
+        // Allow organizer to send custom message to entrants
+        sendMsgToEntrantsButton.setOnClickListener(v -> {
+            // TODO: ALLOW ORGANIZER TO SEND MSG TO ENTRANTS
+        });
     }
 
     /**
@@ -181,7 +180,6 @@ public class ViewCreatedEvent extends AppCompatActivity {
     private void resetDisplay() {
         numOfLotteryEntrantsLinearLayout.setVisibility(View.GONE);
         lotteryDataTable.setVisibility(View.GONE);
-        changeEventPosterButton.setVisibility(View.GONE);
         drawLotteryButton.setVisibility(View.GONE);
     }
 
