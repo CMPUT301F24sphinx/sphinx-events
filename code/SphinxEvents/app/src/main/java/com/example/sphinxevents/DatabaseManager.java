@@ -780,7 +780,7 @@ public class DatabaseManager {
     public interface EventsSearchCallback {
         /**
          * Called when event search is successful
-         * @param users array of events that match query
+         * @param events array of events that match query
          */
         void onSuccess(ArrayList<Event> events);
 
