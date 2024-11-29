@@ -38,10 +38,10 @@ public class FacilityAdapter extends ArrayAdapter<Facility> {
 
         Facility facility = getItem(position);
         TextView facilityNameTextView = view.findViewById(R.id.facility_name_text_view);
-        TextView facilityLocationTextView = view.findViewById(R.id.facility_location_text_view);
+        TextView facilityPhoneNumberTextView = view.findViewById(R.id.facility_phone_number_text_view);
 
         facilityNameTextView.setText(facility.getName());
-        facilityLocationTextView.setText(facility.getLocation());
+        facilityPhoneNumberTextView.setText(facility.getPhoneNumber());
 
         return view;
     }

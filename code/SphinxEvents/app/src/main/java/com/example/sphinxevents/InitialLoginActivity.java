@@ -12,9 +12,11 @@
 
 package com.example.sphinxevents;
 
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.widget.Button;
@@ -23,9 +25,14 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import android.Manifest;
+
 
 import com.example.sphinxevents.DatabaseManager;
 
@@ -43,7 +50,6 @@ public class InitialLoginActivity extends AppCompatActivity {
     private EditText nameEditText;
     private EditText emailEditText;
     private EditText phoneEditText;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,6 +131,9 @@ public class InitialLoginActivity extends AppCompatActivity {
                 Toast.makeText(InitialLoginActivity.this, "Profile created successfully!",
                         Toast.LENGTH_SHORT).show();
 
+                // Ask user to allow location
+                LocationManager.requestLocationPermission(InitialLoginActivity.this);
+
                 finish();  // Close InitialLoginActivity
             }
 
@@ -136,5 +145,4 @@ public class InitialLoginActivity extends AppCompatActivity {
             }
         });
     }
-
 }

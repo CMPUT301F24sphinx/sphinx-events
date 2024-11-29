@@ -10,6 +10,7 @@
 
 package com.example.sphinxevents;
 
+import android.location.Location;
 import android.net.Uri;
 import android.util.Log;
 
@@ -89,7 +90,6 @@ public class DatabaseManager {
                 .add(event)
                 .addOnSuccessListener(callback::onSuccess)
                 .addOnFailureListener(callback::onFailure);
-
     }
 
     /**
@@ -245,10 +245,7 @@ public class DatabaseManager {
                     if (task.isSuccessful() && task.getResult() != null) {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
-                            String name = document.getString("name");
-                            String location = document.getString("location");
-                            String phoneNumber = document.getString("phoneNumber");
-                            Facility facility = new Facility(name, location, phoneNumber, deviceId);
+                            Facility facility = document.toObject(Facility.class);
                             callback.onSuccess(facility);
                         } else {
                             callback.onFailure(new Exception("Facility does not exist."));
@@ -508,21 +505,13 @@ public class DatabaseManager {
                     if (task.isSuccessful() && task.getResult() != null) {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
-                            String name = document.getString("name");
-                            String description = document.getString("description");
-                            String poster = document.getString("poster");
-                            Timestamp dateTimestamp = document.getTimestamp("lotteryEndDate");
-                            Date lotteryEndDate = dateTimestamp.toDate();
+                            Event event = document.toObject(Event.class);
 
-                            Integer entrantLimit;
-                            if(document.get("entrantLimit") != null) {
-                                entrantLimit = Integer.valueOf(document.get("entrantLimit").toString());
-                            } else{
-                                entrantLimit = null;
+                            // Ensure that the waitingList is initialized
+                            if (event != null && event.getWaitingList() == null) {
+                                event.setWaitingList(new ArrayList<>());  // Initialize waitingList if null
                             }
-                            Boolean geolocationReq = document.getBoolean("geolocationReq");
-                            ArrayList<String> entrants = (ArrayList<String>) document.get("entrants");
-                            Event event = new Event(name, description, poster, lotteryEndDate, entrantLimit, geolocationReq, entrants);
+
                             callback.onSuccess(event);
                         } else {
                             callback.onFailure(new Exception("Event does not exist."));

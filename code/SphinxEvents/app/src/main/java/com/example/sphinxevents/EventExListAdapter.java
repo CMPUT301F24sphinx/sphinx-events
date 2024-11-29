@@ -110,8 +110,10 @@ public class EventExListAdapter extends ExListAdapter {
         TextView lotteryTimeRemainingTextView = view.findViewById(R.id.lottery_time_remaining_text_view);
         ImageView clockImage = view.findViewById(R.id.clock_image_view);
 
-        // Sets lottery time remaining to proper text
-        if (event.isLotteryDrawn()) {  // Indicate that lottery was drawn
+
+        // TODO: Fix this logic in case things were changed in the Event class
+        // Sets lottery time remaining to proper display
+        if (event.wasLotteryDrawn()) {
             lotteryTimeRemainingTextView.setText(R.string.lottery_drawn);
             clockImage.setVisibility(View.GONE);
             lotteryTimerLinearLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.green_rounded_border));

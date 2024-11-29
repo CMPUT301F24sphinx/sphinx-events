@@ -4,13 +4,18 @@
     <string name="create_event">Create Event</string>
     <string name="view_profile">View Profile</string>
 
-    <!--Expandable List Strings-->
+    <!--Event and lottery related strings-->
     <string name="joined_events_header">Joined Events (%d)</string>
     <string name="pending_events_header">Pending Events (%d)</string>
     <string name="created_events_header">Created Events (%d)</string>
     <string name="days_until_lottery">%d Days</string>
     <string name="number_of_entrants">Number of Entrants: %d</string>
     <string name="entrant_limit">/ %d</string>
+    <string name="lottery_drawn">Lottery Drawn!</string>
+    <string name="awaiting_lottery">Awaiting Lottery</string>
+    <string name="join">Join</string>
+    <string name="entrants_and_limit">%d / %d</string>
+    <string name="entrants_and_no_limit">%d / No Limit</string>
 
     <!--Drawer strings-->
     <string name="close_drawer_speakable_text">Close side drawer button</string>
@@ -69,30 +74,26 @@
     <string name="back_to_home">Back to Home</string>
     <string name="entrant_limit_optional">Entrant Limit(optional)</string>
     <string name="geo_location_requirement">Geo-Location Requirement:</string>
-    <string name="registration_deadline_yyyy_mm_dd">Registration Deadline(yyyy/MM/dd)*</string>
+    <string name="registration_deadline_yyyy_mm_dd">Registration Deadline (yyyy/MM/dd)*</string>
     <string name="name">Name*</string>
     <string name="create_an_event">Create an Event</string>
     <string name="event_description">Event Description*</string>
 
-<!--    Managing Event String-->
-    <string name="manageevent_event_details">Event Details</string>
+    <!-- Managing Event String-->
+    <string name="manage_event_event_details">Event Details</string>
     <string name="view_qrcode_button">View QR Code</string>
     <string name="edit_event_details_button">Edit Event Details</string>
     <string name="view_entrant_data_button">View Entrant Data</string>
     <string name="notify_entrants_button">Send Message</string>
 
-<!--    Notifications-->
+    <!--Notifications-->
     <string name="channel_name">NotificationChannel</string>
     <string name="channel_description">NotificationChannelDesc</string>
     <string name="CHANNEL_ID">NotificationChannelID</string>
     <string name="notifications">Notifications</string>
 
-
-<!--    QR Code Scan Strings-->
+    <!--QR Code Scan Strings-->
     <string name="qr_camera_scan">Camera</string>
     <string name="qr_use_gallery">Gallery</string>
-    <string name="lottery_drawn">Lottery Drawn!</string>
-    <string name="awaiting_lottery">Awaiting Lottery</string>
-    <string name="join">Join</string>
 
 </resources>

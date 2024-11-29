@@ -7,6 +7,7 @@
 package com.example.sphinxevents;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -17,9 +18,13 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import android.Manifest;
+import android.content.pm.PackageManager;
 
 /**
  * Displays user's facility information if they have one
@@ -40,8 +45,6 @@ public class ManageFacilityActivity extends AppCompatActivity
     private TextView yourFacilityTextView;
     private LinearLayout facilityNameLayout;
     private TextView facilityNameTextView;
-    private LinearLayout facilityLocationLayout;
-    private TextView facilityLocationTextView;
     private LinearLayout facilityPhoneNumberLayout;
     private TextView facilityPhoneNumberTextView;
     private LinearLayout removeEditButtonLayout;
@@ -70,8 +73,6 @@ public class ManageFacilityActivity extends AppCompatActivity
         yourFacilityTextView = findViewById(R.id.your_facility_textview);
         facilityNameLayout = findViewById(R.id.facility_name_layout);
         facilityNameTextView = findViewById(R.id.facility_name_textview);
-        facilityLocationLayout = findViewById(R.id.facility_location_layout);
-        facilityLocationTextView = findViewById(R.id.facility_location_textview);
         facilityPhoneNumberLayout = findViewById(R.id.facility_phone_number_layout);
         facilityPhoneNumberTextView = findViewById(R.id.facility_phone_number_textview);
         removeEditButtonLayout = findViewById(R.id.remove_edit_button_layout);
@@ -88,9 +89,14 @@ public class ManageFacilityActivity extends AppCompatActivity
 
         // Clicking addFacilityButton -> start addFacilityActivity
         addFacilityButton.setOnClickListener(v -> {
-            Intent addFacilityIntent = new Intent(ManageFacilityActivity.this, AddFacilityActivity.class);
-            addFacilityIntent.putExtra("Context", "Add Facility");
-            startActivity(addFacilityIntent);
+            if (isLocationPermissionGranted()) {
+                Intent addFacilityIntent = new Intent(ManageFacilityActivity.this, AddFacilityActivity.class);
+                addFacilityIntent.putExtra("Context", "Add Facility");
+                startActivity(addFacilityIntent);
+            }
+            else {
+                Toast.makeText(getApplicationContext(), "Allow location access to add a facility", Toast.LENGTH_SHORT).show();
+            }
         });
 
         // Clicking editFacilityButton -> start addFacilityActivity with extra context
@@ -164,7 +170,6 @@ public class ManageFacilityActivity extends AppCompatActivity
         addFacilityButton.setVisibility(entrantVisibility);
         yourFacilityTextView.setVisibility(organizerVisibility);
         facilityNameLayout.setVisibility(organizerVisibility);
-        facilityLocationLayout.setVisibility(organizerVisibility);
         facilityPhoneNumberLayout.setVisibility(organizerVisibility);
         removeEditButtonLayout.setVisibility(organizerVisibility);
     }
@@ -178,7 +183,6 @@ public class ManageFacilityActivity extends AppCompatActivity
             @Override
             public void onSuccess(Facility facility) {
                 facilityNameTextView.setText(facility.getName());
-                facilityLocationTextView.setText(facility.getLocation());
                 facilityPhoneNumberTextView.setText(facility.getPhoneNumber());
             }
             @Override
@@ -187,5 +191,14 @@ public class ManageFacilityActivity extends AppCompatActivity
                 finish();
             }
         });
+    }
+
+    /**
+     * Checks if the user has location permission granted
+     * @return boolean representing if location has been granted
+     */
+    private boolean isLocationPermissionGranted() {
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 }
