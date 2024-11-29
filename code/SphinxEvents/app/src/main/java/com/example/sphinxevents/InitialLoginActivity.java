@@ -119,14 +119,11 @@ public class InitialLoginActivity extends AppCompatActivity {
 
         Entrant newUser = new Entrant(deviceId, name, email, phone, profilePicturePath,
                 "", true, true,
-                null, null, null);
+                null, null,  null);
 
         database.saveUser(newUser, new DatabaseManager.UserCreationCallback() {
             @Override
             public void onSuccess(String deviceId) {
-                // Update the current user in UserManager
-                userManager.setCurrentUser(newUser);
-
                 // Show success toast
                 Toast.makeText(InitialLoginActivity.this, "Profile created successfully!",
                         Toast.LENGTH_SHORT).show();

@@ -256,7 +256,6 @@ public class ManageProfileActivity extends AppCompatActivity {
         databaseManager.saveUser(updatedUser, new DatabaseManager.UserCreationCallback() {
             @Override
             public void onSuccess(String deviceId) {
-                userManager.setCurrentUser(updatedUser);
                 if (!initialName.equals(updatedUser.getName())) {
                     updateDefaultPfp();
                 }

@@ -91,9 +91,11 @@
     <string name="channel_description">NotificationChannelDesc</string>
     <string name="CHANNEL_ID">NotificationChannelID</string>
     <string name="notifications">Notifications</string>
+    <string name="notification_msg_preview">%1$s…</string>
 
     <!--QR Code Scan Strings-->
     <string name="qr_camera_scan">Camera</string>
     <string name="qr_use_gallery">Gallery</string>
+    <string name="no_notifications_msg">You have no notifications.</string>
 
 </resources>

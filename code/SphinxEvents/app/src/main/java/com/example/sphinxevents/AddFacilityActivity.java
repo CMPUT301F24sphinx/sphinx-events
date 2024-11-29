@@ -87,7 +87,7 @@ public class AddFacilityActivity extends AppCompatActivity {
 
     /**
      * Validates user inputs
-     * @return boolean of whether inputs are valid
+     * Adds/Edits facility if inputs are valid
      */
     public void validateInputs() {
         // Ensures name is entered
@@ -142,7 +142,6 @@ public class AddFacilityActivity extends AppCompatActivity {
 
     /**
      * Saves facility to user's database document
-     * Sets currentUser into Organizer if adding facility
      */
     public void addFacility(Facility newFacility) {
         // Adds facility to database
@@ -157,7 +156,6 @@ public class AddFacilityActivity extends AppCompatActivity {
                 databaseManager.saveUser(user, new DatabaseManager.UserCreationCallback() {
                     @Override
                     public void onSuccess(String deviceId) {
-                        userManager.setCurrentUser(user);
                         if (activityContext.equals("Add Facility")) {
                             Toast.makeText(getApplicationContext(), "Facility added!", Toast.LENGTH_SHORT).show();
                         }

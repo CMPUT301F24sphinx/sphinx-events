@@ -18,6 +18,8 @@ import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -25,6 +27,7 @@ import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.protobuf.Value;
@@ -620,9 +623,8 @@ public class DatabaseManager {
     public interface NotificationCreationCallback {
         /**
          * Called when notification is created successfully
-         * @param notificationRef DocumentReference object to new created notification
          */
-        void onSuccess(DocumentReference notificationRef);
+        void onSuccess();
 
         /**
          * Called when notification creation fails
@@ -632,16 +634,63 @@ public class DatabaseManager {
     }
 
     /**
-     * Adds notification object to "notification" collection in database
-     * @param notification The notification object being uploaded
-     * @param callback Call back function on weather upload succeeded or faulted
+     * Adds notification object to "notification" collection in the database.
+     *
+     * @param notification The notification object being uploaded.
+     * @param recipients   The recipients of the notification.
+     * @param callback     Callback function on whether upload succeeded or faulted.
      */
-    public void createNotification(Notification notification, NotificationCreationCallback callback) {
-        database.collection("notifications")
-                .add(notification)
-                .addOnSuccessListener(callback::onSuccess)
-                .addOnFailureListener(callback::onFailure);
+    public void createNotification(Notification notification, ArrayList<String> recipients,
+                                   NotificationCreationCallback callback) {
+        WriteBatch batch = database.batch();
+        List<Task<DocumentSnapshot>> tasks = new ArrayList<>();
+
+        // Determine notification type based on channel ID
+        String channelID = notification.getChannelID();
+        boolean isOrganizerNotification = channelID.equals(NotificationsHelper.ORGANIZER_CHANNEL_ID);
+        boolean isAdminNotification = channelID.equals(NotificationsHelper.ADMIN_CHANNEL_ID);
+
+        for (String userID : recipients) {
+            DocumentReference userRef = database.collection("users").document(userID);
+
+            // Fetch user preferences
+            Task<DocumentSnapshot> task = userRef.get().addOnSuccessListener(userDoc -> {
+                if (userDoc.exists()) {
+                    boolean orgNotificationsEnabled = userDoc.getBoolean("orgNotificationsEnabled") != null
+                            && Boolean.TRUE.equals(userDoc.getBoolean("orgNotificationsEnabled"));
+                    boolean adminNotificationsEnabled = userDoc.getBoolean("adminNotificationsEnabled") != null
+                            && Boolean.TRUE.equals(userDoc.getBoolean("adminNotificationsEnabled"));
+
+                    // Check if the notification should be sent based on preferences
+                    if ((isOrganizerNotification && orgNotificationsEnabled)
+                            || (isAdminNotification && adminNotificationsEnabled)) {
+                        DocumentReference notificationRef = userRef.collection("notifications").document();
+                        batch.set(notificationRef, notification);
+                    }
+                }
+            }).addOnFailureListener(callback::onFailure);
+
+            // Add the task to the list
+            tasks.add(task);
+        }
+
+        // After all tasks are completed, commit the batch
+        Tasks.whenAllSuccess(tasks).addOnSuccessListener(aVoid -> {
+            batch.commit()
+                    .addOnSuccessListener(unused -> callback.onSuccess())
+                    .addOnFailureListener(callback::onFailure);
+        }).addOnFailureListener(e -> {
+            callback.onFailure(e); // Handle failure
+        });
+
+        // Edge case: if no recipients, commit immediately
+        if (recipients.isEmpty()) {
+            batch.commit()
+                    .addOnSuccessListener(unused -> callback.onSuccess())
+                    .addOnFailureListener(callback::onFailure);
+        }
     }
+
 
 
     /**
@@ -663,25 +712,22 @@ public class DatabaseManager {
 
     /**
      * Gets ArrayList of Notification objects sent to userID
-     * @param userID The user who to retrieve notifications for
+     * @param userID The list of the user to retrieve notifications for
      * @param callback Success or Failure callback
      */
     public void getNotifications(String userID, getNotificationsCallback callback) {
-        database.collection("notifications")
-                .whereEqualTo("toUser", userID)
+        database.collection("users")
+                .document(userID)
+                .collection("notifications")
                 .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        ArrayList<Notification> notifications = new ArrayList<>();
-                        for (DocumentSnapshot document : task.getResult()) {
-                            Notification notification = document.toObject(Notification.class);
-                            notifications.add(notification);
-                        }
-                        callback.onSuccess(notifications);
-                    } else {
-                        callback.onFailure(task.getException());
+                .addOnSuccessListener(querySnapshot -> {
+                    ArrayList<Notification> notifications = new ArrayList<>();
+                    for (DocumentSnapshot notificationDoc : querySnapshot.getDocuments()) {
+                        notifications.add(notificationDoc.toObject(Notification.class));
                     }
-                });
+                    callback.onSuccess(notifications);
+                })
+                .addOnFailureListener(callback::onFailure);
     }
 
     //---------------------------------------------------------------------------------------------
