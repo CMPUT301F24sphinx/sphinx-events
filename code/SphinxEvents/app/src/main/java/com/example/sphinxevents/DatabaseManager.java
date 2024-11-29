@@ -844,7 +844,7 @@ public class DatabaseManager {
         // event name:
         String event_name = name;
 
-        // Query the users collection for documents with names containing the query
+        // deleting event based on if the parameter 'name' matches the field name
         database.collection("events")
                 .whereEqualTo("name", event_name)
                 .get()

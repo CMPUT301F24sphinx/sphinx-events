@@ -1,6 +1,6 @@
 /*
- * Displays all information of profile that was clicked by administrator in ProfilesSearchActivity
- * Allows administrator to remove user profile
+ * Displays event information that was clicked by administrator in EventsSearchActivity
+ * Allows administrator to remove event
  */
 
 package com.example.sphinxevents;
