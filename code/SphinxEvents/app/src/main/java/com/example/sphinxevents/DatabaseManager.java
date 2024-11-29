@@ -837,22 +837,30 @@ public class DatabaseManager {
 
     /**
      * Removes an event from database
-     * @param deviceId key for profile
+     * @param name key for event
      * @param callback Callback to handle success or failure of event deletion
      */
-    public void removeEvent(String deviceId, EventRemovalCallback callback) {
-        // Remove the event from the Firestore collection
+    public void removeEvent(String name, EventRemovalCallback callback) {
+        // event name:
+        String event_name = name;
+
+        // Query the users collection for documents with names containing the query
         database.collection("events")
-                .document(deviceId)
-                .delete()
-                .addOnSuccessListener(aVoid -> {
-                    // Call the callback on success
-                    callback.onSuccess();
-                })
-                .addOnFailureListener(callback::onFailure);  // Notify failure
-
+                .whereEqualTo("name", event_name)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (DocumentSnapshot document : task.getResult()) {
+                            document.getReference().delete()
+                                    .addOnSuccessListener(aVoid -> {
+                                        // Notify success via callback
+                                        callback.onSuccess();
+                                    })
+                                    .addOnFailureListener(callback::onFailure);
+                        }
+                    }
+                });
     }
-
 
 }
 

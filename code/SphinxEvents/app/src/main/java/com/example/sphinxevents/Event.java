@@ -17,6 +17,9 @@ public class Event implements Serializable {
     private Boolean geolocationReq;
     private ArrayList<String> entrants;
 
+    // No-argument constructor
+    public Event() {}
+
     Event(String name, String description, String poster, Date lotteryEndDate, Integer entrantLimit, Boolean geolocationReq, ArrayList<String> joinedUsers) {
         this.name = name;
         this.description = description;

@@ -55,7 +55,7 @@ public class RemoveEventsActivity extends AppCompatActivity {
         eventNameTextView.setText(event.getName());
         eventDescriptionTextView.setText(event.getDescription());
         eventLotteryDeadlineTextView.setText(event.getLotteryEndDate().toString());
-        eventEntrantLimitTextView.setText(event.getEntrantLimit());
+        eventEntrantLimitTextView.setText(event.getEntrantLimit().toString());
 
         // Set onClickListener for backButton
         backButton.setOnClickListener(v -> {
@@ -82,5 +82,5 @@ public class RemoveEventsActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Error removing event from database", Toast.LENGTH_SHORT).show();
             }
         });
-    }
+   }
 }
