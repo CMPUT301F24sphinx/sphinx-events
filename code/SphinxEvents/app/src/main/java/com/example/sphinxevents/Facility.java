@@ -5,6 +5,8 @@
 
 package com.example.sphinxevents;
 
+import android.location.Location;
+
 import java.io.Serializable;
 
 /**
@@ -14,7 +16,7 @@ import java.io.Serializable;
 public class Facility implements Serializable {
 
     private String name;
-    private String location;
+    private UserLocation location;
     private String phoneNumber;
     private String ownerId;
 
@@ -22,7 +24,7 @@ public class Facility implements Serializable {
     public Facility() {
     }
 
-    Facility(String name, String location, String phoneNumber, String ownerId) {
+    Facility(String name, UserLocation location, String phoneNumber, String ownerId) {
         this.name = name;
         this.location = location;
         this.phoneNumber = phoneNumber;
@@ -33,7 +35,7 @@ public class Facility implements Serializable {
         return name;
     }
 
-    public String getLocation() {
+    public UserLocation getLocation() {
         return location;
     }
 
@@ -45,7 +47,7 @@ public class Facility implements Serializable {
         this.name = name;
     }
 
-    public void setLocation(String location) {
+    public void setLocation(UserLocation location) {
         this.location = location;
     }
 

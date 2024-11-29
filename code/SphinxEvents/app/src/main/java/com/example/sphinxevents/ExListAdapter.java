@@ -32,7 +32,6 @@ public abstract class ExListAdapter<C> extends BaseExpandableListAdapter {
         this.children = children;
     }
 
-
     /**
      * Returns number of groups in ex-list
      *
@@ -42,7 +41,6 @@ public abstract class ExListAdapter<C> extends BaseExpandableListAdapter {
     public int getGroupCount() {
         return parents.size();
     }
-
 
     /**
      * Returns number of children in group
@@ -55,7 +53,6 @@ public abstract class ExListAdapter<C> extends BaseExpandableListAdapter {
         return children.get(parents.get(groupPosition)).size();
     }
 
-
     /**
      * Returns group parent/header
      *
@@ -66,7 +63,6 @@ public abstract class ExListAdapter<C> extends BaseExpandableListAdapter {
     public Object getGroup(int groupPosition) {
         return parents.get(groupPosition);
     }
-
 
     /**
      * Returns child
@@ -80,7 +76,6 @@ public abstract class ExListAdapter<C> extends BaseExpandableListAdapter {
         return children.get(parents.get(groupPosition)).get(childPosition);
     }
 
-
     /**
      * Returns id of group, which is just it's index
      *
@@ -91,7 +86,6 @@ public abstract class ExListAdapter<C> extends BaseExpandableListAdapter {
     public long getGroupId(int groupPosition) {
         return groupPosition;
     }
-
 
     /**
      * Returns id of child, which is just it's index
@@ -105,7 +99,6 @@ public abstract class ExListAdapter<C> extends BaseExpandableListAdapter {
         return childPosition;
     }
 
-
     /**
      * Returns whether the id's do not change, which is false
      *
@@ -115,7 +108,6 @@ public abstract class ExListAdapter<C> extends BaseExpandableListAdapter {
     public boolean hasStableIds() {
         return false;
     }
-
 
     /**
      * Displays the groups/headers/parents
@@ -147,7 +139,6 @@ public abstract class ExListAdapter<C> extends BaseExpandableListAdapter {
 
     @Override
     public abstract View getChildView(int groupPosition, int childPosition, boolean isExpanded, View convertView, ViewGroup parent);
-
 
     /**
      * Returns whether child can be selected, which is true

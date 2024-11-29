@@ -1,3 +1,4 @@
+
 /*
  * Class Name: DatabaseManager
  * Date: 2024-11-06
@@ -10,8 +11,10 @@
 
 package com.example.sphinxevents;
 
+import android.location.Location;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -36,6 +39,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 //TODO: Add a more descriptive comment for the class when more functionality is implemented.
 /**
@@ -88,10 +92,20 @@ public class DatabaseManager {
      * @param callback Callback to handle success or failure of the event creation.
      */
     public void createEvent(Event event, EventCreationCallback callback) {
-        // Add the event to Firestore under the "events" collection
-        database.collection("events")
-                .add(event)
-                .addOnSuccessListener(callback::onSuccess)
+        // Create a new document reference with an auto-generated ID
+        DocumentReference docRef = database.collection("events").document();
+
+        // Set the generated document ID as the eventId in the Event object
+        event.setEventId(docRef.getId());
+        String posterId = "EventPosters/" + docRef.getId() + ".jpg";
+        event.setPoster(posterId);
+
+        // Add the event to Firestore with the generated ID
+        docRef.set(event)
+                .addOnSuccessListener(aVoid -> {
+                    // Pass the DocumentReference to the callback onSuccess method
+                    callback.onSuccess(docRef);
+                })
                 .addOnFailureListener(callback::onFailure);
 
     }
@@ -249,10 +263,7 @@ public class DatabaseManager {
                     if (task.isSuccessful() && task.getResult() != null) {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
-                            String name = document.getString("name");
-                            String location = document.getString("location");
-                            String phoneNumber = document.getString("phoneNumber");
-                            Facility facility = new Facility(name, location, phoneNumber, deviceId);
+                            Facility facility = document.toObject(Facility.class);
                             callback.onSuccess(facility);
                         } else {
                             callback.onFailure(new Exception("Facility does not exist."));
@@ -512,21 +523,13 @@ public class DatabaseManager {
                     if (task.isSuccessful() && task.getResult() != null) {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
-                            String name = document.getString("name");
-                            String description = document.getString("description");
-                            String poster = document.getString("poster");
-                            Timestamp dateTimestamp = document.getTimestamp("lotteryEndDate");
-                            Date lotteryEndDate = dateTimestamp.toDate();
+                            Event event = document.toObject(Event.class);
 
-                            Integer entrantLimit;
-                            if(document.get("entrantLimit") != null) {
-                                entrantLimit = Integer.valueOf(document.get("entrantLimit").toString());
-                            } else{
-                                entrantLimit = null;
+                            // Ensure that the waitingList is initialized
+                            if (event != null && event.getWaitingList() == null) {
+                                event.setWaitingList(new ArrayList<>());  // Initialize waitingList if null
                             }
-                            Boolean geolocationReq = document.getBoolean("geolocationReq");
-                            ArrayList<String> entrants = (ArrayList<String>) document.get("entrants");
-                            Event event = new Event(name, description, poster, lotteryEndDate, entrantLimit, geolocationReq, entrants);
+
                             callback.onSuccess(event);
                         } else {
                             callback.onFailure(new Exception("Event does not exist."));
@@ -580,14 +583,57 @@ public class DatabaseManager {
     }
 
     /**
+     * Callback for changing the poster of an event
+     */
+    public interface changeEventPosterCallback {
+        /**
+         * Called when poster is successfully changed
+         */
+        void onSuccess();
+
+        /**
+         * Called when failure occurs when changing poster
+         * @param e the exception that occurred
+         */
+        void onFailure(Exception e);
+    }
+
+    /**
+     * Changes the poster of an event
+     * Uploads poster, updates poster field for event
+     * @param eventId the ID of the event to change the poster for
+     * @param posterId the path of the poster in the database
+     * @param posterUri  the Uri of the new poster
+     * @param callback  the callback to handle success or failure of changing poster
+     */
+    public void changeEventPoster(String eventId, String posterId, Uri posterUri, changeEventPosterCallback callback) {
+
+        // Get Firebase Storage reference
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference().child(posterId);
+
+        // Upload the poster file
+        storageRef.putFile(posterUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // Handle failure to update the database
+                    database.collection("events").document(eventId)
+                            .update("poster", posterId)
+                            .addOnSuccessListener(aVoid -> {
+                                callback.onSuccess();
+                            })
+                            .addOnFailureListener(callback::onFailure);
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
+    /**
      * Callback interface for created Events retrieval
      */
-    public interface getCreatedEventsCallback {
+    public interface retrieveEventListCallback {
         /**
          * Called when events are retrieved successfully
-         * @param createdEventsID List of Id's of events
+         * @param events List of Event objects that were retrieved
          */
-        void onSuccess(List<String> createdEventsID);
+        void onSuccess(List<Event> events);
 
         /**
          * Called when error occurs during events retrieval
@@ -597,22 +643,30 @@ public class DatabaseManager {
     }
 
     /**
-     * Retrieves an Event from db
-     * @param userID ID of user who created event
+     * Retrieves events that match an ArrayList of event id's
+     * Used for displaying events in home screen
+     * @param eventsToRetrieve list of event id's to search for in database
+     * @param callback callback to handle success or failure of event list retrieval
      */
-    public void getCreatedEvents(String userID, getCreatedEventsCallback callback) {
-        database.collection("users")
-                .document(userID)
+    public void retrieveEventList(ArrayList<String> eventsToRetrieve, retrieveEventListCallback callback) {
+        // Handles empty list of events to search for
+        if (eventsToRetrieve.isEmpty()) {
+            callback.onSuccess(new ArrayList<>());
+            return;
+        }
+
+        // Searches database for events whose id's are in the eventsToRetrieve array
+        database.collection("events")
+                .whereIn(FieldPath.documentId(), eventsToRetrieve)
                 .get()
                 .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document.exists()) {
-                            List<String> createdEvents = (List<String>) document.get("createdEvents");
-                            callback.onSuccess(createdEvents);
-                        } else {
-                            callback.onFailure(new Exception("Created Events does not exist."));
+                    if (task.isSuccessful()) {
+                        ArrayList<Event> events = new ArrayList<>();
+                        for (DocumentSnapshot document : task.getResult()) {
+                            Event event = document.toObject(Event.class);
+                            events.add(event);
                         }
+                        callback.onSuccess(events);
                     } else {
                         callback.onFailure(task.getException());
                     }
@@ -734,7 +788,7 @@ public class DatabaseManager {
     }
 
     //---------------------------------------------------------------------------------------------
-    //Admin profile search handling:
+    // Admin profile search handling:
 
     /**
      * Callback interface for profiles search
@@ -877,7 +931,3 @@ public class DatabaseManager {
     }
 
 }
-
-
-
-

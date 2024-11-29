@@ -32,7 +32,21 @@
     <!-- Admin Search Colors -->
     <color name="facility_search_header_color">#ABABAB</color>
     <color name="facility_search_query_color">#DCDCDC</color>
-    <color name="list_facility_background_color">#FDDBDB</color>
+    <color name="list_facility_background_color">#EDD6D6</color>
     <color name="list_profile_background_color">#C0DEF8</color>
+
+    <!-- Event Colors -->
+    <color name="list_created_event_color">#55DDFF</color>
+
+    <!-- Manage Event Colors -->
+    <color name="event_details_background">#EDEDED</color>
+    <color name="edit_event_details_button_color">#55DDFF</color>
+    <color name="view_qr_code_button_color">#55DDFF</color>
+    <color name="view_entrant_data_button_color">#55DDFF</color>
+    <color name="send_message_button_color">#55DDFF</color>
+    <color name="draw_lottery_button_color">#FF7BFD</color>
+    <color name="lottery_result_header_color">#FFBCFE</color>
+    <color name="lottery_result_color">#F0F0F0</color>
+    <color name="change_poster_button_color">#B0E771</color>
 
 </resources>
