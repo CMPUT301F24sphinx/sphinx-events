@@ -381,11 +381,11 @@
             android:layout_marginBottom="5dp"/>
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/send_msg_to_entrants_button"
+            android:id="@+id/send_notification_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="10dp"
-            android:text="Send Message To Entrants"
+            android:text="Send Notification"
             android:textColor="@color/black"
             android:textSize="20sp"
             android:backgroundTint="@color/send_message_button_color"
