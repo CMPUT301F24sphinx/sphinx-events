@@ -69,7 +69,7 @@ public class ViewCreatedEvent extends AppCompatActivity {
         viewEventPosterButton = findViewById(R.id.view_event_poster_button);
         Button viewQRCodeButton = findViewById(R.id.view_qr_code_button);
         Button viewEntrantDataButton = findViewById(R.id.view_entrant_data_button);
-        Button sendMsgToEntrantsButton = findViewById(R.id.send_msg_to_entrants_button);
+        Button sendNotificationBtn = findViewById(R.id.send_notification_button);
         drawLotteryButton = findViewById(R.id.draw_lottery_button);
         lotteryDataTable = findViewById(R.id.lottery_data_table);
         numOfLosersTextView = findViewById(R.id.num_of_losers_text_view);
@@ -118,9 +118,17 @@ public class ViewCreatedEvent extends AppCompatActivity {
             // TODO: GO TO ACTIVITY THAT DISPLAYS USER DATA
         });
 
-        // Allow organizer to send custom message to entrants
-        sendMsgToEntrantsButton.setOnClickListener(v -> {
-            // TODO: ALLOW ORGANIZER TO SEND MSG TO ENTRANTS
+        // Allow organizer to send custom notification
+        sendNotificationBtn.setOnClickListener(v -> {
+            if (event != null) {
+                // Create an instance of SendOrganizerNotificationFragment
+                SendOrganizerNotificationFragment fragment = SendOrganizerNotificationFragment.newInstance(event);
+                // Show the fragment (if in an Activity)
+                fragment.show(getSupportFragmentManager(), "SendOrganizerNotificationFragment");
+            } else {
+                // Handle the case where the event is not available
+                Toast.makeText(this, "Event not found", Toast.LENGTH_SHORT).show();
+            }
         });
 
 
