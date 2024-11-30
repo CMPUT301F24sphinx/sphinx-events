@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -20,6 +21,9 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 public class ViewCreatedEvent extends AppCompatActivity {
 
@@ -201,7 +205,7 @@ public class ViewCreatedEvent extends AppCompatActivity {
         super.onDestroy();
         eventListener.stopListening();
     }
-}
+
     public void drawInputFragment(){
 
         EditText sampleSize = new EditText(this);
@@ -220,9 +224,10 @@ public class ViewCreatedEvent extends AppCompatActivity {
 
                             if(n <= 0){
                                 Toast.makeText(ViewCreatedEvent.this, "Enter non-zero positive count", Toast.LENGTH_SHORT).show();
+                            } else if (event.getEventEntrants().size() == 0) {
+                                Toast.makeText(ViewCreatedEvent.this, "There are no entrants for the event", Toast.LENGTH_SHORT).show();
                             } else {
-                                //TODO: call lottery draw
-                                Log.d("Aniket", String.valueOf(n));
+                                performLottery(n);
                             }
                         } catch (NumberFormatException e){
                             Toast.makeText(ViewCreatedEvent.this, "Sample count was non-numeric", Toast.LENGTH_SHORT).show();
@@ -234,6 +239,51 @@ public class ViewCreatedEvent extends AppCompatActivity {
                     }
                 })
                 .show();
+    }
+
+    private void performLottery(int n) {
+
+        ArrayList<String> tempEventEntrants = event.getEventEntrants();
+        Collections.shuffle(tempEventEntrants);
+
+
+        ArrayList<String> tempWinners = new ArrayList<>();
+        ArrayList<String> tempLosers = new ArrayList<>();
+
+        // Ugly for loop to assign IDs to temp arrays because java doesn't have a method to convert List<Str> to ArrayList<Str>
+        for(int i = 0; i < n; i++){
+            tempWinners.add(event.getEventEntrants().get(i));
+        }
+        for(int i = n; i < event.getEventEntrants().size(); i++){
+            tempLosers.add(event.getEventEntrants().get(i));
+        }
+
+        event.setLotteryWinners(tempWinners);
+        event.setLotteryLosers(tempLosers);
+
+        DatabaseManager databaseManager;
+        databaseManager = DatabaseManager.getInstance();
+
+        databaseManager.updateEventWinners(event.getEventId(), tempWinners);
+        databaseManager.updateEventLosers(event.getEventId(), tempLosers);
+
+        Log.d("Aniket", tempWinners.get(0));
+
+        NotificationsHelper.sendLotteryWinNotification("BurgerPlace", event.getName(), tempWinners, new DatabaseManager.NotificationCreationCallback() {
+            @Override
+            public void onSuccess() {}
+            @Override
+            public void onFailure(Exception e) {}
+        });
+
+        NotificationsHelper.sendLotteryLossNotification("BurgerPlace", event.getName(), tempWinners, new DatabaseManager.NotificationCreationCallback() {
+            @Override
+            public void onSuccess() {}
+            @Override
+            public void onFailure(Exception e) {}
+        });
+
+
     }
 
 }

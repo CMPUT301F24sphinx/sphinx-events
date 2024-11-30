@@ -21,11 +21,15 @@ public class Event implements Serializable {
     private Boolean geolocationReq;  // Boolean indicating if geolocation is required
     private ArrayList<String> entrants;  // The list of entrants who have joined the event
     private UserLocation facilityLocation;  // The location of the facility event belongs to
+    private ArrayList<String> lotteryWinners; // The list of entrants who won the initial lottery
+    private ArrayList<String> lotteryLosers; // The list of entrants who lost the initial lottery
+    private ArrayList<String> confirmed; // the list of entrants who choose to confirm the event
+    private ArrayList<String> cancelled; // The list of entrants who won the lottery and cancelled
 
     //---------------------------------------------------------------------------------------
     // TODO: Change these variables to match what Aniket has implemented
 
-    private ArrayList<String> waitingList;
+//    private ArrayList<String> waitingList;
     private boolean lotteryWasDrawn = false;  // Boolean indicating if lottery has been drawn
     //---------------------------------------------------------------------------------------
 
@@ -55,7 +59,11 @@ public class Event implements Serializable {
         this.geolocationReq = geolocationReq;
         this.entrants = joinedUsers;
         this.facilityLocation = facilityLocation;
-        this.waitingList = new ArrayList<>();
+//        this.waitingList = new ArrayList<>();
+        this.lotteryWinners = new ArrayList<String>();
+        this.lotteryLosers = new ArrayList<String>();
+        this.confirmed = new ArrayList<String>();
+        this.cancelled = new ArrayList<String>();
     }
 
     /**
@@ -171,6 +179,54 @@ public class Event implements Serializable {
     public void setEventEntrants(ArrayList<String> entrants) {this.entrants = entrants;}
 
     /**
+     * Gets the list of entrants who won the lottery.
+     * @return The list of winners.
+     */
+    public ArrayList<String> getLotteryWinners() {return lotteryWinners;}
+
+    /**
+     * Sets the list of winners of the lottery.
+     * @param winners The list of winners.
+     */
+    public void setLotteryWinners(ArrayList<String> winners) {this.lotteryWinners = winners;}
+
+    /**
+     * Gets the list of entrants who lost the lottery.
+     * @return The list of losers.
+     */
+    public ArrayList<String> getLotteryLosers() {return lotteryLosers;}
+
+    /**
+     * Sets the list of losers of the lottery.
+     * @param losers The list of losers.
+     */
+    public void setLotteryLosers(ArrayList<String> losers) {this.lotteryLosers = losers;}
+
+    /**
+     * Gets the list of entrants who confirmed the event.
+     * @return The list of losers.
+     */
+    public ArrayList<String> getConfirmed() {return confirmed;}
+
+    /**
+     * Sets the list of users who confirmed the event.
+     * @param confirmed The list of users who confirm the event.
+     */
+    public void setConfirmed(ArrayList<String> confirmed) {this.confirmed = confirmed;}
+
+    /**
+     * Gets the list of entrants who cancelled the event.
+     * @return The list of cancellers.
+     */
+    public ArrayList<String> getCancelled() {return cancelled;}
+
+    /**
+     * Sets the list of users who cancelled the event.
+     * @param cancelled The list of users who cancel the event.
+     */
+    public void setCancelled(ArrayList<String> cancelled) {this.cancelled = cancelled;}
+
+    /**
      * Returns location of facility that event belongs to
      * @return location of facility
      */
@@ -182,13 +238,13 @@ public class Event implements Serializable {
     // TODO: Determine which of these functions are used / useful
 
 
-    public ArrayList<String> getWaitingList() {
-        return waitingList;
-    }
-
-    public void setWaitingList(ArrayList<String> waitingList) {
-        this.waitingList = waitingList;
-    }
+//    public ArrayList<String> getWaitingList() {
+//        return waitingList;
+//    }
+//
+//    public void setWaitingList(ArrayList<String> waitingList) {
+//        this.waitingList = waitingList;
+//    }
 
     /**
      * Sets whether lottery for event has been drawn
@@ -227,19 +283,34 @@ public class Event implements Serializable {
         return currentDate.after(lotteryEndDate);
     }
 
+//    /**
+//     * Returns number of people in waiting list
+//     * @return size of waiting list
+//     */
+//    public int retrieveNumInWaitingList() {
+//        return waitingList != null ? waitingList.size() : 0;
+//    }
+//    /**
+//     * Returns whether waiting list is full
+//     * @return boolean representing whether waiting list is full
+//     */
+//    public boolean checkIfWaitingListFull() {
+//        return this.entrantLimit != null && this.waitingList.size() == this.entrantLimit;
+//    }
+
     /**
      * Returns number of people in waiting list
      * @return size of waiting list
      */
     public int retrieveNumInWaitingList() {
-        return waitingList != null ? waitingList.size() : 0;
+        return entrants != null ? entrants.size() : 0;
     }
     /**
      * Returns whether waiting list is full
      * @return boolean representing whether waiting list is full
      */
     public boolean checkIfWaitingListFull() {
-        return this.entrantLimit != null && this.waitingList.size() == this.entrantLimit;
+        return this.entrantLimit != null && this.entrants.size() == this.entrantLimit;
     }
 
     //-------------------------------------------------------------------------------------------

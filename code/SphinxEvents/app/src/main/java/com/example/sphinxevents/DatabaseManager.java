@@ -525,8 +525,8 @@ public class DatabaseManager {
                             Event event = document.toObject(Event.class);
 
                             // Ensure that the waitingList is initialized
-                            if (event != null && event.getWaitingList() == null) {
-                                event.setWaitingList(new ArrayList<>());  // Initialize waitingList if null
+                            if (event != null && event.getEventEntrants() == null) {
+                                event.setEventEntrants(new ArrayList<>());  // Initialize waitingList if null
                             }
 
                             callback.onSuccess(event);
@@ -598,6 +598,48 @@ public class DatabaseManager {
         database.collection("users")
                 .document(userID)
                 .update("joinedEvents", FieldValue.arrayRemove(eventID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+    }
+
+    /**
+     * Updates the winner array of given event
+     * @param winners ID of users who won the lottery.
+     * @param eventID ID of event being updated.
+     */
+    public void updateEventWinners(String eventID, ArrayList<String> winners) {
+        database.collection("events")
+                .document(eventID)
+                .update("lotteryWinners", winners)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+    }
+
+    /**
+     * Updates the loser array of given event
+     * @param losers ID of users who lost the lottery.
+     * @param eventID ID of event being updated.
+     */
+    public void updateEventLosers(String eventID, ArrayList<String> losers) {
+        database.collection("events")
+                .document(eventID)
+                .update("lotteryLosers", losers)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
