@@ -23,7 +23,7 @@ public class Event implements Serializable {
     private UserLocation facilityLocation;  // The location of the facility event belongs to
 
     //---------------------------------------------------------------------------------------
-    // TODO: Change these variables to match what Aniket has implemented
+    // TODO: Change/remove these variables to match the lottery that Aniket has implemented
 
     private ArrayList<String> waitingList;
     private boolean lotteryWasDrawn = false;  // Boolean indicating if lottery has been drawn

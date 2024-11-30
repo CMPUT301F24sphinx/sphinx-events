@@ -22,6 +22,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SphinxEvents"
         tools:targetApi="31">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBaDpOWbtHSswKS9mpwDChczji44wZZEtM" />
+        <activity
+            android:name=".ViewMapActivity"
+            android:exported="false" />
         <activity
             android:name=".ViewQRCodeActivity"
             android:exported="false" />

@@ -42,6 +42,7 @@ public class ViewEventDetails extends AppCompatActivity {
     // Database and manager related attributes
     private EventListener eventListener;
     private UserManager userManager;
+    private DatabaseManager databaseManager;
     private String eventId;
     private Event event;
 
@@ -64,6 +65,7 @@ public class ViewEventDetails extends AppCompatActivity {
     private LinearLayout ableToJoinWaitingList;
 
     private boolean isUserTooFar;  // boolean representing if geolocation requirements are met
+    private UserLocation userLocation;  // user's location when scanning QR code if geolocation is required
 
     /**
      * On creation of activity
@@ -90,6 +92,7 @@ public class ViewEventDetails extends AppCompatActivity {
         }
 
         userManager = UserManager.getInstance();
+        databaseManager = DatabaseManager.getInstance();
 
         // Obtain xml elements
         eventPosterImageView = findViewById(R.id.event_poster_image_view);
@@ -116,8 +119,7 @@ public class ViewEventDetails extends AppCompatActivity {
 
         // Join event waiting list
         joinWaitingListButton.setOnClickListener(v -> {
-            // TODO: ADD LOGIC FOR JOINING WAIT LIST OF EVENT
-            // ALL CHECKS WERE COMPLETE, IF THE USER CAN CLICK THIS BUTTON THEN THEY ARE ABLE TO JOIN THE EVENT
+            joinEvent();
         });
 
         // Create the EventListener and start listening for updates to the event
@@ -295,11 +297,12 @@ public class ViewEventDetails extends AppCompatActivity {
                         eventFacilityLocation.getLatitude(), eventFacilityLocation.getLongitude());
 
                 // Determines if user is too far away or not
-                if (userDistanceToFacility > 50) {  // user must be within 50km of facility
+                if (userDistanceToFacility > 300) {  // User must be within 300km of facility
                     isUserTooFar = true;
                 }
-                else {
+                else {  // User is close enough to facility to join the event
                     isUserTooFar = false;
+                    userLocation = new UserLocation(location.getLatitude(), location.getLongitude());
                 }
             }
 
@@ -330,6 +333,25 @@ public class ViewEventDetails extends AppCompatActivity {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
         return R * c;  // returns distance converted to kilometers
+    }
+
+
+    /**
+     * Signs user up for waitlist of event
+     */
+    private void joinEvent() {
+        databaseManager.joinEventWaitingList(userManager.getCurrentUser().getDeviceId(), userLocation, eventId, new DatabaseManager.joinWaitingListCallback() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(getApplicationContext(), "You have joined the waiting list!.", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(getApplicationContext(), "Error joining event. Please try again.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     /**

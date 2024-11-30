@@ -48,5 +48,7 @@
     <color name="lottery_result_header_color">#FFBCFE</color>
     <color name="lottery_result_color">#F0F0F0</color>
     <color name="change_poster_button_color">#B0E771</color>
+    <color name="view_map_button_color">#76E253</color>
+
 
 </resources>
