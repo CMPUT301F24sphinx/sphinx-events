@@ -95,7 +95,7 @@ public class NotificationsHelper {
     }
 
     /**
-     * Sends a custom notification with a provided title and message.
+     * Sends a custom organizer notification with a provided title and message.
      *
      * @param title The title of the notification
      * @param message The message content of the notification
