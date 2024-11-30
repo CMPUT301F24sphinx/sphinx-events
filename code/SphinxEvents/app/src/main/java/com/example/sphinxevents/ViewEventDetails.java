@@ -55,6 +55,7 @@ public class ViewEventDetails extends AppCompatActivity {
     private Button joinWaitingListButton;
     private Button leaveWaitingListButton;
     private Button confirmEventButton;
+    private Button cancelEventButton;
 
     // Warning/Indicator UI elements
     private LinearLayout alreadyJoinedEvent;
@@ -65,6 +66,8 @@ public class ViewEventDetails extends AppCompatActivity {
     private LinearLayout geolocationReqNotMetWarning;
     private LinearLayout geolocationReqMet;
     private LinearLayout ableToJoinWaitingList;
+    private LinearLayout confirmEventWin;
+    private LinearLayout lotteryLossWarning;
 
     private boolean isUserTooFar;  // boolean representing if geolocation requirements are met
     private UserLocation userLocation;  // user's location when scanning QR code if geolocation is required
@@ -106,6 +109,7 @@ public class ViewEventDetails extends AppCompatActivity {
         Button goBackButton = findViewById(R.id.go_back_button);
         joinWaitingListButton = findViewById(R.id.join_waiting_list_button);
         confirmEventButton = findViewById(R.id.confirm_event_button);
+        cancelEventButton = findViewById(R.id.cancel_event_button);
         alreadyJoinedEvent = findViewById(R.id.already_joined_event);
         geolocationRequiredWarning = findViewById(R.id.geolocation_required_warning);
         deadlinePassedWarning = findViewById(R.id.deadline_passed_warning);
@@ -114,6 +118,8 @@ public class ViewEventDetails extends AppCompatActivity {
         geolocationReqNotMetWarning = findViewById(R.id.geolocation_not_met_warning);
         geolocationReqMet = findViewById(R.id.geolocation_requirement_met);
         ableToJoinWaitingList = findViewById(R.id.able_to_join_waiting_list);
+        confirmEventWin = findViewById(R.id.confirm_event_win);
+        lotteryLossWarning = findViewById(R.id.lottery_loss_warning);
 
         // Exit the activity with back button
         goBackButton.setOnClickListener(v -> {
@@ -162,10 +168,16 @@ public class ViewEventDetails extends AppCompatActivity {
             joinWaitingListButton.setVisibility(View.GONE);
         }
 
+        clearWarnings();
         if(userWonLottery()){
             confirmEventButton.setVisibility(View.VISIBLE);
+            confirmEventWin.setVisibility(View.VISIBLE);
+            cancelEventButton.setVisibility(View.VISIBLE);
         } else {
             confirmEventButton.setVisibility(View.GONE);
+            confirmEventWin.setVisibility(View.GONE);
+            cancelEventButton.setVisibility(View.GONE);
+            lotteryLossWarning.setVisibility(View.VISIBLE);
         }
     }
 

@@ -268,9 +268,11 @@ public class ViewCreatedEvent extends AppCompatActivity {
         event.setLotteryWinners(tempWinners);
         event.setEntrants(tempLosers);
 
+        // Update the database arrays
         databaseManager.updateEventWinners(event.getEventId(), tempWinners);
         databaseManager.updateEntrants(event.getEventId(), tempLosers);
 
+        // Send notifications to the winners and losers
         if(!tempWinners.isEmpty()) {
             NotificationsHelper.sendLotteryWinNotification(organizer.getFacility().getName(), event.getName(), tempWinners, new DatabaseManager.NotificationCreationCallback() {
                 @Override

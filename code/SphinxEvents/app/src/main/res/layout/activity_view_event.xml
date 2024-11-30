@@ -292,6 +292,52 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/confirm_event_win"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/baseline_check_circle_24"
+                android:layout_marginEnd="10dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Confirm your event spot!"
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/lottery_loss_warning"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/baseline_cancel_24"
+                android:layout_marginEnd="10dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="You lost the event lottry, but can be chosen if someone cancels!"
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
     </LinearLayout>
 
     <LinearLayout
@@ -329,10 +375,26 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Confirm"
+            android:layout_marginEnd="16dp"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:text="Confirm Event"
             android:textColor="@color/black"
             android:textSize="22sp"
             app:backgroundTint="@color/facility_positive_button_color"
+            app:cornerRadius="4dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/cancel_event_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:text="Cancel Event"
+            android:textColor="@color/black"
+            android:textSize="22sp"
+            app:backgroundTint="@color/facility_negative_button_color"
             app:cornerRadius="4dp" />
     </LinearLayout>
 
