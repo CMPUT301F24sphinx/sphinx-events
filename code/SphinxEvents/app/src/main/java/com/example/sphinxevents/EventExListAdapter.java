@@ -116,7 +116,7 @@ public class EventExListAdapter extends ExListAdapter {
 
         // TODO: Fix this logic in case things were changed in the Event class
         // Sets lottery time remaining to proper display
-        if (event.wasLotteryDrawn()) {
+        if (event.getLotteryWasDrawn()) {
             lotteryTimeRemainingTextView.setText(R.string.lottery_drawn);
             clockImage.setVisibility(View.GONE);
             lotteryTimerLinearLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.green_rounded_border));

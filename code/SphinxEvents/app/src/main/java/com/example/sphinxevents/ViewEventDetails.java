@@ -108,6 +108,7 @@ public class ViewEventDetails extends AppCompatActivity {
         waitingListFullWarning = findViewById(R.id.waiting_list_full_warning);
         Button goBackButton = findViewById(R.id.go_back_button);
         joinWaitingListButton = findViewById(R.id.join_waiting_list_button);
+        leaveWaitingListButton = findViewById(R.id.leave_waiting_list_button);
         confirmEventButton = findViewById(R.id.confirm_event_button);
         cancelEventButton = findViewById(R.id.cancel_event_button);
         alreadyJoinedEvent = findViewById(R.id.already_joined_event);
@@ -131,6 +132,17 @@ public class ViewEventDetails extends AppCompatActivity {
             joinEvent();
         });
 
+        // Confirm the event
+        confirmEventButton.setOnClickListener(v -> {
+            confirmEvent();
+        });
+
+        // Leave the event
+        leaveWaitingListButton.setOnClickListener(v -> {
+            leaveEvent();
+            finish();
+        });
+
         // Create the EventListener and start listening for updates to the event
         eventListener = new EventListener(eventId, new EventListener.EventUpdateCallback() {
             @Override
@@ -148,6 +160,20 @@ public class ViewEventDetails extends AppCompatActivity {
         eventListener.startListening();  // Start listening for changes to event
     }
 
+    private void confirmEvent() {
+        databaseManager.confirmEvent(userManager.getCurrentUser().getDeviceId(), event.getEventId());
+        Toast.makeText(getApplicationContext(), "You have confirmed " + event.getName(), Toast.LENGTH_LONG).show();
+    }
+
+    private void cancelEvent() {
+        databaseManager.cancelEvent(userManager.getCurrentUser().getDeviceId(), event.getEventId());
+    }
+
+    private void leaveEvent() {
+        databaseManager.leaveEvent(userManager.getCurrentUser().getDeviceId(), event.getEventId());
+        Toast.makeText(getApplicationContext(), "You have left " + event.getName(), Toast.LENGTH_LONG).show();
+    }
+
     /**
      * Sets display of event details
      */
@@ -160,24 +186,15 @@ public class ViewEventDetails extends AppCompatActivity {
         displayWaitListCount();
 
         // Displays warnings / messages and determines if user can join event
-        clearWarnings();  // First, clears current warnings
-        if (userCanJoinEvent()) {
-            joinWaitingListButton.setVisibility(View.VISIBLE);
-        }
-        else {
-            joinWaitingListButton.setVisibility(View.GONE);
-        }
-
+        clearButtons();
         clearWarnings();
-        if(userWonLottery()){
+        if(userCanJoinEvent()){
+            joinWaitingListButton.setVisibility(View.VISIBLE);
+        } else if (userWonLottery()){
             confirmEventButton.setVisibility(View.VISIBLE);
-            confirmEventWin.setVisibility(View.VISIBLE);
             cancelEventButton.setVisibility(View.VISIBLE);
-        } else {
-            confirmEventButton.setVisibility(View.GONE);
-            confirmEventWin.setVisibility(View.GONE);
-            cancelEventButton.setVisibility(View.GONE);
-            lotteryLossWarning.setVisibility(View.VISIBLE);
+        } else if(!userWonLottery()){
+            leaveWaitingListButton.setVisibility(View.VISIBLE);
         }
     }
 
@@ -238,6 +255,18 @@ public class ViewEventDetails extends AppCompatActivity {
         geolocationReqNotMetWarning.setVisibility(View.GONE);
         geolocationReqMet.setVisibility(View.GONE);
         ableToJoinWaitingList.setVisibility(View.GONE);
+        lotteryLossWarning.setVisibility(View.GONE);
+        confirmEventWin.setVisibility(View.GONE);
+    }
+
+    /**
+     * Clears all event interaction buttons
+     */
+    private void clearButtons(){
+        confirmEventButton.setVisibility(View.GONE);
+        cancelEventButton.setVisibility(View.GONE);
+        joinWaitingListButton.setVisibility(View.GONE);
+        leaveWaitingListButton.setVisibility(View.GONE);
     }
 
     private boolean userWonLottery(){

@@ -371,6 +371,19 @@
             app:cornerRadius="4dp" />
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/leave_waiting_list_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:text="Leave Event"
+            android:textColor="@color/black"
+            android:textSize="22sp"
+            app:backgroundTint="@color/facility_negative_button_color"
+            app:cornerRadius="4dp" />
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/confirm_event_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

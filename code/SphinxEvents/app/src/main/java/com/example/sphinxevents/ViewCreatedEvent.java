@@ -154,7 +154,7 @@ public class ViewCreatedEvent extends AppCompatActivity {
 
         // Determines display based on lottery state
         resetDisplay();  // First, reset visibility of conditional UI elements
-        if (event.wasLotteryDrawn()) {  // Lottery has happened
+        if (event.getLotteryWasDrawn()) {  // Lottery has happened
             lotteryStatusTextView.setText(R.string.lottery_has_been_drawn);
         }
         else {
@@ -271,6 +271,10 @@ public class ViewCreatedEvent extends AppCompatActivity {
         // Update the database arrays
         databaseManager.updateEventWinners(event.getEventId(), tempWinners);
         databaseManager.updateEntrants(event.getEventId(), tempLosers);
+
+        event.setLotteryWasDrawn(true);
+        databaseManager.updateLotteryWasDrawn(event.getEventId());
+
 
         // Send notifications to the winners and losers
         if(!tempWinners.isEmpty()) {

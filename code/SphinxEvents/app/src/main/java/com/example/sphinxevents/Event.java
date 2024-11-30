@@ -20,16 +20,9 @@ public class Event implements Serializable {
     private ArrayList<String> entrants;  // The list of entrants who have joined the event
     private UserLocation facilityLocation;  // The location of the facility event belongs to
     private ArrayList<String> lotteryWinners; // The list of entrants who won the initial lottery
-//    private ArrayList<String> lotteryLosers; // The list of entrants who lost the initial lottery
     private ArrayList<String> confirmed; // the list of entrants who choose to confirm the event
     private ArrayList<String> cancelled; // The list of entrants who won the lottery and cancelled
-
-    //---------------------------------------------------------------------------------------
-    // TODO: Change/remove these variables to match the lottery that Aniket has implemented
-
-//    private ArrayList<String> waitingList;
     private boolean lotteryWasDrawn = false;  // Boolean indicating if lottery has been drawn
-    //---------------------------------------------------------------------------------------
 
     // Empty Constructor
     public Event() {
@@ -57,11 +50,10 @@ public class Event implements Serializable {
         this.geolocationReq = geolocationReq;
         this.entrants = joinedUsers;
         this.facilityLocation = facilityLocation;
-//        this.waitingList = new ArrayList<>();
         this.lotteryWinners = new ArrayList<String>();
-//        this.lotteryLosers = new ArrayList<String>();
         this.confirmed = new ArrayList<String>();
         this.cancelled = new ArrayList<String>();
+        this.lotteryWasDrawn = false;
     }
 
     /**
@@ -256,7 +248,7 @@ public class Event implements Serializable {
      * Gets whether lottery for event has been drawn
      * @return boolean indicating if lottery was drawn
      */
-    public boolean wasLotteryDrawn() {
+    public boolean getLotteryWasDrawn() {
         return lotteryWasDrawn;
     }
 
