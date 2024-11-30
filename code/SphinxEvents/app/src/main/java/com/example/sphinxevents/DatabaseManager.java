@@ -558,7 +558,8 @@ public class DatabaseManager {
         // Step 1: Add the user to the event's waiting list
         database.collection("events")
                 .document(eventId)
-                .update("waitingList", FieldValue.arrayUnion(userId))
+                .update("entrants", FieldValue.arrayUnion(userId))
+                // Aniket: I changed the field from waitingList to entrants as were just using that as the waiting list pool and the losers pool
                 .addOnSuccessListener(aVoid -> {
                     // Add the eventId to the user's pendingEvents field
                     database.collection("users")
@@ -695,7 +696,7 @@ public class DatabaseManager {
 
         database.collection("users")
                 .document(userID)
-                .update("joinedEvents", FieldValue.arrayRemove(eventID))
+                .update("pendingEvents", FieldValue.arrayRemove(eventID))
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {

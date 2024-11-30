@@ -323,6 +323,17 @@
             android:textSize="22sp"
             app:backgroundTint="@color/facility_positive_button_color"
             app:cornerRadius="4dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/confirm_event_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Confirm"
+            android:textColor="@color/black"
+            android:textSize="22sp"
+            app:backgroundTint="@color/facility_positive_button_color"
+            app:cornerRadius="4dp" />
     </LinearLayout>
 
 </LinearLayout>

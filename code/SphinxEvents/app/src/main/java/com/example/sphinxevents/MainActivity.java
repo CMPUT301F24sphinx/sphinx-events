@@ -146,15 +146,6 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
                         return;
                     }
                 })
-// Optional gallery scan, might do later it keeps breaking
-//            .setPositiveButton(R.string.qr_use_gallery, new DialogInterface.OnClickListener() {
-//                public void onClick(DialogInterface dialog, int id) {
-//                    Intent CamScanIntent = new Intent(MainActivity.this, ScanQRCode.class);
-//                    CamScanIntent.setAction("Gallery");
-//                    startActivity(CamScanIntent);
-//                    return;
-//                }
-//            })
                 .setNegativeButton(R.string.qr_camera_scan, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Intent CamScanIntent = new Intent(MainActivity.this, ScanQRCode.class);
@@ -298,6 +289,20 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         headers.add(getString(R.string.joined_events_header, currentUser.getJoinedEvents().size()));
         headers.add(getString(R.string.pending_events_header, currentUser.getPendingEvents().size()));
 
+        // Display joined events if there are any
+        databaseManager.retrieveEventList(currentUser.getJoinedEvents(), new DatabaseManager.retrieveEventListCallback() {
+            @Override
+            public void onSuccess(List<Event> joinedEvents) {
+                events.put(headers.get(0), joinedEvents);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(MainActivity.this, "Error Displaying Joined Events",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+
         // Displays pending events
         databaseManager.retrieveEventList(currentUser.getPendingEvents(), new DatabaseManager.retrieveEventListCallback() {
             @Override
@@ -320,7 +325,7 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
             databaseManager.retrieveEventList(organizer.getCreatedEvents(), new DatabaseManager.retrieveEventListCallback() {
                 @Override
                 public void onSuccess(List<Event> createdEvents) {
-                    headers.set(2, getString(R.string.created_events_header, createdEvents.size()));
+//                    headers.set(2, getString(R.string.created_events_header, createdEvents.size()));
                     events.put(headers.get(2), createdEvents);
                 }
 
@@ -340,11 +345,15 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
             Event clickedEvent = (Event) listAdapter.getChild(groupPosition, childPosition);
             switch (groupPosition) {
                 case 0:
-                    // TODO: Go to viewJoinedEvent activity
+                    Intent viewJoinedEventIntent = new Intent(MainActivity.this, ViewEventDetails.class);
+                    viewJoinedEventIntent.putExtra("eventId", clickedEvent.getEventId());
+                    startActivity(viewJoinedEventIntent);
                     break;
 
                 case 1:
-                    // TODO: Got to viewPendingEvent activity
+                    Intent viewPendingEventIntent = new Intent(MainActivity.this, ViewEventDetails.class);
+                    viewPendingEventIntent.putExtra("eventId", clickedEvent.getEventId());
+                    startActivity(viewPendingEventIntent);
                     break;
 
                 case 2:

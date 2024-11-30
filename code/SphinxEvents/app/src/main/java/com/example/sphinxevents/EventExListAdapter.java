@@ -84,7 +84,11 @@ public class EventExListAdapter extends ExListAdapter {
             // Sets display of number of entrants who joined lottery and the entrant limit
             TextView numberOfEntrantsTextView = view.findViewById(R.id.number_of_entrants_text_view);
             TextView limitOfEntrantsTextView = view.findViewById(R.id.limit_of_entrants_text_view);
-            numberOfEntrantsTextView.setText(context.getString(R.string.number_of_entrants, event.getEventEntrants().size()));
+            if(event.getEventEntrants() == null){
+                numberOfEntrantsTextView.setText(context.getString(R.string.number_of_entrants, 0));
+            } else {
+                numberOfEntrantsTextView.setText(context.getString(R.string.number_of_entrants, event.getEventEntrants().size()));
+            }
             if (event.getEntrantLimit() == null || event.getEntrantLimit() == 0 ) {
                 limitOfEntrantsTextView.setVisibility(View.GONE);
             }

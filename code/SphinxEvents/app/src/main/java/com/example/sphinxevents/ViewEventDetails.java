@@ -43,7 +43,6 @@ public class ViewEventDetails extends AppCompatActivity {
     private DatabaseManager databaseManager;
     private EventListener eventListener;
     private UserManager userManager;
-    private DatabaseManager databaseManager;
     private String eventId;
     private Event event;
 
@@ -54,6 +53,8 @@ public class ViewEventDetails extends AppCompatActivity {
     private TextView registrationDeadlineTextView;
     private TextView waitingListCountTextView;
     private Button joinWaitingListButton;
+    private Button leaveWaitingListButton;
+    private Button confirmEventButton;
 
     // Warning/Indicator UI elements
     private LinearLayout alreadyJoinedEvent;
@@ -104,6 +105,7 @@ public class ViewEventDetails extends AppCompatActivity {
         waitingListFullWarning = findViewById(R.id.waiting_list_full_warning);
         Button goBackButton = findViewById(R.id.go_back_button);
         joinWaitingListButton = findViewById(R.id.join_waiting_list_button);
+        confirmEventButton = findViewById(R.id.confirm_event_button);
         alreadyJoinedEvent = findViewById(R.id.already_joined_event);
         geolocationRequiredWarning = findViewById(R.id.geolocation_required_warning);
         deadlinePassedWarning = findViewById(R.id.deadline_passed_warning);
@@ -159,6 +161,11 @@ public class ViewEventDetails extends AppCompatActivity {
         else {
             joinWaitingListButton.setVisibility(View.GONE);
         }
+//        if(userWonLottery()){
+//            confirmEventButton.setVisibility(View.VISIBLE);
+//        } else {
+//            confirmEventButton.setVisibility(View.GONE);
+//        }
     }
 
     /**
@@ -218,6 +225,12 @@ public class ViewEventDetails extends AppCompatActivity {
         geolocationReqNotMetWarning.setVisibility(View.GONE);
         geolocationReqMet.setVisibility(View.GONE);
         ableToJoinWaitingList.setVisibility(View.GONE);
+    }
+
+    private boolean userWonLottery(){
+
+        return event.getLotteryWinners().contains(userManager.getCurrentUser().getDeviceId());
+
     }
 
     /**
