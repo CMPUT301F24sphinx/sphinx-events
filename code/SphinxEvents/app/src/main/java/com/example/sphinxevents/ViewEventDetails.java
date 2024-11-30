@@ -161,11 +161,12 @@ public class ViewEventDetails extends AppCompatActivity {
         else {
             joinWaitingListButton.setVisibility(View.GONE);
         }
-//        if(userWonLottery()){
-//            confirmEventButton.setVisibility(View.VISIBLE);
-//        } else {
-//            confirmEventButton.setVisibility(View.GONE);
-//        }
+
+        if(userWonLottery()){
+            confirmEventButton.setVisibility(View.VISIBLE);
+        } else {
+            confirmEventButton.setVisibility(View.GONE);
+        }
     }
 
     /**

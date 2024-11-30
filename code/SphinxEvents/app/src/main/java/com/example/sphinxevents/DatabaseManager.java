@@ -11,10 +11,7 @@
 
 package com.example.sphinxevents;
 
-import android.location.Location;
 import android.net.Uri;
-import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -22,28 +19,22 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
-import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.protobuf.Value;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 //TODO: Add a more descriptive comment for the class when more functionality is implemented.
 /**
@@ -530,8 +521,8 @@ public class DatabaseManager {
                             Event event = document.toObject(Event.class);
 
                             // Ensure that the waitingList is initialized
-                            if (event != null && event.getEventEntrants() == null) {
-                                event.setEventEntrants(new ArrayList<>());  // Initialize waitingList if null
+                            if (event != null && event.getEntrants() == null) {
+                                event.setEntrants(new ArrayList<>());  // Initialize waitingList if null
                             }
 
                             callback.onSuccess(event);
@@ -735,7 +726,7 @@ public class DatabaseManager {
      * @param entrants ID of users who will be in the updated array.
      * @param eventID ID of event being updated.
      */
-    public void updateEventEntrants(String eventID, ArrayList<String> entrants) {
+    public void updateEntrants(String eventID, ArrayList<String> entrants) {
         database.collection("events")
                 .document(eventID)
                 .update("entrants", entrants)

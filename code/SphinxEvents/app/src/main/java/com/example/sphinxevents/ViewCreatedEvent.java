@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -22,7 +21,6 @@ import androidx.core.view.WindowInsetsCompat;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 
 public class ViewCreatedEvent extends AppCompatActivity {
@@ -230,7 +228,7 @@ public class ViewCreatedEvent extends AppCompatActivity {
 
                             if(n <= 0){
                                 Toast.makeText(ViewCreatedEvent.this, "Enter non-zero positive count", Toast.LENGTH_SHORT).show();
-                            } else if (event.getEventEntrants().isEmpty()) {
+                            } else if (event.getEntrants().isEmpty()) {
                                 Toast.makeText(ViewCreatedEvent.this, "There are no entrants for the event", Toast.LENGTH_LONG).show();
                             } else {
                                 performLottery(n);
@@ -249,39 +247,52 @@ public class ViewCreatedEvent extends AppCompatActivity {
 
     private void performLottery(int n) {
 
-        ArrayList<String> tempEventEntrants = event.getEventEntrants();
+        // Shuffles the waiting list of entrants
+        ArrayList<String> tempEventEntrants = event.getEntrants();
         Collections.shuffle(tempEventEntrants);
 
+        // new arrays for winners and losers
         ArrayList<String> tempWinners = new ArrayList<>();
         ArrayList<String> tempLosers = new ArrayList<>();
 
         // Ugly for-loop to assign IDs to temp arrays because java doesn't have a method to convert List<Str> to ArrayList<Str>
         for(int i = 0; i < n; i++){
-            tempWinners.add(event.getEventEntrants().get(i));
+            tempWinners.add(event.getEntrants().get(i));
         }
-        for(int i = n; i < event.getEventEntrants().size(); i++){
-            tempLosers.add(event.getEventEntrants().get(i));
+        for(int i = n; i < event.getEntrants().size(); i++){
+            tempLosers.add(event.getEntrants().get(i));
         }
 
+        // The winners put in the winner array
+        // The losers stay in the entrants array
         event.setLotteryWinners(tempWinners);
-        event.setEventEntrants(tempLosers);
+        event.setEntrants(tempLosers);
 
         databaseManager.updateEventWinners(event.getEventId(), tempWinners);
-        databaseManager.updateEventEntrants(event.getEventId(), tempLosers);
+        databaseManager.updateEntrants(event.getEventId(), tempLosers);
 
-        NotificationsHelper.sendLotteryWinNotification(organizer.getFacility().getName(), event.getName(), tempWinners, new DatabaseManager.NotificationCreationCallback() {
-            @Override
-            public void onSuccess() {}
-            @Override
-            public void onFailure(Exception e) {}
-        });
+        if(!tempWinners.isEmpty()) {
+            NotificationsHelper.sendLotteryWinNotification(organizer.getFacility().getName(), event.getName(), tempWinners, new DatabaseManager.NotificationCreationCallback() {
+                @Override
+                public void onSuccess() {
+                }
 
-        NotificationsHelper.sendLotteryLossNotification(organizer.getFacility().getName(), event.getName(), tempWinners, new DatabaseManager.NotificationCreationCallback() {
-            @Override
-            public void onSuccess() {}
-            @Override
-            public void onFailure(Exception e) {}
-        });
+                @Override
+                public void onFailure(Exception e) {
+                }
+            });
+        }
+        if(!tempLosers.isEmpty()) {
+            NotificationsHelper.sendLotteryLossNotification(organizer.getFacility().getName(), event.getName(), tempLosers, new DatabaseManager.NotificationCreationCallback() {
+                @Override
+                public void onSuccess() {
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                }
+            });
+        }
     }
 
 }

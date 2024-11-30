@@ -1,8 +1,6 @@
 
 package com.example.sphinxevents;
 
-import com.google.firebase.firestore.auth.User;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -170,13 +168,13 @@ public class Event implements Serializable {
      * Gets the list of entrants who have joined the event.
      * @return The list of entrants.
      */
-    public ArrayList<String> getEventEntrants() {return entrants;}
+    public ArrayList<String> getEntrants() {return entrants;}
 
     /**
      * Sets the list of entrants for the event.
      * @param entrants The list of entrants.
      */
-    public void setEventEntrants(ArrayList<String> entrants) {this.entrants = entrants;}
+    public void setEntrants(ArrayList<String> entrants) {this.entrants = entrants;}
 
     /**
      * Gets the list of entrants who won the lottery.

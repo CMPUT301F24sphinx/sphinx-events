@@ -4,13 +4,10 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -89,7 +86,7 @@ public class SendOrganizerNotificationFragment extends DialogFragment {
                     // Build the recipient list based on selected checkboxes
                     ArrayList<String> recipients = new ArrayList<>();
                     if (cbWaitingList.isChecked()) {
-                        recipients.addAll(event.getEventEntrants());
+                        recipients.addAll(event.getEntrants());
                     }
                     if (cbCancelled.isChecked()) {
                         //recipients.addAll(event.getCancelled());

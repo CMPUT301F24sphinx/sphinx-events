@@ -6,7 +6,6 @@ package com.example.sphinxevents;
 
 
 import android.content.Context;
-import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,12 +15,9 @@ import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 
-import com.example.sphinxevents.ExListAdapter;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Adapter for expandable lists that holds events
@@ -84,10 +80,10 @@ public class EventExListAdapter extends ExListAdapter {
             // Sets display of number of entrants who joined lottery and the entrant limit
             TextView numberOfEntrantsTextView = view.findViewById(R.id.number_of_entrants_text_view);
             TextView limitOfEntrantsTextView = view.findViewById(R.id.limit_of_entrants_text_view);
-            if(event.getEventEntrants() == null){
+            if(event.getEntrants() == null){
                 numberOfEntrantsTextView.setText(context.getString(R.string.number_of_entrants, 0));
             } else {
-                numberOfEntrantsTextView.setText(context.getString(R.string.number_of_entrants, event.getEventEntrants().size()));
+                numberOfEntrantsTextView.setText(context.getString(R.string.number_of_entrants, event.getEntrants().size()));
             }
             if (event.getEntrantLimit() == null || event.getEntrantLimit() == 0 ) {
                 limitOfEntrantsTextView.setVisibility(View.GONE);

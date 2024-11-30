@@ -119,7 +119,7 @@ public class ViewEnteredEvent extends AppCompatActivity {
                 String formattedDate = dateFormatter.format(event.getLotteryEndDate());
 
                 // Set private var to event waitlist
-                eventEntrants = event.getEventEntrants();
+                eventEntrants = event.getEntrants();
                 if(eventEntrants == null){
                     eventEntrants = new ArrayList<>();
                 }
