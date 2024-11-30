@@ -22,7 +22,7 @@ public class Event implements Serializable {
     private ArrayList<String> entrants;  // The list of entrants who have joined the event
     private UserLocation facilityLocation;  // The location of the facility event belongs to
     private ArrayList<String> lotteryWinners; // The list of entrants who won the initial lottery
-    private ArrayList<String> lotteryLosers; // The list of entrants who lost the initial lottery
+//    private ArrayList<String> lotteryLosers; // The list of entrants who lost the initial lottery
     private ArrayList<String> confirmed; // the list of entrants who choose to confirm the event
     private ArrayList<String> cancelled; // The list of entrants who won the lottery and cancelled
 
@@ -61,7 +61,7 @@ public class Event implements Serializable {
         this.facilityLocation = facilityLocation;
 //        this.waitingList = new ArrayList<>();
         this.lotteryWinners = new ArrayList<String>();
-        this.lotteryLosers = new ArrayList<String>();
+//        this.lotteryLosers = new ArrayList<String>();
         this.confirmed = new ArrayList<String>();
         this.cancelled = new ArrayList<String>();
     }
@@ -190,17 +190,17 @@ public class Event implements Serializable {
      */
     public void setLotteryWinners(ArrayList<String> winners) {this.lotteryWinners = winners;}
 
-    /**
-     * Gets the list of entrants who lost the lottery.
-     * @return The list of losers.
-     */
-    public ArrayList<String> getLotteryLosers() {return lotteryLosers;}
-
-    /**
-     * Sets the list of losers of the lottery.
-     * @param losers The list of losers.
-     */
-    public void setLotteryLosers(ArrayList<String> losers) {this.lotteryLosers = losers;}
+//    /**
+//     * Gets the list of entrants who lost the lottery.
+//     * @return The list of losers.
+//     */
+//    public ArrayList<String> getLotteryLosers() {return lotteryLosers;}
+//
+//    /**
+//     * Sets the list of losers of the lottery.
+//     * @param losers The list of losers.
+//     */
+//    public void setLotteryLosers(ArrayList<String> losers) {this.lotteryLosers = losers;}
 
     /**
      * Gets the list of entrants who confirmed the event.

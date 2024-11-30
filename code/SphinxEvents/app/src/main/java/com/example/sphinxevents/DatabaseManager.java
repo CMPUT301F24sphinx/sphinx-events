@@ -633,14 +633,14 @@ public class DatabaseManager {
     }
 
     /**
-     * Updates the loser array of given event
-     * @param losers ID of users who lost the lottery.
+     * Updates the entrants array of the event class.
+     * @param entrants ID of users who will be in the updated array.
      * @param eventID ID of event being updated.
      */
-    public void updateEventLosers(String eventID, ArrayList<String> losers) {
+    public void updateEventEntrants(String eventID, ArrayList<String> entrants) {
         database.collection("events")
                 .document(eventID)
-                .update("lotteryLosers", losers)
+                .update("entrants", entrants)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {

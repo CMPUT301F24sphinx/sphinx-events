@@ -89,7 +89,7 @@ public class SendOrganizerNotificationFragment extends DialogFragment {
                     // Build the recipient list based on selected checkboxes
                     ArrayList<String> recipients = new ArrayList<>();
                     if (cbWaitingList.isChecked()) {
-                        recipients.addAll(event.getWaitingList());
+                        recipients.addAll(event.getEventEntrants());
                     }
                     if (cbCancelled.isChecked()) {
                         //recipients.addAll(event.getCancelled());

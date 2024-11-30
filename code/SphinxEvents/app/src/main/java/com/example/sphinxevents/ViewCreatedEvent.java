@@ -30,6 +30,8 @@ public class ViewCreatedEvent extends AppCompatActivity {
     private EventListener eventListener;
     private String eventId;
     private Event event; // The created event to display
+    private DatabaseManager databaseManager;
+    private Organizer organizer;
 
     // UI Elements
     private TextView eventNameTextView;
@@ -65,6 +67,9 @@ public class ViewCreatedEvent extends AppCompatActivity {
         if (intent != null ) {
             eventId = intent.getStringExtra("eventId");
         }
+
+        databaseManager = DatabaseManager.getInstance();
+        organizer = (Organizer) UserManager.getInstance().getCurrentUser();
 
         // Obtain XML elements
         eventNameTextView = findViewById(R.id.event_name_text_view);
@@ -232,8 +237,8 @@ public class ViewCreatedEvent extends AppCompatActivity {
 
                             if(n <= 0){
                                 Toast.makeText(ViewCreatedEvent.this, "Enter non-zero positive count", Toast.LENGTH_SHORT).show();
-                            } else if (event.getEventEntrants().size() == 0) {
-                                Toast.makeText(ViewCreatedEvent.this, "There are no entrants for the event", Toast.LENGTH_SHORT).show();
+                            } else if (event.getEventEntrants().isEmpty()) {
+                                Toast.makeText(ViewCreatedEvent.this, "There are no entrants for the event", Toast.LENGTH_LONG).show();
                             } else {
                                 performLottery(n);
                             }
@@ -254,11 +259,10 @@ public class ViewCreatedEvent extends AppCompatActivity {
         ArrayList<String> tempEventEntrants = event.getEventEntrants();
         Collections.shuffle(tempEventEntrants);
 
-
         ArrayList<String> tempWinners = new ArrayList<>();
         ArrayList<String> tempLosers = new ArrayList<>();
 
-        // Ugly for loop to assign IDs to temp arrays because java doesn't have a method to convert List<Str> to ArrayList<Str>
+        // Ugly for-loop to assign IDs to temp arrays because java doesn't have a method to convert List<Str> to ArrayList<Str>
         for(int i = 0; i < n; i++){
             tempWinners.add(event.getEventEntrants().get(i));
         }
@@ -267,31 +271,24 @@ public class ViewCreatedEvent extends AppCompatActivity {
         }
 
         event.setLotteryWinners(tempWinners);
-        event.setLotteryLosers(tempLosers);
-
-        DatabaseManager databaseManager;
-        databaseManager = DatabaseManager.getInstance();
+        event.setEventEntrants(tempLosers);
 
         databaseManager.updateEventWinners(event.getEventId(), tempWinners);
-        databaseManager.updateEventLosers(event.getEventId(), tempLosers);
+        databaseManager.updateEventEntrants(event.getEventId(), tempLosers);
 
-        Log.d("Aniket", tempWinners.get(0));
-
-        NotificationsHelper.sendLotteryWinNotification("BurgerPlace", event.getName(), tempWinners, new DatabaseManager.NotificationCreationCallback() {
+        NotificationsHelper.sendLotteryWinNotification(organizer.getFacility().getName(), event.getName(), tempWinners, new DatabaseManager.NotificationCreationCallback() {
             @Override
             public void onSuccess() {}
             @Override
             public void onFailure(Exception e) {}
         });
 
-        NotificationsHelper.sendLotteryLossNotification("BurgerPlace", event.getName(), tempWinners, new DatabaseManager.NotificationCreationCallback() {
+        NotificationsHelper.sendLotteryLossNotification(organizer.getFacility().getName(), event.getName(), tempWinners, new DatabaseManager.NotificationCreationCallback() {
             @Override
             public void onSuccess() {}
             @Override
             public void onFailure(Exception e) {}
         });
-
-
     }
 
 }
