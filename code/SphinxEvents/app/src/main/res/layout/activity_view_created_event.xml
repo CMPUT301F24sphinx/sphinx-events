@@ -143,6 +143,34 @@
             </LinearLayout>
 
             <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp">
+
+                <TextView
+                    android:id="@+id/lottery_status_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:gravity="center_vertical"
+                    android:text="Lottery Status:"
+                    android:textSize="20sp"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:visibility="visible"/>
+
+                <TextView
+                    android:id="@+id/lottery_status_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:textSize="20sp"
+                    android:textColor="@color/black"
+                    android:text="Status"/>
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/num_of_lottery_entrants_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -173,167 +201,9 @@
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10dp">
-
-                <TextView
-                    android:id="@+id/lottery_status_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:gravity="center_vertical"
-                    android:text="Lottery Status:"
-                    android:textSize="20sp"
-                    android:textColor="@color/black"
-                    android:textStyle="bold"
-                    android:visibility="visible"/>
-
-                <TextView
-                    android:id="@+id/lottery_status_text_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:textSize="20sp"
-                    android:textColor="@color/black"
-                    android:text="Status"/>
-
-            </LinearLayout>
-
         </LinearLayout>
 
     </ScrollView>
-
-    <LinearLayout
-        android:id="@+id/lottery_data_table"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="3dp"
-        android:padding="3dp"
-        android:background="@drawable/square_border">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="Lottery Result"
-                android:padding="2dp"
-                android:textSize="20sp"
-                android:textColor="@color/black"
-                android:textStyle="bold"
-                android:background="@color/lottery_result_header_color"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:padding="2dp"
-                        android:text="Losers"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/black"
-                        android:background="@drawable/lottery_result_bottom_right_top_border"/>
-
-                    <TextView
-                        android:id="@+id/num_of_losers_text_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:paddingVertical="2dp"
-                        android:text="%d"
-                        android:textSize="20sp"
-                        android:textColor="@color/black"
-                        android:background="@drawable/lottery_result_right_border"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:paddingVertical="2dp"
-                        android:text="Winners"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/black"
-                        android:background="@drawable/lottery_result_bottom_right_top_border"/>
-
-                    <TextView
-                        android:id="@+id/num_of_winners_text_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:paddingVertical="2dp"
-                        android:text="%d"
-                        android:textSize="20sp"
-                        android:textColor="@color/black"
-                        android:background="@drawable/lottery_result_right_border"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:paddingVertical="2dp"
-                        android:text="Confirmed"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/black"
-                        android:background="@drawable/lottery_result_top_bottom_border"/>
-
-                    <TextView
-                        android:id="@+id/num_of_confirmed_text_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:paddingVertical="2dp"
-                        android:text="%d"
-                        android:textSize="20sp"
-                        android:textColor="@color/black"
-                        android:background="@color/lottery_result_color"/>
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </LinearLayout>
-
 
     <LinearLayout
         android:id="@+id/button_options_linear_layout"

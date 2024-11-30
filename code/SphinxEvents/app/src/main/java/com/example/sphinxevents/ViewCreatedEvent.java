@@ -31,17 +31,8 @@ public class ViewCreatedEvent extends AppCompatActivity {
     private TextView numOfLotteryEntrantsTextView;
     private TextView registrationDeadlineTextView;
     private TextView lotteryStatusTextView;
-    private Button viewEventPosterButton;
     private Button drawLotteryButton;
-    private LinearLayout lotteryDataTable;
-    private TextView numOfLosersTextView;
-    private TextView numOfWinnersTextView;
-    private TextView numOfConfirmedTextView;
 
-    /**
-     * On creation of activity
-     * @param savedInstanceState
-     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,15 +57,11 @@ public class ViewCreatedEvent extends AppCompatActivity {
         numOfLotteryEntrantsTextView = findViewById(R.id.num_of_lottery_entrants_text_view);
         registrationDeadlineTextView = findViewById(R.id.registration_deadline_text_view);
         lotteryStatusTextView = findViewById(R.id.lottery_status_text_view);
-        viewEventPosterButton = findViewById(R.id.view_event_poster_button);
+        Button viewEventPosterButton = findViewById(R.id.view_event_poster_button);
         Button viewQRCodeButton = findViewById(R.id.view_qr_code_button);
         Button viewEntrantDataButton = findViewById(R.id.view_entrant_data_button);
         Button sendNotificationBtn = findViewById(R.id.send_notification_button);
         drawLotteryButton = findViewById(R.id.draw_lottery_button);
-        lotteryDataTable = findViewById(R.id.lottery_data_table);
-        numOfLosersTextView = findViewById(R.id.num_of_losers_text_view);
-        numOfWinnersTextView = findViewById(R.id.num_of_winners_text_view);
-        numOfConfirmedTextView = findViewById(R.id.num_of_confirmed_text_view);
 
         // Exit activity if back arrow is pressed
         ImageButton backButton = findViewById(R.id.manage_event_back_button);
@@ -154,8 +141,6 @@ public class ViewCreatedEvent extends AppCompatActivity {
         resetDisplay();  // First, reset visibility of conditional UI elements
         if (event.wasLotteryDrawn()) {  // Lottery has happened
             lotteryStatusTextView.setText(R.string.lottery_has_been_drawn);
-            lotteryDataTable.setVisibility(View.VISIBLE);
-            // TODO: SET THE LOSERS, WINNERS, AND CONFIRMED VALUES
         }
         else {
             numOfLotteryEntrantsLinearLayout.setVisibility(View.VISIBLE);
@@ -198,7 +183,6 @@ public class ViewCreatedEvent extends AppCompatActivity {
      */
     private void resetDisplay() {
         numOfLotteryEntrantsLinearLayout.setVisibility(View.GONE);
-        lotteryDataTable.setVisibility(View.GONE);
         drawLotteryButton.setVisibility(View.GONE);
     }
 

@@ -280,7 +280,8 @@ public class ViewEventDetails extends AppCompatActivity {
      * @return boolean indicating whether user has joined event already
      */
     private boolean alreadyJoined() {
-        return userManager.getCurrentUser().getJoinedEvents().contains(eventId);
+        Entrant currentUser = userManager.getCurrentUser();
+        return currentUser.getJoinedEvents().contains(eventId) || currentUser.getPendingEvents().contains(eventId) ;
     }
 
     /**
