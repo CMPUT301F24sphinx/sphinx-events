@@ -40,6 +40,7 @@ import java.util.UUID;
 public class ViewEventDetails extends AppCompatActivity {
 
     // Database and manager related attributes
+    private DatabaseManager databaseManager;
     private EventListener eventListener;
     private UserManager userManager;
     private String eventId;
@@ -90,6 +91,7 @@ public class ViewEventDetails extends AppCompatActivity {
         }
 
         userManager = UserManager.getInstance();
+        databaseManager = DatabaseManager.getInstance();
 
         // Obtain xml elements
         eventPosterImageView = findViewById(R.id.event_poster_image_view);
@@ -118,6 +120,7 @@ public class ViewEventDetails extends AppCompatActivity {
         joinWaitingListButton.setOnClickListener(v -> {
             // TODO: ADD LOGIC FOR JOINING WAIT LIST OF EVENT
             // ALL CHECKS WERE COMPLETE, IF THE USER CAN CLICK THIS BUTTON THEN THEY ARE ABLE TO JOIN THE EVENT
+            databaseManager.joinEvent(userManager.getCurrentUser().getDeviceId(), eventId);
         });
 
         // Create the EventListener and start listening for updates to the event
