@@ -27,7 +27,7 @@ public class Event implements Serializable {
     private ArrayList<String> cancelled; // The list of entrants who won the lottery and cancelled
 
     //---------------------------------------------------------------------------------------
-    // TODO: Change these variables to match what Aniket has implemented
+    // TODO: Change/remove these variables to match the lottery that Aniket has implemented
 
 //    private ArrayList<String> waitingList;
     private boolean lotteryWasDrawn = false;  // Boolean indicating if lottery has been drawn

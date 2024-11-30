@@ -30,6 +30,7 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -37,8 +38,11 @@ import com.google.protobuf.Value;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 //TODO: Add a more descriptive comment for the class when more functionality is implemented.
@@ -539,6 +543,99 @@ public class DatabaseManager {
                     }
                 });
     }
+
+
+    //--------------------------------------------------------------------------------------------------------
+    // TODO: Determine if this function is needed or not depending on how the lottery is implemented
+
+    public interface joinWaitingListCallback {
+        void onSuccess();
+        void onFailure(Exception e);
+    }
+
+
+    public void joinEventWaitingList(String userId, UserLocation userLocation, String eventId, joinWaitingListCallback callback) {
+        // Step 1: Add the user to the event's waiting list
+        database.collection("events")
+                .document(eventId)
+                .update("waitingList", FieldValue.arrayUnion(userId))
+                .addOnSuccessListener(aVoid -> {
+                    // Add the eventId to the user's pendingEvents field
+                    database.collection("users")
+                            .document(userId)
+                            .update("pendingEvents", FieldValue.arrayUnion(eventId))
+                            .addOnSuccessListener(aVoid1 -> {
+                                // If userLocation is not null, add a map to the event with userId -> userLocation
+                                if (userLocation != null) {
+                                    // Create a map for the user location
+                                    Map<String, Object> userLocationMap = new HashMap<>();
+                                    userLocationMap.put(userId, userLocation);
+
+                                    // Update the event document with the user's location
+                                    database.collection("events")
+                                            .document(eventId)
+                                            .set(Collections.singletonMap("entrantLocations", userLocationMap), SetOptions.merge())
+                                            .addOnSuccessListener(aVoid2 -> {
+                                                // All updates successful, trigger callback success
+                                                callback.onSuccess();
+                                            })
+                                            .addOnFailureListener(callback::onFailure);
+                                } else {
+                                    // If no location, success at this point
+                                    callback.onSuccess();
+                                }
+                            })
+                            .addOnFailureListener(callback::onFailure);
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
+    public interface getUserLocationsCallback {
+        void onSuccess(ArrayList<UserLocation> locations);
+        void onFailure(Exception e);
+    }
+
+    public void getUserLocations(String eventId, getUserLocationsCallback callback) {
+        database.collection("events")
+                .document(eventId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        // Get the 'entrantLocations' map
+                        Map<String, Object> entrantLocationsMap = (Map<String, Object>) documentSnapshot.get("entrantLocations");
+
+                        if (entrantLocationsMap != null && !entrantLocationsMap.isEmpty()) {
+                            ArrayList<UserLocation> userLocations = new ArrayList<>();
+
+                            // Iterate through the map and create UserLocation objects
+                            for (Map.Entry<String, Object> entry : entrantLocationsMap.entrySet()) {
+                                // Cast the value of each entry to a Map that represents latitude and longitude
+                                Map<String, Object> locationData = (Map<String, Object>) entry.getValue();
+
+                                double latitude = (Double) locationData.get("latitude");
+                                double longitude = (Double) locationData.get("longitude");
+
+                                // Instantiate the UserLocation object and add to the list
+                                UserLocation userLocation = new UserLocation(latitude, longitude);
+                                userLocations.add(userLocation);
+                            }
+
+                            // Pass the list to the callback
+                            callback.onSuccess(userLocations);
+                        } else {
+                            callback.onSuccess(new ArrayList<>());
+                        }
+                    } else {
+                        callback.onFailure(new Exception("Event not found"));
+                    }
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
+
+
+    //--------------------------------------------------------------------------------------------------------
+
 
     /**
      * Adds Id of entree to entrants field of event
