@@ -130,6 +130,15 @@ public class ViewCreatedEvent extends AppCompatActivity {
                 Toast.makeText(this, "Event not found", Toast.LENGTH_SHORT).show();
             }
         });
+
+
+        // TODO: Move this logic to the view entrant data activity that noobray is working on
+        Button viewMapButton = findViewById(R.id.view_map_button);
+        viewMapButton.setOnClickListener(v -> {
+            Intent viewMapIntent = new Intent(ViewCreatedEvent.this, ViewMapActivity.class);
+            viewMapIntent.putExtra("event", event);
+            startActivity(viewMapIntent);
+        });
     }
 
     /**
