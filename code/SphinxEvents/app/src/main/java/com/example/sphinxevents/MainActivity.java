@@ -55,6 +55,7 @@ import com.google.firebase.firestore.auth.User;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -303,12 +304,13 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
             @Override
             public void onSuccess(List<Event> joinedEvents) {
                 events.put(headers.get(0), joinedEvents);
+
                 // Displays pending events
                 databaseManager.retrieveEventList(currentUser.getPendingEvents(), new DatabaseManager.retrieveEventListCallback() {
                     @Override
                     public void onSuccess(List<Event> pendingEvents) {
                         events.put(headers.get(1), pendingEvents);
-                        // Displays created events if user is Organizer
+
                         if (currentUser.getRole().equals("Organizer")) {
                             Organizer organizer = (Organizer) currentUser;
                             headers.add(getString(R.string.created_events_header, organizer.getCreatedEvents().size()));
@@ -318,29 +320,8 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
                                 public void onSuccess(List<Event> createdEvents) {
                                     headers.set(2, getString(R.string.created_events_header, createdEvents.size()));
                                     events.put(headers.get(2), createdEvents);
-                                    listAdapter = new EventExListAdapter(MainActivity.this, headers, events);
-                                    expandableListView.setAdapter(listAdapter);
 
-                                    // Clicking event in main screen -> allows user to view event details
-                                    expandableListView.setOnChildClickListener((parent, view, groupPosition, childPosition, id) -> {
-                                        Event clickedEvent = (Event) listAdapter.getChild(groupPosition, childPosition);
-                                        switch (groupPosition) {
-                                            case 0:
-                                                // TODO: Go to viewJoinedEvent activity
-                                                break;
-
-                                            case 1:
-                                                // TODO: Got to viewPendingEvent activity
-                                                break;
-
-                                            case 2:
-                                                Intent viewCreatedEventIntent = new Intent(MainActivity.this, ViewCreatedEvent.class);
-                                                viewCreatedEventIntent.putExtra("eventId", clickedEvent.getEventId());
-                                                startActivity(viewCreatedEventIntent);
-                                                break;
-                                        }
-                                        return true;
-                                    });
+                                    updateExpandableListView(headers, events);
                                 }
 
                                 @Override
@@ -350,29 +331,7 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
                                 }
                             });
                         } else {
-                            listAdapter = new EventExListAdapter(MainActivity.this, headers, events);
-                            expandableListView.setAdapter(listAdapter);
-
-                            // Clicking event in main screen -> allows user to view event details
-                            expandableListView.setOnChildClickListener((parent, view, groupPosition, childPosition, id) -> {
-                                Event clickedEvent = (Event) listAdapter.getChild(groupPosition, childPosition);
-                                switch (groupPosition) {
-                                    case 0:
-                                        // TODO: Go to viewJoinedEvent activity
-                                        break;
-
-                                    case 1:
-                                        // TODO: Got to viewPendingEvent activity
-                                        break;
-
-                                    case 2:
-                                        Intent viewCreatedEventIntent = new Intent(MainActivity.this, ViewCreatedEvent.class);
-                                        viewCreatedEventIntent.putExtra("eventId", clickedEvent.getEventId());
-                                        startActivity(viewCreatedEventIntent);
-                                        break;
-                                }
-                                return true;
-                            });
+                            updateExpandableListView(headers, events);
                         }
                     }
 
@@ -391,6 +350,40 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
             }
         });
     }
+
+    /**
+     * Updates the ExpandableListView with the provided headers and events data.
+     * Configures the adapter and sets an OnChildClickListener for handling child item clicks.
+     *
+     * @param headers A list of headers representing the group titles.
+     * @param events  A map linking each header to its corresponding list of events.
+     */
+    private void updateExpandableListView(List<String> headers, Map<String, List<Event>> events) {
+        listAdapter = new EventExListAdapter(MainActivity.this, headers, events);
+        expandableListView.setAdapter(listAdapter);
+
+        expandableListView.setOnChildClickListener((parent, view, groupPosition, childPosition, id) -> {
+            Event clickedEvent = (Event) listAdapter.getChild(groupPosition, childPosition);
+            switch (groupPosition) {
+                case 0:
+                    // TODO: Go to viewJoinedEvent activity
+                    break;
+
+                case 1:
+                    // TODO: Go to viewPendingEvent activity
+                    break;
+
+                case 2:
+                    Intent viewCreatedEventIntent = new Intent(MainActivity.this, ViewCreatedEvent.class);
+                    viewCreatedEventIntent.putExtra("eventId", clickedEvent.getEventId());
+                    startActivity(viewCreatedEventIntent);
+                    break;
+            }
+            return true;
+        });
+    }
+
+
 
     /**
      * Updates the user profile picture to custom or default profile picture
