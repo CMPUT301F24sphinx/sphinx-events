@@ -304,8 +304,11 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
 
                         if (currentUser.getRole().equals("Organizer")) {
                             Organizer organizer = (Organizer) currentUser;
-                            headers.add(getString(R.string.created_events_header, organizer.getCreatedEvents().size()));
 
+                            // For some reason this line was being executed twice and adding 2 created events headers
+                            if(headers.size() < 3) {
+                                headers.add(getString(R.string.created_events_header, organizer.getCreatedEvents().size()));
+                            }
                             databaseManager.retrieveEventList(organizer.getCreatedEvents(), new DatabaseManager.retrieveEventListCallback() {
                                 @Override
                                 public void onSuccess(List<Event> createdEvents) {
