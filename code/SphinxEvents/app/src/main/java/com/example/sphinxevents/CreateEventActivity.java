@@ -155,7 +155,7 @@ public class CreateEventActivity extends AppCompatActivity {
             return;
         }
 
-        if (Integer.parseInt(entrantLimitString) <= 0){
+        if (!entrantLimitString.isEmpty() && Integer.parseInt(entrantLimitString) <= 0){
             Toast.makeText(this, "Entrant limit must be greater than 0", Toast.LENGTH_SHORT).show();
             return;
         }
