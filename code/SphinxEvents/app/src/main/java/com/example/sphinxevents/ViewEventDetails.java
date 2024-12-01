@@ -132,14 +132,20 @@ public class ViewEventDetails extends AppCompatActivity {
             joinEvent();
         });
 
+        // Leave the event
+        leaveWaitingListButton.setOnClickListener(v -> {
+            leaveEvent();
+            finish();
+        });
+
         // Confirm the event
         confirmEventButton.setOnClickListener(v -> {
             confirmEvent();
         });
 
-        // Leave the event
-        leaveWaitingListButton.setOnClickListener(v -> {
-            leaveEvent();
+        // Cancel the event
+        cancelEventButton.setOnClickListener(v -> {
+            cancelEvent();
             finish();
         });
 
@@ -167,6 +173,7 @@ public class ViewEventDetails extends AppCompatActivity {
 
     private void cancelEvent() {
         databaseManager.cancelEvent(userManager.getCurrentUser().getDeviceId(), event.getEventId());
+        Toast.makeText(getApplicationContext(), "You have cancelled " + event.getName(), Toast.LENGTH_LONG).show();
     }
 
     private void leaveEvent() {
@@ -190,6 +197,10 @@ public class ViewEventDetails extends AppCompatActivity {
         clearWarnings();
         if(userCanJoinEvent()){
             joinWaitingListButton.setVisibility(View.VISIBLE);
+        } else if (userHasConfirmed()){
+            clearWarnings();
+        } else if (userHasConfirmed()) {
+            clearWarnings();
         } else if (userWonLottery()){
             confirmEventButton.setVisibility(View.VISIBLE);
             cancelEventButton.setVisibility(View.VISIBLE);
@@ -270,9 +281,15 @@ public class ViewEventDetails extends AppCompatActivity {
     }
 
     private boolean userWonLottery(){
-
         return event.getLotteryWinners().contains(userManager.getCurrentUser().getDeviceId());
+    }
 
+    private boolean userHasConfirmed() {
+        return event.getConfirmed().contains(userManager.getCurrentUser().getDeviceId());
+    }
+
+    private boolean userHasCancelled() {
+        return event.getCancelled().contains(userManager.getCurrentUser().getDeviceId());
     }
 
     /**
@@ -328,6 +345,7 @@ public class ViewEventDetails extends AppCompatActivity {
 
         // All checks passed, display proper message and return true
         ableToJoinWaitingList.setVisibility(View.VISIBLE);
+        clearButtons();
         return true;
     }
 

@@ -19,6 +19,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import java.security.AllPermission;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,6 +40,7 @@ public class ViewCreatedEvent extends AppCompatActivity {
     private TextView registrationDeadlineTextView;
     private TextView lotteryStatusTextView;
     private Button drawLotteryButton;
+    private Button redrawLotteryButton;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -72,6 +74,7 @@ public class ViewCreatedEvent extends AppCompatActivity {
         Button viewEntrantDataButton = findViewById(R.id.view_entrant_data_button);
         Button sendNotificationBtn = findViewById(R.id.send_notification_button);
         drawLotteryButton = findViewById(R.id.draw_lottery_button);
+        redrawLotteryButton = findViewById(R.id.redraw_lottery_button);
 
         // Exit activity if back arrow is pressed
         ImageButton backButton = findViewById(R.id.manage_event_back_button);
@@ -133,6 +136,10 @@ public class ViewCreatedEvent extends AppCompatActivity {
             drawInputFragment();
         });
 
+        redrawLotteryButton.setOnClickListener(v -> {
+            performRedraw(event.getCancelled().size());
+        });
+
 
         // TODO: Move this logic to the view entrant data activity that noobray is working on
         Button viewMapButton = findViewById(R.id.view_map_button);
@@ -154,14 +161,20 @@ public class ViewCreatedEvent extends AppCompatActivity {
 
         // Determines display based on lottery state
         resetDisplay();  // First, reset visibility of conditional UI elements
-        if (event.getLotteryWasDrawn()) {  // Lottery has happened
+        if (event.getLotteryWasDrawn() && event.getCancelled().isEmpty()) {  // Lottery has happened and nobody has cancelled
             lotteryStatusTextView.setText(R.string.lottery_has_been_drawn);
-        }
-        else {
+            redrawLotteryButton.setVisibility(View.GONE);
+        } else if(event.getLotteryWasDrawn() && !event.getCancelled().isEmpty()) { // Primary lottery happened and >= 1 person cancelled
+            numOfLotteryEntrantsLinearLayout.setVisibility(View.VISIBLE);
+            displayEntrantCount();
+            redrawLotteryButton.setVisibility(View.VISIBLE);
+            lotteryStatusTextView.setText("You can redraw " + event.getCancelled().size() + " people.");
+        } else {
             numOfLotteryEntrantsLinearLayout.setVisibility(View.VISIBLE);
             displayEntrantCount();
             if (event.canLotteryBeDrawn()) {  // Lottery is ready to be drawn
                 drawLotteryButton.setVisibility(View.VISIBLE);
+                redrawLotteryButton.setVisibility(View.GONE);
                 lotteryStatusTextView.setText(R.string.lottery_is_ready_to_be_drawn);
             }
             else {  // Lottery can't be drawn yet
@@ -301,4 +314,38 @@ public class ViewCreatedEvent extends AppCompatActivity {
         }
     }
 
+    private void performRedraw(int n) {
+
+        // Don't need to shuffle the entrants as it was done in the first lottery and new users cant join after first draw
+        // the new arrays for entrants and winners
+        ArrayList<String> currWinners = event.getLotteryWinners();
+        ArrayList<String> currEntrants = event.getEntrants();
+
+        ArrayList<String> notifList = new ArrayList<>();
+
+        for (int i = 0; i < n; ++i){
+            if(!currEntrants.isEmpty()) {
+                String tempUser = currEntrants.remove(i);
+                currWinners.add(tempUser);
+                notifList.add(tempUser);
+            }
+        }
+
+        // Update the database arrays
+        databaseManager.updateEventWinners(event.getEventId(), currWinners);
+        databaseManager.updateEntrants(event.getEventId(), currEntrants);
+
+        // Send notifications to the winners
+        if(!notifList.isEmpty()) {
+            NotificationsHelper.sendLotteryWinNotification(organizer.getFacility().getName(), event.getName(), notifList, new DatabaseManager.NotificationCreationCallback() {
+                @Override
+                public void onSuccess() {
+                }
+                @Override
+                public void onFailure(Exception e) {
+                }
+            });
+        }
+
+    }
 }

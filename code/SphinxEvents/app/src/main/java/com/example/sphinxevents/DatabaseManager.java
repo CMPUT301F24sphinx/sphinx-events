@@ -753,7 +753,7 @@ public class DatabaseManager {
 
         database.collection("users")
                 .document(userID)
-                .update("pendingEvents", FieldValue.arrayUnion(eventID))
+                .update("pendingEvents", FieldValue.arrayRemove(eventID))
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -772,6 +772,21 @@ public class DatabaseManager {
      * @param eventID ID of event being updated
      */
     public void cancelEvent(String userID, String eventID) {
+
+        // Remove userId from lotteryWinners array
+        database.collection("events")
+                .document(eventID)
+                .update("cancelled", FieldValue.arrayUnion(userID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
 
         // Remove userId from lotteryWinners array
         database.collection("events")
