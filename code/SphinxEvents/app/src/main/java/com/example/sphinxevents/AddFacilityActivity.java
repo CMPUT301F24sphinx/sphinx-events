@@ -151,7 +151,7 @@ public class AddFacilityActivity extends AppCompatActivity {
                 user = new Organizer(user.getDeviceId(), user.getName(), user.getEmail(),
                         user.getPhoneNumber(), user.getDefaultPfpPath(), user.getCustomPfpUrl(),
                         user.isOrgNotificationsEnabled(), user.isAdminNotificationsEnabled(),
-                        user.getJoinedEvents(), user.getPendingEvents(), user.getNotifications(),
+                        user.getJoinedEvents(), user.getPendingEvents(),
                         newFacility, new ArrayList<>());
                 databaseManager.saveUser(user, new DatabaseManager.UserCreationCallback() {
                     @Override

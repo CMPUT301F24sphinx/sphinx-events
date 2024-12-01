@@ -307,7 +307,7 @@ public class DatabaseManager {
                             Entrant updatedUser = new Entrant(user.getDeviceId(), user.getName(), user.getEmail(),
                                     user.getPhoneNumber(), user.getDefaultPfpPath(), user.getCustomPfpUrl(),
                                     user.isOrgNotificationsEnabled(), user.isAdminNotificationsEnabled(),
-                                    user.getJoinedEvents(), user.getPendingEvents(), user.getNotifications());
+                                    user.getJoinedEvents(), user.getPendingEvents());
                             saveUser(updatedUser, new UserCreationCallback() {
                                 @Override
                                 public void onSuccess(String deviceId) {

@@ -36,7 +36,6 @@ public class Entrant implements Serializable {
     private boolean adminNotificationsEnabled; // Notifications from administrators preference
     private ArrayList<String> joinedEvents;  // List of event IDs the user has accepted invitation to
     private ArrayList<String> pendingEvents;  // List of event IDs the user has joined lottery for
-    private ArrayList<String> notifications; // List of notification IDs sent to the user;
 
     /**
      * Default constructor for Entrant. Initializes an empty entrant.
@@ -58,7 +57,7 @@ public class Entrant implements Serializable {
      */
     public Entrant(String deviceId, String name, String email, String phoneNumber, String defaultPfpPath,
                    String customPfpUrl, boolean orgNotificationsEnabled, boolean adminNotificationsEnabled,
-                   ArrayList<String> joinedEvents, ArrayList<String> pendingEvents, ArrayList<String> notifications) {
+                   ArrayList<String> joinedEvents, ArrayList<String> pendingEvents) {
         this.deviceId = deviceId;
         this.role = "Entrant";
         this.name = name;
@@ -70,7 +69,6 @@ public class Entrant implements Serializable {
         this.adminNotificationsEnabled = adminNotificationsEnabled;
         this.joinedEvents = joinedEvents != null ? joinedEvents : new ArrayList<>();
         this.pendingEvents = pendingEvents != null ? pendingEvents : new ArrayList<>();
-        this.notifications = notifications != null ? notifications : new ArrayList<>();
     }
 
     /**
@@ -207,19 +205,4 @@ public class Entrant implements Serializable {
      */
     public void addPendingEvent(String eventId) { pendingEvents.add(eventId); }
 
-    /**
-     * Gets the list of user notification IDs
-     * @return a list of notification IDs
-     */
-    public ArrayList<String> getNotifications() {
-        return notifications;
-    }
-
-    /**
-     * Adds a notification to users notification list
-     * @param notificationID The ID of the notification to add
-     */
-    public void addNotification(String notificationID) {
-        notifications.add(notificationID);
-    }
 }
