@@ -19,7 +19,6 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import java.security.AllPermission;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -115,7 +114,7 @@ public class ViewCreatedEvent extends AppCompatActivity {
 
         // Allow organizer to view entrant data
         viewEntrantDataButton.setOnClickListener(v -> {
-            Intent viewEventEntrantDataIntent = new Intent(ViewCreatedEvent.this, ActivityViewEventEntrantData.class);
+            Intent viewEventEntrantDataIntent = new Intent(ViewCreatedEvent.this, ViewEventEntrantData.class);
             viewEventEntrantDataIntent.putExtra("eventId", eventId);
             startActivity(viewEventEntrantDataIntent);
         });

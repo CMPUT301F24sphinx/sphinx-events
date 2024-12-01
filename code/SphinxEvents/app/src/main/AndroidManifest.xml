@@ -74,7 +74,7 @@
             android:name=".ViewEventDetails"
             android:exported="false" />
         <activity
-            android:name=".ActivityViewEventEntrantData"
+            android:name=".ViewEventEntrantData"
             android:exported="false" />
         <activity
             android:name=".ScanWithCam"

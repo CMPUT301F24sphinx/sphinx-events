@@ -19,6 +19,7 @@
     <string name="waiting_for_registration_deadline">Lottery can\'t be drawn yet. Registration is still open.</string>
     <string name="lottery_has_been_drawn">Lottery has been drawn!</string>
     <string name="lottery_is_ready_to_be_drawn">Lottery is ready to be drawn!</string>
+    <string name="view_event_entrants_data">Event Entrant Data</string>
 
     <!--Drawer strings-->
     <string name="close_drawer_speakable_text">Close side drawer button</string>
