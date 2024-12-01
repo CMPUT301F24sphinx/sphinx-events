@@ -45,7 +45,7 @@ tools:context=".ViewEventEntrantData">
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ExpandableListView
-        android:id="@+id/main_screen_expandable_listview"
+        android:id="@+id/entrant_data_expandable_listview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

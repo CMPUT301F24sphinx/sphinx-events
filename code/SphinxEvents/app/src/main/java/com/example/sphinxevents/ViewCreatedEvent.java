@@ -175,7 +175,7 @@ public class ViewCreatedEvent extends AppCompatActivity {
             displayEntrantCount();
 
             // Determine if to show re-draw button, only if more people have cancelled than the number of people we have re-drawn
-            if((event.getCancelled().size() - event.getRedrawUserCount()) > 0){
+            if((event.getCancelled().size() - (int) event.getRedrawUserCount()) > 0){
                 redrawLotteryButton.setVisibility(View.VISIBLE);
             } else {
                 redrawLotteryButton.setVisibility(View.GONE);

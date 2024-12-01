@@ -20,6 +20,10 @@
     <string name="lottery_has_been_drawn">Lottery has been drawn!</string>
     <string name="lottery_is_ready_to_be_drawn">Lottery is ready to be drawn!</string>
     <string name="view_event_entrants_data">Event Entrant Data</string>
+    <string name="confirmed_entrants">Confirmed Entrants  (%d)</string>
+    <string name="entrants_invited_to_apply">Invited To Apply  (%d)</string>
+    <string name="cancelled_entrants">Cancelled  (%d)</string>
+
 
     <!--Drawer strings-->
     <string name="close_drawer_speakable_text">Close side drawer button</string>

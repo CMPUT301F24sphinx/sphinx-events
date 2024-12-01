@@ -77,6 +77,9 @@
             android:name=".ViewEventEntrantData"
             android:exported="false" />
         <activity
+            android:name=".EntrantExListAdapter"
+            android:exported="false" />
+        <activity
             android:name=".ScanWithCam"
             android:stateNotNeeded="true"
             android:theme="@style/zxing_CaptureTheme" />
