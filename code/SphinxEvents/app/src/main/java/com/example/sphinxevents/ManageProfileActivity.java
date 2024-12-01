@@ -394,7 +394,8 @@ public class ManageProfileActivity extends AppCompatActivity {
      * Launches an intent to pick an image from external storage
      */
     private void pickImage() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,"image/*");
         resultLauncher.launch(intent);
     }
 
