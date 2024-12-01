@@ -11,9 +11,7 @@
 
 package com.example.sphinxevents;
 
-import android.location.Location;
 import android.net.Uri;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,28 +20,22 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
-import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.protobuf.Value;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 //TODO: Add a more descriptive comment for the class when more functionality is implemented.
 /**
@@ -530,8 +522,8 @@ public class DatabaseManager {
                             Event event = document.toObject(Event.class);
 
                             // Ensure that the waitingList is initialized
-                            if (event != null && event.getWaitingList() == null) {
-                                event.setWaitingList(new ArrayList<>());  // Initialize waitingList if null
+                            if (event != null && event.getEntrants() == null) {
+                                event.setEntrants(new ArrayList<>());  // Initialize waitingList if null
                             }
 
                             callback.onSuccess(event);
@@ -558,7 +550,8 @@ public class DatabaseManager {
         // Step 1: Add the user to the event's waiting list
         database.collection("events")
                 .document(eventId)
-                .update("waitingList", FieldValue.arrayUnion(userId))
+                .update("entrants", FieldValue.arrayUnion(userId))
+                // Aniket: I changed the field from waitingList to entrants as were just using that as the waiting list pool and the losers pool
                 .addOnSuccessListener(aVoid -> {
                     // Add the eventId to the user's pendingEvents field
                     database.collection("users")
@@ -646,6 +639,258 @@ public class DatabaseManager {
         database.collection("events")
                 .document(eventID)
                 .update("entrants", FieldValue.arrayUnion(userID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+
+        database.collection("users")
+                .document(userID)
+                .update("joinedEvents", FieldValue.arrayUnion(eventID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+    }
+
+    /**
+     * Removes userID from list of entrants in events document
+     * Removes EventID from list of joinedEvents in users document
+     * @param userID ID of user being removed
+     * @param eventID ID of event being removed
+     */
+    public void leaveEvent(String userID, String eventID) {
+        database.collection("events")
+                .document(eventID)
+                .update("entrants", FieldValue.arrayRemove(userID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+
+        database.collection("users")
+                .document(userID)
+                .update("pendingEvents", FieldValue.arrayRemove(eventID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+    }
+
+    /**
+     * Adds userId to confirm array of eventId and moves eventId form panding to joined events in user document
+     * @param userID ID of user being added
+     * @param eventID ID of event being updated
+     */
+    public void confirmEvent(String userID, String eventID) {
+        // Add event userId to confirmed Ids
+        database.collection("events")
+                .document(eventID)
+                .update("confirmed", FieldValue.arrayUnion(userID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+
+        // Remove userId from lotteryWinners array
+        database.collection("events")
+                .document(eventID)
+                .update("lotteryWinners", FieldValue.arrayRemove(userID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+
+        database.collection("users")
+                .document(userID)
+                .update("joinedEvents", FieldValue.arrayUnion(eventID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+
+        database.collection("users")
+                .document(userID)
+                .update("pendingEvents", FieldValue.arrayRemove(eventID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+    }
+
+    /**
+     * Adds userId to confirm array of eventId and moves eventId form panding to joined events in user document
+     * @param userID ID of user being added
+     * @param eventID ID of event being updated
+     */
+    public void cancelEvent(String userID, String eventID) {
+
+        // Remove userId from lotteryWinners array
+        database.collection("events")
+                .document(eventID)
+                .update("cancelled", FieldValue.arrayUnion(userID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+
+        // Remove userId from lotteryWinners array
+        database.collection("events")
+                .document(eventID)
+                .update("lotteryWinners", FieldValue.arrayRemove(userID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+
+        database.collection("users")
+                .document(userID)
+                .update("pendingEvents", FieldValue.arrayRemove(eventID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+
+    }
+
+    /**
+     * Updates bool lotteryWasDrawn to true, called when the lottery is drawn by organizer.
+     * @param eventID ID of event being updated.
+     */
+    public void updateLotteryWasDrawn(String eventID) {
+        database.collection("events")
+                .document(eventID)
+                .update("lotteryWasDrawn", true)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+    }
+
+    /**
+     * Updates the winner array of given event
+     * @param winners ID of users who won the lottery.
+     * @param eventID ID of event being updated.
+     */
+    public void updateEventWinners(String eventID, ArrayList<String> winners) {
+        database.collection("events")
+                .document(eventID)
+                .update("lotteryWinners", winners)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+    }
+
+
+    /**
+     * Updates the total count of redrawn users.
+     * @param count The total count.
+     * @param eventID ID of event being updated.
+     */
+    public void updateRedrawUserCount(String eventID, Integer count) {
+        database.collection("events")
+                .document(eventID)
+                .update("redrawUserCount", count)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+    }
+
+    /**
+     * Updates the entrants array of the event class.
+     * @param entrants ID of users who will be in the updated array.
+     * @param eventID ID of event being updated.
+     */
+    public void updateEntrants(String eventID, ArrayList<String> entrants) {
+        database.collection("events")
+                .document(eventID)
+                .update("entrants", entrants)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -764,6 +1009,44 @@ public class DatabaseManager {
                             events.add(event);
                         }
                         callback.onSuccess(events);
+                    } else {
+                        callback.onFailure(task.getException());
+                    }
+                });
+    }
+
+
+    /**
+     * Callback interface for joined Events retrieval
+     */
+    public interface getJoinedEventsCallback {
+        /**
+         * Called when events are retrieved successfully
+         * @param joinedEventsID List of Id's of events
+         */
+        void onSuccess(List<String> joinedEventsID);
+
+        /**
+         * Called when error occurs during events retrieval
+         * @param e the exception that occurred
+         */
+        void onFailure(Exception e);
+    }
+
+    public void getJoinedEvents(String userID, getJoinedEventsCallback callback) {
+
+        database.collection("users")
+                .document(userID)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            List<String> createdEvents = (List<String>) document.get("joinedEvents");
+                            callback.onSuccess(createdEvents);
+                        } else {
+                            callback.onFailure(new Exception("Created Events does not exist."));
+                        }
                     } else {
                         callback.onFailure(task.getException());
                     }
