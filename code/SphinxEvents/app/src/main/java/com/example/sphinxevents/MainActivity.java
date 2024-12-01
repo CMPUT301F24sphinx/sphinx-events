@@ -55,6 +55,7 @@ import com.google.firebase.firestore.auth.User;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -289,11 +290,48 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         headers.add(getString(R.string.joined_events_header, currentUser.getJoinedEvents().size()));
         headers.add(getString(R.string.pending_events_header, currentUser.getPendingEvents().size()));
 
-        // Display joined events if there are any
+        // Displays joined events
         databaseManager.retrieveEventList(currentUser.getJoinedEvents(), new DatabaseManager.retrieveEventListCallback() {
             @Override
             public void onSuccess(List<Event> joinedEvents) {
                 events.put(headers.get(0), joinedEvents);
+
+                // Displays pending events
+                databaseManager.retrieveEventList(currentUser.getPendingEvents(), new DatabaseManager.retrieveEventListCallback() {
+                    @Override
+                    public void onSuccess(List<Event> pendingEvents) {
+                        events.put(headers.get(1), pendingEvents);
+
+                        if (currentUser.getRole().equals("Organizer")) {
+                            Organizer organizer = (Organizer) currentUser;
+                            headers.add(getString(R.string.created_events_header, organizer.getCreatedEvents().size()));
+
+                            databaseManager.retrieveEventList(organizer.getCreatedEvents(), new DatabaseManager.retrieveEventListCallback() {
+                                @Override
+                                public void onSuccess(List<Event> createdEvents) {
+                                    headers.set(2, getString(R.string.created_events_header, createdEvents.size()));
+                                    events.put(headers.get(2), createdEvents);
+
+                                    updateExpandableListView(headers, events);
+                                }
+
+                                @Override
+                                public void onFailure(Exception e) {
+                                    Toast.makeText(MainActivity.this, "Error Displaying Created Events",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        } else {
+                            updateExpandableListView(headers, events);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        Toast.makeText(MainActivity.this, "Error Displaying Pending Events",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
@@ -302,45 +340,19 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
                         Toast.LENGTH_SHORT).show();
             }
         });
+    }
 
-        // Displays pending events
-        databaseManager.retrieveEventList(currentUser.getPendingEvents(), new DatabaseManager.retrieveEventListCallback() {
-            @Override
-            public void onSuccess(List<Event> pendingEvents) {
-                events.put(headers.get(1), pendingEvents);
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                Toast.makeText(MainActivity.this, "Error Displaying Pending Events",
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        // Displays created events if user is Organizer
-        if (currentUser.getRole().equals("Organizer")) {
-            Organizer organizer = (Organizer) currentUser;
-            headers.add(getString(R.string.created_events_header, organizer.getCreatedEvents().size()));
-
-            databaseManager.retrieveEventList(organizer.getCreatedEvents(), new DatabaseManager.retrieveEventListCallback() {
-                @Override
-                public void onSuccess(List<Event> createdEvents) {
-//                    headers.set(2, getString(R.string.created_events_header, createdEvents.size()));
-                    events.put(headers.get(2), createdEvents);
-                }
-
-                @Override
-                public void onFailure(Exception e) {
-                    Toast.makeText(MainActivity.this, "Error Displaying Created Events",
-                            Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
-
-        listAdapter = new EventExListAdapter(this, headers, events);
+    /**
+     * Updates the ExpandableListView with the provided headers and events data.
+     * Configures the adapter and sets an OnChildClickListener for handling child item clicks.
+     *
+     * @param headers A list of headers representing the group titles.
+     * @param events  A map linking each header to its corresponding list of events.
+     */
+    private void updateExpandableListView(List<String> headers, Map<String, List<Event>> events) {
+        listAdapter = new EventExListAdapter(MainActivity.this, headers, events);
         expandableListView.setAdapter(listAdapter);
 
-        // Clicking event in main screen -> allows user to view event details
         expandableListView.setOnChildClickListener((parent, view, groupPosition, childPosition, id) -> {
             Event clickedEvent = (Event) listAdapter.getChild(groupPosition, childPosition);
             switch (groupPosition) {
@@ -365,6 +377,8 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
             return true;
         });
     }
+
+
 
     /**
      * Updates the user profile picture to custom or default profile picture
