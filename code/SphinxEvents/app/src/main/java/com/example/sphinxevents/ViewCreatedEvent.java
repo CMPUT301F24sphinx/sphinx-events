@@ -115,7 +115,9 @@ public class ViewCreatedEvent extends AppCompatActivity {
 
         // Allow organizer to view entrant data
         viewEntrantDataButton.setOnClickListener(v -> {
-            // TODO: GO TO ACTIVITY THAT DISPLAYS USER DATA
+            Intent viewEventEntrantDataIntent = new Intent(ViewCreatedEvent.this, ActivityViewEventEntrantData.class);
+            viewEventEntrantDataIntent.putExtra("eventId", eventId);
+            startActivity(viewEventEntrantDataIntent);
         });
 
         // Allow organizer to send custom notification
