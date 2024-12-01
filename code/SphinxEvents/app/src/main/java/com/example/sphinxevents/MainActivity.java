@@ -298,62 +298,97 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         headers.add(getString(R.string.joined_events_header, currentUser.getJoinedEvents().size()));
         headers.add(getString(R.string.pending_events_header, currentUser.getPendingEvents().size()));
 
-        // Displays pending events
-        databaseManager.retrieveEventList(currentUser.getPendingEvents(), new DatabaseManager.retrieveEventListCallback() {
+        // Displays joined events
+        databaseManager.retrieveEventList(currentUser.getJoinedEvents(), new DatabaseManager.retrieveEventListCallback() {
             @Override
-            public void onSuccess(List<Event> pendingEvents) {
-                events.put(headers.get(1), pendingEvents);
+            public void onSuccess(List<Event> joinedEvents) {
+                events.put(headers.get(0), joinedEvents);
+                // Displays pending events
+                databaseManager.retrieveEventList(currentUser.getPendingEvents(), new DatabaseManager.retrieveEventListCallback() {
+                    @Override
+                    public void onSuccess(List<Event> pendingEvents) {
+                        events.put(headers.get(1), pendingEvents);
+                        // Displays created events if user is Organizer
+                        if (currentUser.getRole().equals("Organizer")) {
+                            Organizer organizer = (Organizer) currentUser;
+                            headers.add(getString(R.string.created_events_header, organizer.getCreatedEvents().size()));
+
+                            databaseManager.retrieveEventList(organizer.getCreatedEvents(), new DatabaseManager.retrieveEventListCallback() {
+                                @Override
+                                public void onSuccess(List<Event> createdEvents) {
+                                    headers.set(2, getString(R.string.created_events_header, createdEvents.size()));
+                                    events.put(headers.get(2), createdEvents);
+                                    listAdapter = new EventExListAdapter(MainActivity.this, headers, events);
+                                    expandableListView.setAdapter(listAdapter);
+
+                                    // Clicking event in main screen -> allows user to view event details
+                                    expandableListView.setOnChildClickListener((parent, view, groupPosition, childPosition, id) -> {
+                                        Event clickedEvent = (Event) listAdapter.getChild(groupPosition, childPosition);
+                                        switch (groupPosition) {
+                                            case 0:
+                                                // TODO: Go to viewJoinedEvent activity
+                                                break;
+
+                                            case 1:
+                                                // TODO: Got to viewPendingEvent activity
+                                                break;
+
+                                            case 2:
+                                                Intent viewCreatedEventIntent = new Intent(MainActivity.this, ViewCreatedEvent.class);
+                                                viewCreatedEventIntent.putExtra("eventId", clickedEvent.getEventId());
+                                                startActivity(viewCreatedEventIntent);
+                                                break;
+                                        }
+                                        return true;
+                                    });
+                                }
+
+                                @Override
+                                public void onFailure(Exception e) {
+                                    Toast.makeText(MainActivity.this, "Error Displaying Created Events",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        } else {
+                            listAdapter = new EventExListAdapter(MainActivity.this, headers, events);
+                            expandableListView.setAdapter(listAdapter);
+
+                            // Clicking event in main screen -> allows user to view event details
+                            expandableListView.setOnChildClickListener((parent, view, groupPosition, childPosition, id) -> {
+                                Event clickedEvent = (Event) listAdapter.getChild(groupPosition, childPosition);
+                                switch (groupPosition) {
+                                    case 0:
+                                        // TODO: Go to viewJoinedEvent activity
+                                        break;
+
+                                    case 1:
+                                        // TODO: Got to viewPendingEvent activity
+                                        break;
+
+                                    case 2:
+                                        Intent viewCreatedEventIntent = new Intent(MainActivity.this, ViewCreatedEvent.class);
+                                        viewCreatedEventIntent.putExtra("eventId", clickedEvent.getEventId());
+                                        startActivity(viewCreatedEventIntent);
+                                        break;
+                                }
+                                return true;
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        Toast.makeText(MainActivity.this, "Error Displaying Pending Events",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
             public void onFailure(Exception e) {
-                Toast.makeText(MainActivity.this, "Error Displaying Pending Events",
+                Toast.makeText(MainActivity.this, "Error Displaying Joined Events",
                         Toast.LENGTH_SHORT).show();
             }
-        });
-
-        // Displays created events if user is Organizer
-        if (currentUser.getRole().equals("Organizer")) {
-            Organizer organizer = (Organizer) currentUser;
-            headers.add(getString(R.string.created_events_header, organizer.getCreatedEvents().size()));
-
-            databaseManager.retrieveEventList(organizer.getCreatedEvents(), new DatabaseManager.retrieveEventListCallback() {
-                @Override
-                public void onSuccess(List<Event> createdEvents) {
-                    headers.set(2, getString(R.string.created_events_header, createdEvents.size()));
-                    events.put(headers.get(2), createdEvents);
-                }
-
-                @Override
-                public void onFailure(Exception e) {
-                    Toast.makeText(MainActivity.this, "Error Displaying Created Events",
-                            Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
-
-        listAdapter = new EventExListAdapter(this, headers, events);
-        expandableListView.setAdapter(listAdapter);
-
-        // Clicking event in main screen -> allows user to view event details
-        expandableListView.setOnChildClickListener((parent, view, groupPosition, childPosition, id) -> {
-            Event clickedEvent = (Event) listAdapter.getChild(groupPosition, childPosition);
-            switch (groupPosition) {
-                case 0:
-                    // TODO: Go to viewJoinedEvent activity
-                    break;
-
-                case 1:
-                    // TODO: Got to viewPendingEvent activity
-                    break;
-
-                case 2:
-                    Intent viewCreatedEventIntent = new Intent(MainActivity.this, ViewCreatedEvent.class);
-                    viewCreatedEventIntent.putExtra("eventId", clickedEvent.getEventId());
-                    startActivity(viewCreatedEventIntent);
-                    break;
-            }
-            return true;
         });
     }
 

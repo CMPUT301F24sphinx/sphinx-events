@@ -17,7 +17,7 @@ public class Event implements Serializable {
     private String description;  // The description of the event
     private String poster;  // The url of the poster location
     private Date lotteryEndDate;  // The end date of the lottery
-    private Integer entrantLimit;  // The entrant limit for the event
+    private int entrantLimit;  // The entrant limit for the event
     private Boolean geolocationReq;  // Boolean indicating if geolocation is required
     private ArrayList<String> entrants;  // The list of entrants who have joined the event
     private UserLocation facilityLocation;  // The location of the facility event belongs to
@@ -44,7 +44,7 @@ public class Event implements Serializable {
      * @param joinedUsers The list of users who have joined the event.
      * @param facilityLocation The location of the event's facility.
      */
-    Event(String name, String description, Date lotteryEndDate, Integer entrantLimit,
+    Event(String name, String description, Date lotteryEndDate, int entrantLimit,
           Boolean geolocationReq, ArrayList<String> joinedUsers, UserLocation facilityLocation) {
         this.eventId = null;
         this.name = name;
@@ -138,7 +138,7 @@ public class Event implements Serializable {
      * Gets the entrant limit for the event.
      * @return The entrant limit.
      */
-    public Integer getEntrantLimit() {return entrantLimit;}
+    public int getEntrantLimit() {return entrantLimit;}
 
     /**
      * Sets the entrant limit for the event.
@@ -239,7 +239,7 @@ public class Event implements Serializable {
      * @return boolean representing whether waiting list is full
      */
     public boolean checkIfWaitingListFull() {
-        return this.entrantLimit != null && this.waitingList.size() == this.entrantLimit;
+        return this.entrantLimit != 0 && this.waitingList.size() == this.entrantLimit;
     }
 
     //-------------------------------------------------------------------------------------------
