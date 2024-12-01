@@ -89,10 +89,10 @@ public class SendOrganizerNotificationFragment extends DialogFragment {
                         recipients.addAll(event.getEntrants());
                     }
                     if (cbCancelled.isChecked()) {
-                        //recipients.addAll(event.getCancelled());
+                        recipients.addAll(event.getCancelled());
                     }
                     if (cbJoined.isChecked()) {
-                        //recipients.addAll(event.getJoined());
+                        recipients.addAll(event.getConfirmed());
                     }
 
                     // Check if the recipient list is empty
