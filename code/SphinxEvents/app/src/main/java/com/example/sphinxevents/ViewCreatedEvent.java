@@ -136,8 +136,10 @@ public class ViewCreatedEvent extends AppCompatActivity {
             drawInputFragment();
         });
 
+        // Allow organizer to do another lottery for the people who lost
         redrawLotteryButton.setOnClickListener(v -> {
             performRedraw(event.getCancelled().size());
+
         });
 
 
@@ -190,6 +192,7 @@ public class ViewCreatedEvent extends AppCompatActivity {
             }
             else {  // Lottery can't be drawn yet
                 lotteryStatusTextView.setText(R.string.waiting_for_registration_deadline);
+                redrawLotteryButton.setVisibility(View.GONE);
             }
         }
     }
