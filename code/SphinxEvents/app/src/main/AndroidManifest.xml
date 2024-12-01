@@ -74,6 +74,9 @@
             android:name=".ViewEventDetails"
             android:exported="false" />
         <activity
+            android:name=".ActivityViewEventEntrantData"
+            android:exported="false" />
+        <activity
             android:name=".ScanWithCam"
             android:stateNotNeeded="true"
             android:theme="@style/zxing_CaptureTheme" />

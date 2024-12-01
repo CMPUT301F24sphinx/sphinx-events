@@ -17,12 +17,9 @@ import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 
-import com.example.sphinxevents.ExListAdapter;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Adapter for expandable lists that holds events
@@ -85,8 +82,12 @@ public class EventExListAdapter extends ExListAdapter {
             // Sets display of number of entrants who joined lottery and the entrant limit
             TextView numberOfEntrantsTextView = view.findViewById(R.id.number_of_entrants_text_view);
             TextView limitOfEntrantsTextView = view.findViewById(R.id.limit_of_entrants_text_view);
-            numberOfEntrantsTextView.setText(context.getString(R.string.number_of_entrants, event.getEventEntrants().size()));
-            if (event.getEntrantLimit() == 0) {
+            if(event.getEntrants() == null){
+                numberOfEntrantsTextView.setText(context.getString(R.string.number_of_entrants, 0));
+            } else {
+                numberOfEntrantsTextView.setText(context.getString(R.string.number_of_entrants, event.getEntrants().size()));
+            }
+            if (event.getEntrantLimit() == null || event.getEntrantLimit() == 0 ) {
                 limitOfEntrantsTextView.setVisibility(View.GONE);
             }
             else {
@@ -117,7 +118,7 @@ public class EventExListAdapter extends ExListAdapter {
 
         // TODO: Fix this logic in case things were changed in the Event class
         // Sets lottery time remaining to proper display
-        if (event.wasLotteryDrawn()) {
+        if (event.getLotteryWasDrawn()) {
             lotteryTimeRemainingTextView.setText(R.string.lottery_drawn);
             clockImage.setVisibility(View.GONE);
             lotteryTimerLinearLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.green_rounded_border));

@@ -147,15 +147,6 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
                         return;
                     }
                 })
-// Optional gallery scan, might do later it keeps breaking
-//            .setPositiveButton(R.string.qr_use_gallery, new DialogInterface.OnClickListener() {
-//                public void onClick(DialogInterface dialog, int id) {
-//                    Intent CamScanIntent = new Intent(MainActivity.this, ScanQRCode.class);
-//                    CamScanIntent.setAction("Gallery");
-//                    startActivity(CamScanIntent);
-//                    return;
-//                }
-//            })
                 .setNegativeButton(R.string.qr_camera_scan, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Intent CamScanIntent = new Intent(MainActivity.this, ScanQRCode.class);
@@ -313,8 +304,11 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
 
                         if (currentUser.getRole().equals("Organizer")) {
                             Organizer organizer = (Organizer) currentUser;
-                            headers.add(getString(R.string.created_events_header, organizer.getCreatedEvents().size()));
 
+                            // For some reason this line was being executed twice and adding 2 created events headers
+                            if(headers.size() < 3) {
+                                headers.add(getString(R.string.created_events_header, organizer.getCreatedEvents().size()));
+                            }
                             databaseManager.retrieveEventList(organizer.getCreatedEvents(), new DatabaseManager.retrieveEventListCallback() {
                                 @Override
                                 public void onSuccess(List<Event> createdEvents) {
@@ -366,11 +360,15 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
             Event clickedEvent = (Event) listAdapter.getChild(groupPosition, childPosition);
             switch (groupPosition) {
                 case 0:
-                    // TODO: Go to viewJoinedEvent activity
+                    Intent viewJoinedEventIntent = new Intent(MainActivity.this, ViewEventDetails.class);
+                    viewJoinedEventIntent.putExtra("eventId", clickedEvent.getEventId());
+                    startActivity(viewJoinedEventIntent);
                     break;
 
                 case 1:
-                    // TODO: Go to viewPendingEvent activity
+                    Intent viewPendingEventIntent = new Intent(MainActivity.this, ViewEventDetails.class);
+                    viewPendingEventIntent.putExtra("eventId", clickedEvent.getEventId());
+                    startActivity(viewPendingEventIntent);
                     break;
 
                 case 2:
