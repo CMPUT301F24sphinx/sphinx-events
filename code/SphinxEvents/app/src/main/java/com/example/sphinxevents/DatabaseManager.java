@@ -860,6 +860,28 @@ public class DatabaseManager {
                 });
     }
 
+
+    /**
+     * Updates the total count of redrawn users.
+     * @param count The total count.
+     * @param eventID ID of event being updated.
+     */
+    public void updateRedrawUserCount(String eventID, Integer count) {
+        database.collection("events")
+                .document(eventID)
+                .update("redrawUserCount", count)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+    }
+
     /**
      * Updates the entrants array of the event class.
      * @param entrants ID of users who will be in the updated array.

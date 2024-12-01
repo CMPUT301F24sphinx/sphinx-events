@@ -162,13 +162,24 @@ public class ViewCreatedEvent extends AppCompatActivity {
         // Determines display based on lottery state
         resetDisplay();  // First, reset visibility of conditional UI elements
         if (event.getLotteryWasDrawn() && event.getCancelled().isEmpty()) {  // Lottery has happened and nobody has cancelled
+
             lotteryStatusTextView.setText(R.string.lottery_has_been_drawn);
             redrawLotteryButton.setVisibility(View.GONE);
+
         } else if(event.getLotteryWasDrawn() && !event.getCancelled().isEmpty()) { // Primary lottery happened and >= 1 person cancelled
+
             numOfLotteryEntrantsLinearLayout.setVisibility(View.VISIBLE);
             displayEntrantCount();
-            redrawLotteryButton.setVisibility(View.VISIBLE);
-            lotteryStatusTextView.setText("You can redraw " + event.getCancelled().size() + " people.");
+
+            // Determine if to show re-draw button, only if more people have cancelled than the number of people we have re-drawn
+            if((event.getCancelled().size() - event.getRedrawUserCount()) > 0){
+                redrawLotteryButton.setVisibility(View.VISIBLE);
+            } else {
+                redrawLotteryButton.setVisibility(View.GONE);
+            }
+
+            lotteryStatusTextView.setText("You can re-draw " + (event.getCancelled().size() - event.getRedrawUserCount()) + " people.");
+
         } else {
             numOfLotteryEntrantsLinearLayout.setVisibility(View.VISIBLE);
             displayEntrantCount();
@@ -234,11 +245,10 @@ public class ViewCreatedEvent extends AppCompatActivity {
                 .setPositiveButton("Draw", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
 
-                        String nStr = sampleSize.getText().toString().trim();
-
+                        String nStr = sampleSize.getText().toString().trim(); // Get number from user's input
                         try {
-                            Integer n = Integer.valueOf(nStr);
 
+                            Integer n = Integer.valueOf(nStr);
                             if(n <= 0){
                                 Toast.makeText(ViewCreatedEvent.this, "Enter non-zero positive count", Toast.LENGTH_SHORT).show();
                             } else if (event.getEntrants().isEmpty()) {
@@ -325,6 +335,7 @@ public class ViewCreatedEvent extends AppCompatActivity {
 
         for (int i = 0; i < n; ++i){
             if(!currEntrants.isEmpty()) {
+                event.setRedrawUserCount(event.getRedrawUserCount() + 1);
                 String tempUser = currEntrants.remove(i);
                 currWinners.add(tempUser);
                 notifList.add(tempUser);
@@ -334,6 +345,7 @@ public class ViewCreatedEvent extends AppCompatActivity {
         // Update the database arrays
         databaseManager.updateEventWinners(event.getEventId(), currWinners);
         databaseManager.updateEntrants(event.getEventId(), currEntrants);
+        databaseManager.updateRedrawUserCount(event.getEventId(), event.getRedrawUserCount());
 
         // Send notifications to the winners
         if(!notifList.isEmpty()) {

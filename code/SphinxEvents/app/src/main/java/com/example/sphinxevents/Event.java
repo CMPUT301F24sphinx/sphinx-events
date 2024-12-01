@@ -16,6 +16,7 @@ public class Event implements Serializable {
     private String poster;  // The url of the poster location
     private Date lotteryEndDate;  // The end date of the lottery
     private Integer entrantLimit;  // The entrant limit for the event
+    private Integer redrawUserCount; // The total number of users we invite to join again after someone cancels
     private Boolean geolocationReq;  // Boolean indicating if geolocation is required
     private ArrayList<String> entrants;  // The list of entrants who have joined the event
     private UserLocation facilityLocation;  // The location of the facility event belongs to
@@ -54,6 +55,7 @@ public class Event implements Serializable {
         this.confirmed = new ArrayList<String>();
         this.cancelled = new ArrayList<String>();
         this.lotteryWasDrawn = false;
+        this.redrawUserCount = 0;
     }
 
     /**
@@ -143,6 +145,18 @@ public class Event implements Serializable {
      * @param entrantLimit The maximum number of entrants.
      */
     public void setEntrantLimit(Integer entrantLimit) {this.entrantLimit = entrantLimit;}
+
+    /**
+     * Gets the number of total users who got another chance to join the event after losing the first draw
+     * @return The total redrawn user count
+     */
+    public Integer getRedrawUserCount() {return redrawUserCount;}
+
+    /**
+     * Sets the number of total users who got another chance to join the event after losing the first draw
+     * @param _redrawnUserCount The total redrawn users we want to set
+     */
+    public void setRedrawUserCount(Integer _redrawnUserCount) {this.redrawUserCount = _redrawnUserCount;}
 
     /**
      * Gets whether geolocation is required for the event.
