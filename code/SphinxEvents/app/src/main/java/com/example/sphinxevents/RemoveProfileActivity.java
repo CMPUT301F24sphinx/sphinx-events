@@ -67,8 +67,8 @@ public class RemoveProfileActivity extends AppCompatActivity {
             if (entrant.getRole().equals("Organizer")) {
                 removeUserFacility();
             }
-            if (!entrant.getCustomPfpUrl().isEmpty()) {
-                deleteCustomPfp();
+            if (!entrant.getProfilePictureUrl().isEmpty()) {
+                deleteUserPfp();
             }
             removeProfile();
 
@@ -76,7 +76,7 @@ public class RemoveProfileActivity extends AppCompatActivity {
 
     }
 
-    private void deleteCustomPfp() {
+    private void deleteUserPfp() {
         databaseManager.deleteProfilePicture(entrant.getDeviceId(), new DatabaseManager.DeleteProfilePictureCallback() {
             @Override
             public void onSuccess() {
