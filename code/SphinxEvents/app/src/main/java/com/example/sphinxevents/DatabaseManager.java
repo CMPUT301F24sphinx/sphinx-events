@@ -18,6 +18,7 @@ import android.location.Location;
 
 
 import android.net.Uri;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -359,7 +360,7 @@ public class DatabaseManager {
                         public void onSuccess(Entrant user) {
                             // Updates user to be an Entrant
                             Entrant updatedUser = new Entrant(user.getDeviceId(), user.getName(), user.getEmail(),
-                                    user.getPhoneNumber(), user.getDefaultPfpPath(), user.getCustomPfpUrl(),
+                                    user.getPhoneNumber(), user.getProfilePictureUrl(), user.isCustomPfp(),
                                     user.isOrgNotificationsEnabled(), user.isAdminNotificationsEnabled(),
                                     user.getJoinedEvents(), user.getPendingEvents());
                             saveUser(updatedUser, new UserCreationCallback() {
@@ -520,7 +521,8 @@ public class DatabaseManager {
     }
 
     /**
-     * Deletes a profile picture from Firebase Storage.
+     * Deletes a profile picture from Firebase Storage and updates the user's profilePictureUrl to an empty string.
+     *
      * @param deviceId The device ID of the user whose profile picture is being deleted.
      * @param callback Callback to handle success or failure of the deletion.
      */
@@ -532,34 +534,27 @@ public class DatabaseManager {
         // Delete the profile picture
         profilePicRef.delete()
                 .addOnSuccessListener(aVoid -> {
-                    // Call the callback on success
-                    callback.onSuccess();
+                    // Update the user's profilePictureUrl to an empty string in the Firestore database
+                    FirebaseFirestore.getInstance()
+                            .collection("users")
+                            .document(deviceId)
+                            .update("profilePictureUrl", "")
+                            .addOnSuccessListener(unused -> {
+                                // Call the callback on success
+                                callback.onSuccess();
+                            })
+                            .addOnFailureListener(e -> {
+                                // Call the callback on failure to update Firestore
+                                callback.onFailure();
+                            });
                 })
                 .addOnFailureListener(e -> {
-                    // Call the callback on failure
+                    // Call the callback on failure to delete the profile picture
                     callback.onFailure();
                 });
     }
 
-    public void removeDefaultProfilePic(String deviceId, Context context){
-        DocumentReference defaultProfileRef = database.collection("users").document(deviceId);
 
-        defaultProfileRef
-                .update("defaultPfpPath", "")
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Toast.makeText(context, "Default profile picture removed successfully!", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error updating document", e);
-                        Toast.makeText(context, "Unable to remove default profile picture...", Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
 
     // ---------------------------------------------------------------------------------------------
 
@@ -1151,7 +1146,7 @@ public class DatabaseManager {
     }
 
     /**
-     * Adds notification object to "notification" collection in the database.
+     * Adds notification to the "notifications" sub-collection of recipients.
      *
      * @param notification The notification object being uploaded.
      * @param recipients   The recipients of the notification.
@@ -1419,8 +1414,6 @@ public class DatabaseManager {
                 });
     }
 
-}
-
     /**
      * Callback interface for entrant cancellation for an event.
      */
@@ -1462,11 +1455,18 @@ public class DatabaseManager {
                 throw new FirebaseFirestoreException("User not found", FirebaseFirestoreException.Code.NOT_FOUND);
             }
 
-            // Update the "entrants" list in the event document
-            ArrayList<String> entrants = (ArrayList<String>) eventSnapshot.get("waitingList");
-            if (entrants != null && entrants.contains(userId)) {
-                entrants.remove(userId);
-                transaction.update(eventDocRef, "entrants", entrants);
+            // Update the "lotteryWinners" list in the event document
+            ArrayList<String> lotteryWinners = (ArrayList<String>) eventSnapshot.get("lotteryWinners");
+            if (lotteryWinners != null && lotteryWinners.contains(userId)) {
+                lotteryWinners.remove(userId);
+                transaction.update(eventDocRef, "lotteryWinners", lotteryWinners);
+            }
+
+            // Update the "cancelled" list in the event document
+            ArrayList<String> cancelled = (ArrayList<String>) eventSnapshot.get("cancelled");
+            if (cancelled != null && cancelled.contains(userId)) {
+                cancelled.add(userId);
+                transaction.update(eventDocRef, "cancelled", cancelled);
             }
 
             // Update the "pendingEvents" list in the user document

@@ -34,6 +34,8 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.bumptech.glide.Glide;
 
+import java.io.IOException;
+
 /**
  * ManageProfileActivity provides a simple, user-friendly interface for editing profile details.
  * Users can:
@@ -53,7 +55,7 @@ public class ManageProfileActivity extends AppCompatActivity {
     private Uri initialProfilePicUri;
     private Uri newProfilePicUri;
 
-    private String initialName;
+    private String nameFirstChar;
 
     private ImageView profilePictureView;
     private Button changePfpBtn;
@@ -71,6 +73,12 @@ public class ManageProfileActivity extends AppCompatActivity {
     private Button saveButton;
 
 
+    /**
+     * Initializes the activity, sets up the UI, and loads the user's profile data.
+     * Prepares necessary elements for managing the user's profile information.
+     *
+     * @param savedInstanceState The saved state of the activity, if any.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,16 +91,16 @@ public class ManageProfileActivity extends AppCompatActivity {
         });
 
         userManager = UserManager.getInstance();
-        updatedUser = userManager.getCurrentUser();
+        updatedUser = userManager.getCurrentUser().clone();
         databaseManager = DatabaseManager.getInstance();
 
         // Initialize variables that handle profile selection
-        String profilePictureUrl = updatedUser.getCustomPfpUrl();
+        String profilePictureUrl = updatedUser.getProfilePictureUrl();
         if (profilePictureUrl != null && !profilePictureUrl.isEmpty()) {
             newProfilePicUri = initialProfilePicUri = Uri.parse(profilePictureUrl);
         }
 
-        initialName = userManager.getCurrentUser().getName();
+        nameFirstChar = String.valueOf(userManager.getCurrentUser().getName().charAt(0));
 
         profilePictureView = findViewById(R.id.manage_profile_picture);
 
@@ -121,7 +129,7 @@ public class ManageProfileActivity extends AppCompatActivity {
         });
 
         deletePfpBtn.setOnClickListener(v -> {
-            if (newProfilePicUri != null) {
+            if (newProfilePicUri != null && updatedUser.isCustomPfp()) {
                 newProfilePicUri = null;
                 setProfilePictureDisplay();  // Update display to reflect deletion of picture
             }
@@ -158,6 +166,7 @@ public class ManageProfileActivity extends AppCompatActivity {
      * Updates the users information if any changes are made
      */
     public void saveProfileChanges() {
+
         String updatedName = nameEditText.getText().toString().trim();
         String updatedEmail = emailEditText.getText().toString().trim();
         String updatedPhone = phoneNumberEditText.getText().toString().trim();
@@ -181,17 +190,21 @@ public class ManageProfileActivity extends AppCompatActivity {
         updatedUser.setOrgNotificationsEnabled(updatedOrgNotificationsEnabled);
         updatedUser.setAdminNotificationsEnabled(updatedAdminNotificationsEnabled);
 
+
+        if (!updatedUser.isCustomPfp() && !nameFirstChar.equals(String.valueOf(updatedName.charAt(0)))) {
+            generateDeterministicPfp();
+        }
+
         // Determine if profile picture changed
         boolean profilePictureChanged = (initialProfilePicUri == null && newProfilePicUri != null) ||
                 (initialProfilePicUri != null && !initialProfilePicUri.equals(newProfilePicUri));
 
         if (profilePictureChanged) {
-            if (newProfilePicUri != null) {  // Profile picture was either added or changed
                 databaseManager.uploadProfilePicture(updatedUser.getDeviceId(), newProfilePicUri,
                         new DatabaseManager.UploadProfilePictureCallback() {
                             @Override
                             public void onSuccess(String url) {
-                                updatedUser.setCustomPfpUrl(url);
+                                updatedUser.setProfilePictureUrl(url);
                                 saveUser();
                             }
 
@@ -201,22 +214,6 @@ public class ManageProfileActivity extends AppCompatActivity {
                                         "Unable to upload profile picture", Toast.LENGTH_SHORT).show();
                             }
                         });
-            } else {  // Profile Pic was deleted
-                databaseManager.deleteProfilePicture(updatedUser.getDeviceId(),
-                        new DatabaseManager.DeleteProfilePictureCallback() {
-                            @Override
-                            public void onSuccess() {
-                                updatedUser.setCustomPfpUrl("");
-                                saveUser();
-                            }
-
-                            @Override
-                            public void onFailure() {
-                                Toast.makeText(ManageProfileActivity.this,
-                                        "Unable to remove profile picture", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-            }
         } else {
             // No changes to profile picture
             saveUser();
@@ -256,9 +253,6 @@ public class ManageProfileActivity extends AppCompatActivity {
         databaseManager.saveUser(updatedUser, new DatabaseManager.UserCreationCallback() {
             @Override
             public void onSuccess(String deviceId) {
-                if (!initialName.equals(updatedUser.getName())) {
-                    updateDefaultPfp();
-                }
                 Toast.makeText(ManageProfileActivity.this, "Profile updated successfully",
                         Toast.LENGTH_SHORT).show();
                 finish();
@@ -301,72 +295,49 @@ public class ManageProfileActivity extends AppCompatActivity {
      * Sets the profile picture display
      */
     public void setProfilePictureDisplay() {
-        if (newProfilePicUri == null) {  // Means no custom profile picture is selected
-            loadDefaultPfp();
-        } else {
-            loadCustomPfp();
+        if (newProfilePicUri == null) {  // Means no profile picture is selected at the moment
+            generateDeterministicPfp();
+            updatedUser.setCustomPfp(false);
+            Glide.with(this)
+                    .load(ProfilePictureHelper.getBitmapFromUri(newProfilePicUri))
+                    .centerCrop()
+                    .into(profilePictureView);
+        }
+        else {
+            Glide.with(this)
+                    .load(newProfilePicUri)
+                    .centerCrop()
+                    .into(profilePictureView);
         }
     }
 
     /**
-     * loads the default profile picture form users storage to set display
+     * Generates a deterministic profile picture based on the users name.
      */
-    public void loadDefaultPfp() {
-        Entrant currentUser = userManager.getCurrentUser();
-        String userName = currentUser.getName();
-        String path = currentUser.getDefaultPfpPath();
+    public void generateDeterministicPfp() {
 
-        // Check if the profile picture path is not empty
-        if (path != null && !path.isEmpty()) {
-            // Load the bitmap from local storage
-            Bitmap profileBitmap = userManager.loadBitmapFromLocalStorage(path);
+        // Get the trimmed text from the EditText
+        String nameText = nameEditText.getText().toString().trim();
 
-            profilePictureView.setImageBitmap(profileBitmap);
-
+        // Use first char of the name edit text if applicable
+        if (!nameText.isEmpty()) {
+            nameFirstChar = String.valueOf(nameText.charAt(0));
         } else {
-            // Generate a new deterministic profile picture if no path is found
-            Drawable textDrawable = TextDrawable.createTextDrawable(
-                    this,
-                    String.valueOf(userName.charAt(0)),
-                    Color.WHITE,
-                    140
-            );
-            profilePictureView.setImageDrawable(textDrawable);
+            // Fallback to the first character of the updated user's name
+            nameFirstChar = String.valueOf(updatedUser.getName().charAt(0));
         }
-    }
-
-    /**
-     * Updates the users default profile picture if name has been changed
-     */
-    public void updateDefaultPfp() {
-        Entrant currentUser = UserManager.getInstance().getCurrentUser();
-        String deviceId = currentUser.getDeviceId();
-        String userName = currentUser.getName();
 
         // Generate deterministic profile picture for user
         Drawable newDefaultPfp = TextDrawable.createTextDrawable(
                 this,
-                String.valueOf(userName.charAt(0)),
+                nameFirstChar,
                 Color.WHITE,
                 140
         );
 
-        Bitmap defaultPfpBitmap = TextDrawable.drawableToBitmap(newDefaultPfp);
-        String profilePicturePath = userManager.saveBitmapToLocalStorage(this,
-                defaultPfpBitmap, deviceId);
+        Bitmap defaultPfpBitmap = ProfilePictureHelper.drawableToBitmap(newDefaultPfp, 140, 140);
 
-        currentUser.setDefaultPfpPath(profilePicturePath);
-        userManager.setCurrentUser(currentUser);
-    }
-
-    /**
-     * Sets the profile picture display to users custom profile picture
-     */
-    private void loadCustomPfp() {
-        Glide.with(this)
-                .load(newProfilePicUri)
-                .centerCrop()
-                .into(profilePictureView);
+        newProfilePicUri = ProfilePictureHelper.saveBitmapToTempFile(this, defaultPfpBitmap);
     }
 
     /**
@@ -380,6 +351,7 @@ public class ManageProfileActivity extends AppCompatActivity {
                     Uri imageUri = result.getData() != null ? result.getData().getData() : null;
                     if (imageUri != null) {
                         newProfilePicUri = imageUri;
+                        updatedUser.setCustomPfp(true);
                         setProfilePictureDisplay();
                     } else {
                         Toast.makeText(ManageProfileActivity.this, "No Image Selected",

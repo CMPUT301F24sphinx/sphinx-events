@@ -31,18 +31,6 @@ public class Event implements Serializable {
     // No-argument constructor
     public Event() {}
 
-    Event(String name, String description, String poster, Date lotteryEndDate, Integer entrantLimit, Boolean geolocationReq, ArrayList<String> joinedUsers) {
-    /**
-     * Constructs an Event with the specified attributes.
-     *
-     * @param name The name of the event.
-     * @param description The description of the event.
-     * @param lotteryEndDate The end date of the lottery.
-     * @param entrantLimit The maximum number of entrants.
-     * @param geolocationReq True if geolocation is required, false otherwise.
-     * @param joinedUsers The list of users who have joined the event.
-     * @param facilityLocation The location of the event's facility.
-     */
     Event(String name, String description, Date lotteryEndDate, Integer entrantLimit,
           Boolean geolocationReq, ArrayList<String> joinedUsers, UserLocation facilityLocation) {
         this.eventId = null;
@@ -54,9 +42,9 @@ public class Event implements Serializable {
         this.geolocationReq = geolocationReq;
         this.entrants = joinedUsers;
         this.facilityLocation = facilityLocation;
-        this.lotteryWinners = new ArrayList<String>();
-        this.confirmed = new ArrayList<String>();
-        this.cancelled = new ArrayList<String>();
+        this.lotteryWinners = new ArrayList<>();
+        this.confirmed = new ArrayList<>();
+        this.cancelled = new ArrayList<>();
         this.lotteryWasDrawn = false;
         this.redrawUserCount = 0;
     }

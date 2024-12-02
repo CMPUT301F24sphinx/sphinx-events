@@ -2,8 +2,6 @@ package com.example.sphinxevents;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.Button;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
@@ -14,8 +12,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-
-import com.google.firebase.firestore.auth.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -133,5 +129,14 @@ public class ViewEventEntrantData extends AppCompatActivity {
 
         listAdapter = new EntrantExListAdapter(ViewEventEntrantData.this, headers, entrantList);
         expandableListView.setAdapter(listAdapter);
+        expandableListView.setOnChildClickListener((parent, view, groupPosition, childPosition, id) -> {
+            Entrant clickedEntrant = (Entrant) listAdapter.getChild(groupPosition, childPosition);
+            if (groupPosition == 1) {  // Clicked on a lottery winner
+                // Create and show the dialog fragment
+                CancelEntrantDialogFragment dialogFragment = CancelEntrantDialogFragment.newInstance(currEvent, clickedEntrant);
+                dialogFragment.show(getSupportFragmentManager(), "CancelEntrantDialog");
+            }
+            return true;
+        });
     }
 }

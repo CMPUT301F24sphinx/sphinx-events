@@ -29,6 +29,8 @@ public class RemoveProfileActivity extends AppCompatActivity {
     private DatabaseManager databaseManager;
     private UserManager userManager;
 
+    private ImageView profileImageView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +56,7 @@ public class RemoveProfileActivity extends AppCompatActivity {
         TextView profileRoleTextView = findViewById(R.id.profile_role_textview);
         TextView profilePhoneNumberTextView = findViewById(R.id.profile_phone_number_textview);
         TextView profiledeviceIDTextView = findViewById(R.id.profile_deviceID_textview);
-        ImageView profileImageView = findViewById(R.id.profileImageView);
+        profileImageView = findViewById(R.id.profileImageView);
 
         Button removeButton = findViewById(R.id.remove_profile_button);
         Button removePfpImageButton = findViewById(R.id.remove_profileImage_button);
@@ -66,20 +68,15 @@ public class RemoveProfileActivity extends AppCompatActivity {
         profiledeviceIDTextView.setText(entrant.getDeviceId());
 
         //Setting profile Image Display:
-        String custom_pfp_url = entrant.getCustomPfpUrl();
-        String default_pfp_path = entrant.getDefaultPfpPath();
-        if(custom_pfp_url != ""){
+        String profilePictureUrl = entrant.getProfilePictureUrl();
+        if(!profilePictureUrl.isEmpty()){
             // Load image using Glide
             Glide.with(this)
-                    .load(custom_pfp_url)
+                    .load(profilePictureUrl)
+                    .centerCrop()
                     .into(profileImageView);
         } else {
-            // Create a File object
-            File imageFile = new File(default_pfp_path);
-            // Load the image using Glide
-            Glide.with(this)
-                    .load(imageFile) // Load from file
-                    .into(profileImageView);
+            profileImageView.setImageResource(android.R.color.transparent);
         }
 
         // Set onClickListener for backButton
@@ -92,8 +89,8 @@ public class RemoveProfileActivity extends AppCompatActivity {
             if (entrant.getRole().equals("Organizer")) {
                 removeUserFacility();
             }
-            if (!entrant.getCustomPfpUrl().isEmpty()) {
-                deleteCustomPfp();
+            if (!entrant.getProfilePictureUrl().isEmpty()) {
+                deleteUserPfp();
             }
             removeProfile();
 
@@ -101,28 +98,19 @@ public class RemoveProfileActivity extends AppCompatActivity {
 
         // Sets onClickListener for removeButton
         removePfpImageButton.setOnClickListener(v -> {
-            if (custom_pfp_url != "") {
-                deleteCustomPfp();
-                profileImageView.setImageResource(android.R.color.transparent);
+            if (!profilePictureUrl.isEmpty()) {
+                deleteUserPfp();
             }
-            else {
-                deleteDefaultPfp();
-                profileImageView.setImageResource(android.R.color.transparent);
-            }
-
         });
 
     }
 
-
-    private void deleteDefaultPfp(){
-        databaseManager.removeDefaultProfilePic(entrant.getDeviceId(), getApplicationContext());
-    }
-
-    private void deleteCustomPfp() {
+    private void deleteUserPfp() {
         databaseManager.deleteProfilePicture(entrant.getDeviceId(), new DatabaseManager.DeleteProfilePictureCallback() {
             @Override
             public void onSuccess() {
+                Toast.makeText(RemoveProfileActivity.this, "Profile picture successfully removed.", Toast.LENGTH_SHORT).show();
+                profileImageView.setImageResource(android.R.color.transparent);
             }
 
             @Override
@@ -159,7 +147,6 @@ public class RemoveProfileActivity extends AppCompatActivity {
             }
         });
     }
-
 
 }
 
