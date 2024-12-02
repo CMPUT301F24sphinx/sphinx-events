@@ -1,3 +1,15 @@
+/*
+ * Class Name: ViewMapActivity
+ * Date: 2024-11-28
+ *
+ * Description:
+ * The ViewMapActivity is responsible for displaying a map of event participants' locations
+ * and the event's facility. It uses the Google Maps API to show markers for the locations
+ * of entrants and the facility, positioning the camera on the facility by default. The activity
+ * retrieves the event and entrants' locations from the database and displays them on the map.
+ *
+ */
+
 package com.example.sphinxevents;
 
 import android.content.Intent;
@@ -18,6 +30,12 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 
+/**
+ * The ViewMapActivity is responsible for displaying a map of event participants' locations
+ * and the event's facility. It uses the Google Maps API to show markers for the locations
+ * of entrants and the facility, positioning the camera on the facility by default. The activity
+ * retrieves the event and entrants' locations from the database and displays them on the map.
+ */
 public class ViewMapActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private DatabaseManager databaseManager;
