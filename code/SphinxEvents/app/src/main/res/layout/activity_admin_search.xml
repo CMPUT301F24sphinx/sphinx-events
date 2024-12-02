@@ -114,18 +114,6 @@
         android:gravity="center"
         android:paddingVertical="15dp">
 
-        <Button
-            android:id="@+id/see_all_images_button"
-            android:layout_width="200dp"
-            android:layout_height="50dp"
-            android:layout_gravity="center"
-            android:layout_marginBottom="16dp"
-            android:backgroundTint="#C3C3C3"
-            android:text="See All Images"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:textColor="@color/black"
-            android:textSize="20dp"
-            app:cornerRadius="5dp" />
 
         <Button
             android:id="@+id/searchButton"
