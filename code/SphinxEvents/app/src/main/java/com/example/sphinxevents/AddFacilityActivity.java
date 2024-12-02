@@ -1,6 +1,11 @@
 /*
+ * Class Name: AddFacilityActivity
+ * Date: 2024-11-07
+ *
+ * Description:
  * Allows user to add/edit their facility
- * User can input/edit name, location, and phone number of their facility
+ * User can input/edit name and phone number of their facility
+ * The facility location is the location of the user when they are creating the facility
  */
 
 package com.example.sphinxevents;

@@ -19,6 +19,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -77,8 +78,18 @@ public class ViewScannedEvent extends AppCompatActivity {
         }
         else {
             Toast.makeText(this, "QR Code Scan Failed", Toast.LENGTH_SHORT).show();
-            finish(); // exit activity
+            finish();
         }
+
+        // Checks if the QR code wasn't removed in the database
+        String qrCodePath = "qr_codes/" + eventId + ".jpg";
+        StorageReference qrCodeRef = FirebaseStorage.getInstance().getReference(qrCodePath);
+        // Load the QR code image into the ImageView
+        qrCodeRef.getDownloadUrl().addOnSuccessListener(uri -> {
+        }).addOnFailureListener(e -> {
+            Toast.makeText(this, "QR Code was removed. Unable to view event.", Toast.LENGTH_SHORT).show();
+            finish();  // exit activity if QR code was removed
+        });
 
         userManager = UserManager.getInstance();
         databaseManager = DatabaseManager.getInstance();
