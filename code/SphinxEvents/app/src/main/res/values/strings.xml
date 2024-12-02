@@ -4,6 +4,28 @@
     <string name="create_event">Create Event</string>
     <string name="view_profile">View Profile</string>
 
+    <!--Event and lottery related strings-->
+    <string name="joined_events_header">Joined Events (%d)</string>
+    <string name="pending_events_header">Pending Events (%d)</string>
+    <string name="created_events_header">Created Events (%d)</string>
+    <string name="days_until_lottery">%d Days</string>
+    <string name="number_of_entrants">Number of Entrants: %d</string>
+    <string name="entrant_limit">/ %d</string>
+    <string name="lottery_drawn">Lottery Drawn!</string>
+    <string name="awaiting_lottery">Awaiting Lottery</string>
+    <string name="join">Join</string>
+    <string name="entrants_and_limit">%d / %d</string>
+    <string name="entrants_and_no_limit">%d / No Limit</string>
+    <string name="waiting_for_registration_deadline">Lottery can\'t be drawn yet. Registration is still open.</string>
+    <string name="lottery_has_been_drawn">Lottery has been drawn!</string>
+    <string name="lottery_is_ready_to_be_drawn">Lottery is ready to be drawn!</string>
+    <string name="view_event_entrants_data">Event Entrant Data</string>
+    <string name="confirmed_entrants">Confirmed Entrants  (%d)</string>
+    <string name="entrants_invited_to_apply">Invited To Apply  (%d)</string>
+    <string name="cancelled_entrants">Cancelled  (%d)</string>
+    <string name="entrants">Waiting List  (%d)</string>
+
+
     <!--Drawer strings-->
     <string name="close_drawer_speakable_text">Close side drawer button</string>
     <string name="profile_pic_speakable_text">Profile picture</string>
@@ -61,31 +83,38 @@
     <string name="back_to_home">Back to Home</string>
     <string name="entrant_limit_optional">Entrant Limit(optional)</string>
     <string name="geo_location_requirement">Geo-Location Requirement:</string>
-    <string name="registration_deadline_yyyy_mm_dd">Registration Deadline(yyyy/MM/dd)*</string>
+    <string name="registration_deadline_yyyy_mm_dd">Registration Deadline (yyyy/MM/dd)*</string>
     <string name="name">Name*</string>
     <string name="create_an_event">Create an Event</string>
     <string name="event_description">Event Description*</string>
 
-    <!--    Search query Event String-->
+    <!-- Search query Event String-->
     <string name="event_search_query">\"%s\"</string>
 
 
-<!--    Managing Event String-->
+    <!-- Managing Event String-->
     <string name="manageevent_event_details">Event Details</string>
+
+    <!-- Managing Event String-->
+    <string name="manage_event_event_details">Event Details</string>
+
     <string name="view_qrcode_button">View QR Code</string>
     <string name="edit_event_details_button">Edit Event Details</string>
     <string name="view_entrant_data_button">View Entrant Data</string>
     <string name="notify_entrants_button">Send Message</string>
+    <string name="leave_event_waitlist">Leave Waitlist</string>
+    <string name="do_event_draw">Draw Lottery</string>
 
-<!--    Notifications-->
+    <!--Notifications-->
     <string name="channel_name">NotificationChannel</string>
     <string name="channel_description">NotificationChannelDesc</string>
     <string name="CHANNEL_ID">NotificationChannelID</string>
     <string name="notifications">Notifications</string>
+    <string name="notification_msg_preview">%1$s…</string>
 
-
-<!--    QR Code Scan Strings-->
+    <!--QR Code Scan Strings-->
     <string name="qr_camera_scan">Camera</string>
     <string name="qr_use_gallery">Gallery</string>
+    <string name="no_notifications_msg">You have no notifications.</string>
 
 </resources>

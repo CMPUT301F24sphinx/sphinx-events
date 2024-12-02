@@ -1,3 +1,4 @@
+
 /*
  * Class Name: DatabaseManager
  * Date: 2024-11-06
@@ -11,26 +12,30 @@
 package com.example.sphinxevents;
 
 import android.net.Uri;
-import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.Timestamp;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.protobuf.Value;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 //TODO: Add a more descriptive comment for the class when more functionality is implemented.
 /**
@@ -82,12 +87,21 @@ public class DatabaseManager {
      * @param event The event object containing details to be stored.
      * @param callback Callback to handle success or failure of the event creation.
      */
-    // TODO: Include all other fields an event should have
     public void createEvent(Event event, EventCreationCallback callback) {
-        // Add the event to Firestore under the "events" collection
-        database.collection("events")
-                .add(event)
-                .addOnSuccessListener(callback::onSuccess)
+        // Create a new document reference with an auto-generated ID
+        DocumentReference docRef = database.collection("events").document();
+
+        // Set the generated document ID as the eventId in the Event object
+        event.setEventId(docRef.getId());
+        String posterId = "EventPosters/" + docRef.getId() + ".jpg";
+        event.setPoster(posterId);
+
+        // Add the event to Firestore with the generated ID
+        docRef.set(event)
+                .addOnSuccessListener(aVoid -> {
+                    // Pass the DocumentReference to the callback onSuccess method
+                    callback.onSuccess(docRef);
+                })
                 .addOnFailureListener(callback::onFailure);
 
     }
@@ -181,6 +195,54 @@ public class DatabaseManager {
                 });
     }
 
+    /**
+     * Callback interface for created Entrants retrieval
+     */
+    public interface retrieveEntrantListCallback {
+        /**
+         * Called when entrants are retrieved successfully
+         * @param entrants List of Entrant objects that were retrieved
+         */
+        void onSuccess(List<Entrant> entrants);
+
+        /**
+         * Called when error occurs during entrant retrieval
+         * @param e the exception that occurred
+         */
+        void onFailure(Exception e);
+    }
+
+    /**
+     * Retrieves entrants that match an ArrayList of entrant id's
+     * Used for displaying entrants in home screen
+     * @param entrantsToRetrive list of entrant id's to search for in database
+     * @param callback callback to handle success or failure of entrants list retrieval
+     */
+    public void retrieveEntrantList(ArrayList<String> entrantsToRetrive, retrieveEntrantListCallback callback) {
+        // Handles empty list of events to search for
+        if (entrantsToRetrive.isEmpty()) {
+            callback.onSuccess(new ArrayList<>());
+            return;
+        }
+
+        // Searches database for events whose id's are in the eventsToRetrieve array
+        database.collection("users")
+                .whereIn(FieldPath.documentId(), entrantsToRetrive)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        ArrayList<Entrant> entrants = new ArrayList<>();
+                        for (DocumentSnapshot document : task.getResult()) {
+                            Entrant entrant = document.toObject(Entrant.class);
+                            entrants.add(entrant);
+                        }
+                        callback.onSuccess(entrants);
+                    } else {
+                        callback.onFailure(task.getException());
+                    }
+                });
+    }
+
 
     /**
      * Callback interface for adding facility
@@ -245,10 +307,7 @@ public class DatabaseManager {
                     if (task.isSuccessful() && task.getResult() != null) {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
-                            String name = document.getString("name");
-                            String location = document.getString("location");
-                            String phoneNumber = document.getString("phoneNumber");
-                            Facility facility = new Facility(name, location, phoneNumber, deviceId);
+                            Facility facility = document.toObject(Facility.class);
                             callback.onSuccess(facility);
                         } else {
                             callback.onFailure(new Exception("Facility does not exist."));
@@ -508,21 +567,18 @@ public class DatabaseManager {
                     if (task.isSuccessful() && task.getResult() != null) {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
-                            String name = document.getString("name");
-                            String description = document.getString("description");
-                            String poster = document.getString("poster");
-                            Timestamp dateTimestamp = document.getTimestamp("lotteryEndDate");
-                            Date lotteryEndDate = dateTimestamp.toDate();
+                            Event event = document.toObject(Event.class);
 
-                            Integer entrantLimit;
-                            if(document.get("entrantLimit") != null) {
-                                entrantLimit = Integer.valueOf(document.get("entrantLimit").toString());
-                            } else{
-                                entrantLimit = null;
+                            // Ensure that the waitingList is initialized
+                            if (event != null && event.getEntrants() == null) {
+                                event.setEntrants(new ArrayList<>());  // Initialize waitingList if null
                             }
-                            Boolean geolocationReq = document.getBoolean("geolocationReq");
-                            ArrayList<String> entrants = (ArrayList<String>) document.get("entrants");
-                            Event event = new Event(name, description, poster, lotteryEndDate, entrantLimit, geolocationReq, entrants);
+
+                            // Ensure that the confirmedlist is initialized
+                            if (event != null && event.getConfirmed() == null) {
+                                event.setConfirmed(new ArrayList<>());  // Initialize waitingList if null
+                            }
+
                             callback.onSuccess(event);
                         } else {
                             callback.onFailure(new Exception("Event does not exist."));
@@ -533,6 +589,99 @@ public class DatabaseManager {
                 });
     }
 
+
+    //--------------------------------------------------------------------------------------------------------
+    // TODO: Determine if this function is needed or not depending on how the lottery is implemented
+
+    public interface joinWaitingListCallback {
+        void onSuccess();
+        void onFailure(Exception e);
+    }
+
+
+    public void joinEventWaitingList(String userId, UserLocation userLocation, String eventId, joinWaitingListCallback callback) {
+        // Add the user to the event's waiting list
+        database.collection("events")
+                .document(eventId)
+                .update("entrants", FieldValue.arrayUnion(userId))
+                .addOnSuccessListener(aVoid -> {
+                    // Add the eventId to the user's pendingEvents field
+                    database.collection("users")
+                            .document(userId)
+                            .update("pendingEvents", FieldValue.arrayUnion(eventId))
+                            .addOnSuccessListener(aVoid1 -> {
+                                // If userLocation is not null, add a map to the event with userId -> userLocation
+                                if (userLocation != null) {
+                                    // Create a map for the user location
+                                    Map<String, Object> userLocationMap = new HashMap<>();
+                                    userLocationMap.put(userId, userLocation);
+
+                                    // Update the event document with the user's location
+                                    database.collection("events")
+                                            .document(eventId)
+                                            .set(Collections.singletonMap("entrantLocations", userLocationMap), SetOptions.merge())
+                                            .addOnSuccessListener(aVoid2 -> {
+                                                // All updates successful, trigger callback success
+                                                callback.onSuccess();
+                                            })
+                                            .addOnFailureListener(callback::onFailure);
+                                } else {
+                                    // If no location, success at this point
+                                    callback.onSuccess();
+                                }
+                            })
+                            .addOnFailureListener(callback::onFailure);
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
+    public interface getUserLocationsCallback {
+        void onSuccess(ArrayList<UserLocation> locations);
+        void onFailure(Exception e);
+    }
+
+    public void getUserLocations(String eventId, getUserLocationsCallback callback) {
+        database.collection("events")
+                .document(eventId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        // Get the 'entrantLocations' map
+                        Map<String, Object> entrantLocationsMap = (Map<String, Object>) documentSnapshot.get("entrantLocations");
+
+                        if (entrantLocationsMap != null && !entrantLocationsMap.isEmpty()) {
+                            ArrayList<UserLocation> userLocations = new ArrayList<>();
+
+                            // Iterate through the map and create UserLocation objects
+                            for (Map.Entry<String, Object> entry : entrantLocationsMap.entrySet()) {
+                                // Cast the value of each entry to a Map that represents latitude and longitude
+                                Map<String, Object> locationData = (Map<String, Object>) entry.getValue();
+
+                                double latitude = (Double) locationData.get("latitude");
+                                double longitude = (Double) locationData.get("longitude");
+
+                                // Instantiate the UserLocation object and add to the list
+                                UserLocation userLocation = new UserLocation(latitude, longitude);
+                                userLocations.add(userLocation);
+                            }
+
+                            // Pass the list to the callback
+                            callback.onSuccess(userLocations);
+                        } else {
+                            callback.onSuccess(new ArrayList<>());
+                        }
+                    } else {
+                        callback.onFailure(new Exception("Event not found"));
+                    }
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
+
+
+    //--------------------------------------------------------------------------------------------------------
+
+
     /**
      * Adds Id of entree to entrants field of event
      * @param userID ID of user being added
@@ -542,6 +691,258 @@ public class DatabaseManager {
         database.collection("events")
                 .document(eventID)
                 .update("entrants", FieldValue.arrayUnion(userID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+
+        database.collection("users")
+                .document(userID)
+                .update("joinedEvents", FieldValue.arrayUnion(eventID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+    }
+
+    /**
+     * Removes userID from list of entrants in events document
+     * Removes EventID from list of pendingEvents in users document
+     * @param userID ID of user being removed
+     * @param eventID ID of event being removed
+     */
+    public void leaveEvent(String userID, String eventID) {
+        database.collection("events")
+                .document(eventID)
+                .update("entrants", FieldValue.arrayRemove(userID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+
+        database.collection("users")
+                .document(userID)
+                .update("pendingEvents", FieldValue.arrayRemove(eventID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+    }
+
+    /**
+     * Adds userId to confirmed array of event and moves eventId from pending to joined events in user document
+     * @param userID ID of user being added
+     * @param eventID ID of event being updated
+     */
+    public void confirmEvent(String userID, String eventID) {
+        // Add event userId to confirmed Ids
+        database.collection("events")
+                .document(eventID)
+                .update("confirmed", FieldValue.arrayUnion(userID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+
+        // Remove userId from lotteryWinners array
+        database.collection("events")
+                .document(eventID)
+                .update("lotteryWinners", FieldValue.arrayRemove(userID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+
+        database.collection("users")
+                .document(userID)
+                .update("joinedEvents", FieldValue.arrayUnion(eventID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+
+        database.collection("users")
+                .document(userID)
+                .update("pendingEvents", FieldValue.arrayRemove(eventID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+    }
+
+    /**
+     * Removes userId to winners array of Event and removes eventId from pendingEvents in user document
+     * @param userID ID of user being added
+     * @param eventID ID of event being updated
+     */
+    public void cancelEvent(String userID, String eventID) {
+
+        // Remove userId from lotteryWinners array
+        database.collection("events")
+                .document(eventID)
+                .update("cancelled", FieldValue.arrayUnion(userID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+
+        // Remove userId from lotteryWinners array
+        database.collection("events")
+                .document(eventID)
+                .update("lotteryWinners", FieldValue.arrayRemove(userID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+
+        database.collection("users")
+                .document(userID)
+                .update("pendingEvents", FieldValue.arrayRemove(eventID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+
+    }
+
+    /**
+     * Updates bool lotteryWasDrawn to true, called when the lottery is drawn by organizer.
+     * @param eventID ID of event being updated.
+     */
+    public void updateLotteryWasDrawn(String eventID) {
+        database.collection("events")
+                .document(eventID)
+                .update("lotteryWasDrawn", true)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+    }
+
+    /**
+     * Updates the winner array of given event
+     * @param winners ID of users who won the lottery.
+     * @param eventID ID of event being updated.
+     */
+    public void updateEventWinners(String eventID, ArrayList<String> winners) {
+        database.collection("events")
+                .document(eventID)
+                .update("lotteryWinners", winners)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+    }
+
+
+    /**
+     * Updates the total count of redrawn users.
+     * @param count The total count.
+     * @param eventID ID of event being updated.
+     */
+    public void updateRedrawUserCount(String eventID, Integer count) {
+        database.collection("events")
+                .document(eventID)
+                .update("redrawUserCount", count)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+    }
+
+    /**
+     * Updates the entrants array of the event class.
+     * @param entrants ID of users who will be in the updated array.
+     * @param eventID ID of event being updated.
+     */
+    public void updateEntrants(String eventID, ArrayList<String> entrants) {
+        database.collection("events")
+                .document(eventID)
+                .update("entrants", entrants)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -576,27 +977,116 @@ public class DatabaseManager {
     }
 
     /**
-     * Callback interface for created Events retrieval
+     * Callback for changing the poster of an event
      */
-    public interface getCreatedEventsCallback {
+    public interface changeEventPosterCallback {
         /**
-         * Called when events are retrieved successfully
-         * @param createdEventsID List of Id's of events
+         * Called when poster is successfully changed
          */
-        void onSuccess(List<String> createdEventsID);
+        void onSuccess();
 
         /**
-         * Called when error occurs during events retrival
+         * Called when failure occurs when changing poster
          * @param e the exception that occurred
          */
         void onFailure(Exception e);
     }
 
     /**
-     * Retrieves an Event from db
-     * @param userID ID of user who created event
+     * Changes the poster of an event
+     * Uploads poster, updates poster field for event
+     * @param eventId the ID of the event to change the poster for
+     * @param posterId the path of the poster in the database
+     * @param posterUri  the Uri of the new poster
+     * @param callback  the callback to handle success or failure of changing poster
      */
-    public void getCreatedEvents(String userID, getCreatedEventsCallback callback) {
+    public void changeEventPoster(String eventId, String posterId, Uri posterUri, changeEventPosterCallback callback) {
+
+        // Get Firebase Storage reference
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference().child(posterId);
+
+        // Upload the poster file
+        storageRef.putFile(posterUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // Handle failure to update the database
+                    database.collection("events").document(eventId)
+                            .update("poster", posterId)
+                            .addOnSuccessListener(aVoid -> {
+                                callback.onSuccess();
+                            })
+                            .addOnFailureListener(callback::onFailure);
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
+    /**
+     * Callback interface for created Events retrieval
+     */
+    public interface retrieveEventListCallback {
+        /**
+         * Called when events are retrieved successfully
+         * @param events List of Event objects that were retrieved
+         */
+        void onSuccess(List<Event> events);
+
+        /**
+         * Called when error occurs during events retrieval
+         * @param e the exception that occurred
+         */
+        void onFailure(Exception e);
+    }
+
+    /**
+     * Retrieves events that match an ArrayList of event id's
+     * Used for displaying events in home screen
+     * @param eventsToRetrieve list of event id's to search for in database
+     * @param callback callback to handle success or failure of event list retrieval
+     */
+    public void retrieveEventList(ArrayList<String> eventsToRetrieve, retrieveEventListCallback callback) {
+        // Handles empty list of events to search for
+        if (eventsToRetrieve.isEmpty()) {
+            callback.onSuccess(new ArrayList<>());
+            return;
+        }
+
+        // Searches database for events whose id's are in the eventsToRetrieve array
+        database.collection("events")
+                .whereIn(FieldPath.documentId(), eventsToRetrieve)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        ArrayList<Event> events = new ArrayList<>();
+                        for (DocumentSnapshot document : task.getResult()) {
+                            Event event = document.toObject(Event.class);
+                            events.add(event);
+                        }
+                        callback.onSuccess(events);
+                    } else {
+                        callback.onFailure(task.getException());
+                    }
+                });
+    }
+
+
+    /**
+     * Callback interface for joined Events retrieval
+     */
+    public interface getJoinedEventsCallback {
+        /**
+         * Called when events are retrieved successfully
+         * @param joinedEventsID List of Id's of events
+         */
+        void onSuccess(List<String> joinedEventsID);
+
+        /**
+         * Called when error occurs during events retrieval
+         * @param e the exception that occurred
+         */
+        void onFailure(Exception e);
+    }
+
+    public void getJoinedEvents(String userID, getJoinedEventsCallback callback) {
+
         database.collection("users")
                 .document(userID)
                 .get()
@@ -604,7 +1094,7 @@ public class DatabaseManager {
                     if (task.isSuccessful() && task.getResult() != null) {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
-                            List<String> createdEvents = (List<String>) document.get("createdEvents");
+                            List<String> createdEvents = (List<String>) document.get("joinedEvents");
                             callback.onSuccess(createdEvents);
                         } else {
                             callback.onFailure(new Exception("Created Events does not exist."));
@@ -615,6 +1105,7 @@ public class DatabaseManager {
                 });
     }
 
+
     // --------------------------------------------------------------------------------------------------
 
     /**
@@ -623,9 +1114,8 @@ public class DatabaseManager {
     public interface NotificationCreationCallback {
         /**
          * Called when notification is created successfully
-         * @param notifRef DocumentReference object to new created notification
          */
-        void onSuccess(DocumentReference notifRef);
+        void onSuccess();
 
         /**
          * Called when notification creation fails
@@ -635,15 +1125,61 @@ public class DatabaseManager {
     }
 
     /**
-     * Adds notification object to "notification" collection in database
-     * @param notification The notification object being uploaded
-     * @param callback Call back function on weather upload succeeded or faulted
+     * Adds notification object to "notification" collection in the database.
+     *
+     * @param notification The notification object being uploaded.
+     * @param recipients   The recipients of the notification.
+     * @param callback     Callback function on whether upload succeeded or faulted.
      */
-    public void createNotification(Notification notification, NotificationCreationCallback callback) {
-        database.collection("notifications")
-                .add(notification)
-                .addOnSuccessListener(callback::onSuccess)
-                .addOnFailureListener(callback::onFailure);
+    public void createNotification(Notification notification, ArrayList<String> recipients,
+                                   NotificationCreationCallback callback) {
+        WriteBatch batch = database.batch();
+        List<Task<DocumentSnapshot>> tasks = new ArrayList<>();
+
+        // Determine notification type based on channel ID
+        String channelID = notification.getChannelID();
+        boolean isOrganizerNotification = channelID.equals(NotificationsHelper.ORGANIZER_CHANNEL_ID);
+        boolean isAdminNotification = channelID.equals(NotificationsHelper.ADMIN_CHANNEL_ID);
+
+        for (String userID : recipients) {
+            DocumentReference userRef = database.collection("users").document(userID);
+
+            // Fetch user preferences
+            Task<DocumentSnapshot> task = userRef.get().addOnSuccessListener(userDoc -> {
+                if (userDoc.exists()) {
+                    boolean orgNotificationsEnabled = userDoc.getBoolean("orgNotificationsEnabled") != null
+                            && Boolean.TRUE.equals(userDoc.getBoolean("orgNotificationsEnabled"));
+                    boolean adminNotificationsEnabled = userDoc.getBoolean("adminNotificationsEnabled") != null
+                            && Boolean.TRUE.equals(userDoc.getBoolean("adminNotificationsEnabled"));
+
+                    // Check if the notification should be sent based on preferences
+                    if ((isOrganizerNotification && orgNotificationsEnabled)
+                            || (isAdminNotification && adminNotificationsEnabled)) {
+                        DocumentReference notificationRef = userRef.collection("notifications").document();
+                        batch.set(notificationRef, notification);
+                    }
+                }
+            }).addOnFailureListener(callback::onFailure);
+
+            // Add the task to the list
+            tasks.add(task);
+        }
+
+        // After all tasks are completed, commit the batch
+        Tasks.whenAllSuccess(tasks).addOnSuccessListener(aVoid -> {
+            batch.commit()
+                    .addOnSuccessListener(unused -> callback.onSuccess())
+                    .addOnFailureListener(callback::onFailure);
+        }).addOnFailureListener(e -> {
+            callback.onFailure(e); // Handle failure
+        });
+
+        // Edge case: if no recipients, commit immediately
+        if (recipients.isEmpty()) {
+            batch.commit()
+                    .addOnSuccessListener(unused -> callback.onSuccess())
+                    .addOnFailureListener(callback::onFailure);
+        }
     }
 
 
@@ -653,9 +1189,9 @@ public class DatabaseManager {
     public interface getNotificationsCallback {
         /**
          * Callback for successful notification retrieval
-         * @param notificationIDs List of DocumentSnapShots of returned notifications
+         * @param notifications ArrayList of notifications directed to user
          */
-        void onSuccess(List<DocumentSnapshot> notificationIDs);
+        void onSuccess(ArrayList<Notification> notifications);
 
         /**
          * Callback for failed notification retrieval
@@ -665,31 +1201,27 @@ public class DatabaseManager {
     }
 
     /**
-     * Gets list of DocumentSnapshots of notifications sent to` userID
-     * @param userID The user who is the reviewer of notifications
-     * @param callback Success or Fail callback
+     * Gets ArrayList of Notification objects sent to userID
+     * @param userID The list of the user to retrieve notifications for
+     * @param callback Success or Failure callback
      */
     public void getNotifications(String userID, getNotificationsCallback callback) {
-        database.collection("notifications")
-                .whereEqualTo("toUser", userID)
+        database.collection("users")
+                .document(userID)
+                .collection("notifications")
                 .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null) {
-                        QuerySnapshot query = task.getResult();
-                        if (!query.isEmpty()) {
-                            List<DocumentSnapshot> notifDocSnapshots =  query.getDocuments();
-                            callback.onSuccess(notifDocSnapshots);
-                        } else {
-                            callback.onFailure(task.getException());
-                        }
-                    } else {
-                        callback.onFailure(task.getException());
+                .addOnSuccessListener(querySnapshot -> {
+                    ArrayList<Notification> notifications = new ArrayList<>();
+                    for (DocumentSnapshot notificationDoc : querySnapshot.getDocuments()) {
+                        notifications.add(notificationDoc.toObject(Notification.class));
                     }
-                });
+                    callback.onSuccess(notifications);
+                })
+                .addOnFailureListener(callback::onFailure);
     }
 
     //---------------------------------------------------------------------------------------------
-    //Admin profile search handling:
+    // Admin profile search handling:
 
     /**
      * Callback interface for profiles search
@@ -769,8 +1301,7 @@ public class DatabaseManager {
                 .addOnFailureListener(callback::onFailure);  // Notify failure
 
     }
-
-
+  
     //---------------------------------------------------------------------------------------------
     //Admin events search handling:
 
@@ -864,4 +1395,65 @@ public class DatabaseManager {
 
 }
 
+    /**
+     * Callback interface for entrant cancellation for an event.
+     */
+    public interface CancelEntrantCallback {
+        /**
+         * Called when entrant is successfully cancelled from event.
+         */
+        void onSuccess();
 
+        /**
+         * Called when error occurs during entrant cancellation for event.
+         * @param e The exception that occurred.
+         */
+        void onFailure(Exception e);
+    }
+
+    /**
+     * Cancels an entrant from participation in an event
+     * @param eventId The ID of the event to cancel entrant from
+     * @param userId The ID of the user to be cancelled
+     * @param callback Callback to handle success or failure of entrant cancellation
+     */
+    public void cancelEntrant(String eventId, String userId, CancelEntrantCallback callback) {
+
+        database.runTransaction(transaction -> {
+            // References to the documents
+            DocumentReference eventDocRef = database.collection("events").document(eventId);
+            DocumentReference userDocRef = database.collection("users").document(userId);
+
+            // Fetch the event document
+            DocumentSnapshot eventSnapshot = transaction.get(eventDocRef);
+            if (!eventSnapshot.exists()) {
+                throw new FirebaseFirestoreException("Event not found", FirebaseFirestoreException.Code.NOT_FOUND);
+            }
+
+            // Fetch the user document
+            DocumentSnapshot userSnapshot = transaction.get(userDocRef);
+            if (!userSnapshot.exists()) {
+                throw new FirebaseFirestoreException("User not found", FirebaseFirestoreException.Code.NOT_FOUND);
+            }
+
+            // Update the "entrants" list in the event document
+            ArrayList<String> entrants = (ArrayList<String>) eventSnapshot.get("waitingList");
+            if (entrants != null && entrants.contains(userId)) {
+                entrants.remove(userId);
+                transaction.update(eventDocRef, "entrants", entrants);
+            }
+
+            // Update the "pendingEvents" list in the user document
+            ArrayList<String> pendingEvents = (ArrayList<String>) userSnapshot.get("pendingEvents");
+            if (pendingEvents != null && pendingEvents.contains(eventId)) {
+                pendingEvents.remove(eventId);
+                transaction.update(userDocRef, "pendingEvents", pendingEvents);
+            }
+
+            return null; // Transaction success
+        }).addOnSuccessListener(aVoid -> {
+            callback.onSuccess();
+        }).addOnFailureListener(callback::onFailure);
+    }
+
+}

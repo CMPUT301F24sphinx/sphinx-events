@@ -5,9 +5,12 @@
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -19,6 +22,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SphinxEvents"
         tools:targetApi="31">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBaDpOWbtHSswKS9mpwDChczji44wZZEtM" />
+        <activity
+            android:name=".ViewMapActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ViewQRCodeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ViewEventPosterActivity"
+            android:exported="false" />
         <activity
             android:name=".RemoveFacilityActivity"
             android:exported="false" />
@@ -60,23 +75,26 @@
             android:exported="false" />
         <activity
             android:name=".ScanQRCode"
-            android:exported="false"  />
+            android:exported="false" />
         <activity
-            android:name=".ViewEventDetails"
-            android:exported="false"/>
+            android:name=".ViewScannedEvent"
+            android:exported="false" />
+        <activity
+            android:name=".ViewEventEntrantData"
+            android:exported="false" />
+        <activity
+            android:name=".EntrantExListAdapter"
+            android:exported="false" />
         <activity
             android:name=".ScanWithCam"
             android:stateNotNeeded="true"
-            android:theme="@style/zxing_CaptureTheme"/>
+            android:theme="@style/zxing_CaptureTheme" />
         <activity
             android:name=".ViewCreatedEvent"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".ViewEnteredEvent"
-            android:exported="false"/>
-        <activity
-            android:name=".viewNotificationsActivity"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

@@ -1,3 +1,4 @@
+
 /*
  * Class Name: MainActivity
  * Date: 2024-11-06
@@ -12,16 +13,19 @@
 package com.example.sphinxevents;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
@@ -33,27 +37,25 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.splashscreen.SplashScreen;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.DialogFragment;
 
-import com.google.firebase.firestore.DocumentReference;
 //import com.journeyapps.barcodescanner.ScanContract;
 //import com.journeyapps.barcodescanner.ScanOptions;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.firestore.auth.User;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -62,14 +64,15 @@ import java.util.Objects;
  */
 public class MainActivity extends AppCompatActivity implements UserManager.UserUpdateListener {
 
-    private DatabaseManager databaseManager;
     private UserManager userManager;
+    private DatabaseManager databaseManager;
     private String deviceId;
 
+    private NotificationListener notificationListener;
+
     private ExpandableListView expandableListView;  // expandable list of events
-    private List<String> headers;  // headers/parents/group names
+    private ArrayList<String> headers;  // headers/parents/group names
     private HashMap<String, List<Event>> events;  // map each group name to list of Event objects
-    private HashMap<String, List<String>> eventCodes;
     private ExpandableListAdapter listAdapter;
 
     private ImageButton profilePicBtn;
@@ -106,12 +109,18 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
             return insets;
         });
 
+        deviceId = getDeviceId(this);
 
-        // Register as a listener for currentUser updates
-        UserManager.getInstance().addUserUpdateListener(this);
+
+        createNotificationChannels();
+        notificationListener = new NotificationListener(this);
+        notificationListener.startListeningForNotifications(deviceId);
 
         databaseManager = DatabaseManager.getInstance();
         userManager = UserManager.getInstance();
+        // Register as a listener for currentUser updates
+        userManager.addUserUpdateListener(this);
+        userManager.startListeningForUserChanges(deviceId);
         retrieveUser();
 
         initializeDrawer();  // initializes drawer display and functionalities
@@ -133,35 +142,25 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
     public void scanQRFrag() {
         AlertDialog.Builder builder  = new AlertDialog.Builder(this);
         builder.setMessage(R.string.scan_qr_code)
-            .setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    return;
-                }
-            })
-// Optional gallery scan, might do later it keeps breaking
-//            .setPositiveButton(R.string.qr_use_gallery, new DialogInterface.OnClickListener() {
-//                public void onClick(DialogInterface dialog, int id) {
-//                    Intent CamScanIntent = new Intent(MainActivity.this, ScanQRCode.class);
-//                    CamScanIntent.setAction("Gallery");
-//                    startActivity(CamScanIntent);
-//                    return;
-//                }
-//            })
-            .setNegativeButton(R.string.qr_camera_scan, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    Intent CamScanIntent = new Intent(MainActivity.this, ScanQRCode.class);
-                    CamScanIntent.setAction("Camera");
-                    startActivity(CamScanIntent);
-                    return;
-                }
-            }).show();
+                .setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        return;
+                    }
+                })
+                .setNegativeButton(R.string.qr_camera_scan, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Intent CamScanIntent = new Intent(MainActivity.this, ScanQRCode.class);
+                        CamScanIntent.setAction("Camera");
+                        startActivity(CamScanIntent);
+                        return;
+                    }
+                }).show();
     }
 
     /**
      * Retrieves the user from the Firestore database
      */
     public void retrieveUser() {
-        deviceId = getDeviceId(this);
 
         // Attempts to retrieve the user from the Firebase Firestore database.
         databaseManager.getUser(deviceId, new DatabaseManager.UserRetrievalCallback() {
@@ -201,7 +200,6 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
         Button manageProfileBtn = findViewById(R.id.drawer_manage_profile_btn);
         Button manageFacilityBtn = findViewById(R.id.drawer_manage_facility_btn);
-        Button viewNotificationsBtn = findViewById(R.id.drawer_notifications_btn);
         Button administratorBtn = findViewById(R.id.drawer_administrator_btn);
         Button createEventBtn = findViewById(R.id.create_event_button);
 
@@ -232,14 +230,6 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
             startActivity(manageFacilityIntent);
         });
 
-        // Set the Notification button to activate Notification page
-        viewNotificationsBtn.setOnClickListener(v -> {
-            Intent viewNotificationsIntent = new Intent(this,
-                    viewNotificationsActivity.class);
-            viewNotificationsIntent.putExtra("userID", userManager.getCurrentUser().getDeviceId().toString());
-            startActivity(viewNotificationsIntent);
-        });
-
         // Sets OnClickListener for administrator actions
         administratorBtn.setOnClickListener(v -> {
             Intent manageAdminIntent = new Intent(MainActivity.this, AdminSearchActivity.class);
@@ -248,11 +238,16 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
 
         // Sets OnClickListener for create event actions
         createEventBtn.setOnClickListener(v -> {
-            Intent createEventIntent = new Intent(this, CreateEventActivity.class);
-            createEventIntent.putExtra("DeviceID", deviceId);
-            startActivity(createEventIntent);
+            // Checks whether user is able to create events
+            if (userManager.getCurrentUser().getRole().equals("Organizer")) {
+                Intent createEventIntent = new Intent(this, CreateEventActivity.class);
+                startActivity(createEventIntent);
+            } else {  // Entrant is attempting to create an event
+                Toast.makeText(this,
+                        "Add a facility to your profile to be able to create events!",
+                        Toast.LENGTH_LONG).show();
+            }
         });
-
     }
 
     /**
@@ -291,63 +286,97 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
 
         headers = new ArrayList<>();
         events = new HashMap<>();
-        eventCodes = new HashMap<>();
 
-        headers.add("Joined Events");
-        headers.add("Pending Events");
+        headers.add(getString(R.string.joined_events_header, currentUser.getJoinedEvents().size()));
+        headers.add(getString(R.string.pending_events_header, currentUser.getPendingEvents().size()));
 
-        List<Event> joinedEvents = new ArrayList<>();
-        List<Event> pendingEvents = new ArrayList<>();
-        ArrayList<Event> createdEvents = new ArrayList<>();
+        // Displays joined events
+        databaseManager.retrieveEventList(currentUser.getJoinedEvents(), new DatabaseManager.retrieveEventListCallback() {
+            @Override
+            public void onSuccess(List<Event> joinedEvents) {
+                events.put(headers.get(0), joinedEvents);
 
-        events.put(headers.get(0), joinedEvents);
-        events.put(headers.get(1), pendingEvents);
+                // Displays pending events
+                databaseManager.retrieveEventList(currentUser.getPendingEvents(), new DatabaseManager.retrieveEventListCallback() {
+                    @Override
+                    public void onSuccess(List<Event> pendingEvents) {
+                        events.put(headers.get(1), pendingEvents);
 
-        // Add organizer stuff if user is an Organizer
+                        updateExpandableListView(headers, events);
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        Toast.makeText(MainActivity.this, "Error Displaying Pending Events",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(MainActivity.this, "Error Displaying Joined Events",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Get created events if user is an organizer
         if (currentUser.getRole().equals("Organizer")) {
             Organizer organizer = (Organizer) currentUser;
-            headers.add("Created Events");
 
-            databaseManager.getCreatedEvents(currentUser.getDeviceId(), new DatabaseManager.getCreatedEventsCallback() {
+            if (headers.size() < 3) {
+                headers.add(getString(R.string.created_events_header, organizer.getCreatedEvents().size()));
+            }
+
+            databaseManager.retrieveEventList(organizer.getCreatedEvents(), new DatabaseManager.retrieveEventListCallback() {
                 @Override
-                public void onSuccess(List<String> createdEventsID) {
-
-                    eventCodes.put(headers.get(2), createdEventsID);
-                    for(Integer i = 0; i < createdEventsID.size(); ++i){
-                        Log.d("Aniket", eventCodes.get(headers.get(2)).get(i));
-                        databaseManager.getEvent(createdEventsID.get(i), new DatabaseManager.eventRetrievalCallback() {
-                            @Override
-                            public void onSuccess(Event event) {
-                                createdEvents.add(event);
-                                Log.d("Aniket", event.getName());
-
-                            }
-                            @Override
-                            public void onFailure(Exception e) {
-                                Log.d("Aniket", "Cant retrieve created event with code");
-                            }
-                        });
-                    }
+                public void onSuccess(List<Event> createdEvents) {
+                    headers.set(2, getString(R.string.created_events_header, createdEvents.size()));
+                    events.put(headers.get(2), createdEvents);
+                    updateExpandableListView(headers, events);
                 }
+
                 @Override
                 public void onFailure(Exception e) {
+                    Toast.makeText(MainActivity.this, "Error Displaying Created Events",
+                            Toast.LENGTH_SHORT).show();
                 }
             });
-            events.put(headers.get(2), createdEvents);
         }
+    }
 
-        listAdapter = new EventExListAdapter(this, headers, events);
+    /**
+     * Updates the ExpandableListView with the provided headers and events data.
+     * Configures the adapter and sets an OnChildClickListener for handling child item clicks.
+     *
+     * @param headers A list of headers representing the group titles.
+     * @param events  A map linking each header to its corresponding list of events.
+     */
+    private void updateExpandableListView(List<String> headers, Map<String, List<Event>> events) {
+        listAdapter = new EventExListAdapter(MainActivity.this, headers, events);
         expandableListView.setAdapter(listAdapter);
 
-        // Clicking event in main screen -> allows user to view event details
         expandableListView.setOnChildClickListener((parent, view, groupPosition, childPosition, id) -> {
-            // Code for new activity that views events goes here
-            Intent viewEnteredEvents = new Intent(this, ViewCreatedEvent.class);
-            viewEnteredEvents.putExtra("eventCode", eventCodes.get(headers.get(groupPosition)).get(childPosition));
-            startActivity(viewEnteredEvents);
-            return true; // Indicating the event is handled
+            Event clickedEvent = (Event) listAdapter.getChild(groupPosition, childPosition);
+            switch (groupPosition) {
+                case 0:
+                case 1:
+                    Intent viewEnteredEventIntent = new Intent(MainActivity.this, ViewEnteredEvent.class);
+                    viewEnteredEventIntent.putExtra("eventId", clickedEvent.getEventId());
+                    startActivity(viewEnteredEventIntent);
+                    break;
+
+                case 2:
+                    Intent viewCreatedEventIntent = new Intent(MainActivity.this, ViewCreatedEvent.class);
+                    viewCreatedEventIntent.putExtra("eventId", clickedEvent.getEventId());
+                    startActivity(viewCreatedEventIntent);
+                    break;
+            }
+            return true;
         });
     }
+
+
 
     /**
      * Updates the user profile picture to custom or default profile picture
@@ -419,7 +448,7 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
      * Listener method for user updates from UserManager
      */
     @Override
-    public void onUserUpdated(Entrant updatedUser) {
+    public void onUserUpdated() {
         // Update UI elements based on the new currentUser data
         updateProfilePicture();
         updateDrawer();
@@ -431,7 +460,51 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
      */
     @Override
     protected void onDestroy() {
-        userManager.removeUserUpdateListener(this);
+        userManager.stopListeningForUserChanges();
+        if (notificationListener != null) {
+            notificationListener.stopListeningForNotifications();
+        }
         super.onDestroy();
+    }
+
+    /**
+     * Creates notification channels for organizers and administrator notifications.
+     */
+    public void createNotificationChannels() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Organizer Notifications Channel
+            String organizerChannelId = NotificationsHelper.ORGANIZER_CHANNEL_ID;
+            String organizerChannelName = "Organizer Notifications";
+            String organizerChannelDescription = "Notifications from event organizers";
+            int organizerImportance = NotificationManager.IMPORTANCE_HIGH;
+
+            NotificationChannel organizerChannel = new NotificationChannel(
+                    organizerChannelId,
+                    organizerChannelName,
+                    organizerImportance
+            );
+            organizerChannel.setDescription(organizerChannelDescription);
+
+
+            // Administrator Notifications Channel
+            String adminChannelId = NotificationsHelper.ADMIN_CHANNEL_ID;
+            String adminChannelName = "Administrator Notifications";
+            String adminChannelDescription = "Notifications from administrators";
+            int adminImportance = NotificationManager.IMPORTANCE_HIGH;
+
+            NotificationChannel adminChannel = new NotificationChannel(
+                    adminChannelId,
+                    adminChannelName,
+                    adminImportance
+            );
+            adminChannel.setDescription(adminChannelDescription);
+
+            // Register channels with the system
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(organizerChannel);
+                notificationManager.createNotificationChannel(adminChannel);
+            }
+        }
     }
 }

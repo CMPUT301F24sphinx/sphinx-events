@@ -34,8 +34,8 @@ public class Entrant implements Serializable {
     private String customPfpUrl;  // Url of the custom profile picture in Firebase Storage
     private boolean orgNotificationsEnabled; // Notifications from organizers preference
     private boolean adminNotificationsEnabled; // Notifications from administrators preference
-    private ArrayList<String> joinedEvents;  // List of events the user has accepted invitation to
-    private ArrayList<String> pendingEvents;  // List of events the user has joined lottery for
+    private ArrayList<String> joinedEvents;  // List of event IDs the user has accepted invitation to
+    private ArrayList<String> pendingEvents;  // List of event IDs the user has joined lottery for
 
     /**
      * Default constructor for Entrant. Initializes an empty entrant.

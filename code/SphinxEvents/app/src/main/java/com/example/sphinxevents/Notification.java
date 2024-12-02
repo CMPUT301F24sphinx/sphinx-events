@@ -1,116 +1,65 @@
 package com.example.sphinxevents;
 
 /**
- * This is the class for a notification
- * Will be expanded later only Text messages implemented
+ * Represents a system notification to be displayed on the user's device.
+ * This class holds the necessary data to generate and display Android system notifications.
  */
 public class Notification {
-
-    private String fromEvent; // The ID of the event/organizer who sends the message
-    private String eventName; // The name of the event, to easily get name
-    private String toUser; // The ID of user who revives the message
-
-    // Enum to denote weather notification is a message or lottery result
-    public enum notifType {
-        Message,
-        LotteryResult
-    }
-    private notifType notificationType; // Set it to enum value
-    private String message; // String of message sent by organizer/event
-
-    // Constructor
+    private String title;          // Title of the notification
+    private String message;        // Body text of the notification
+    private String channelID;      // The ID of the notification channel (e.g., "event_notifications")
 
     /**
-     * The constructor of a notification object
-     * @param from the ID of the event that is sending the notification
-     * @param eventName The name of the event
-     * @param to the ID of the user receiving notification
-     * @param notifT The notification type of the notificaion, chosen from enum of this class
+     * Constructs a Notification object with the specified details.
+     *
+     * @param title the title of the notification.
+     * @param message the content (body text) of the notification.
+     * @param channelID the ID of the notification channel.
      */
-    Notification(String from, String eventName, String to, notifType notifT){
-        this.fromEvent = from;
-        this.eventName = eventName;
-        this.toUser = to;
-        this.notificationType = notifT;
+    public Notification(String title, String message, String channelID) {
+        this.title = title;
+        this.message = message;
+        this.channelID = channelID;
     }
 
-    /**
-     * Get the ID of the sender
-     * @return The eventID of the sender
-     */
-    public String getFromEvent(){
-        return fromEvent;
-    }
+    // Getters and Setters
 
     /**
-     * Set the ID of the event sender
-     * @param from ID of the event sending the notification
+     * Gets the title of the notification.
+     * @return the title of the notification.
      */
-    public void setFromEvent(String from){
-        this.fromEvent = from;
-    }
+    public String getTitle() { return title; }
 
     /**
-     * Get event name
-     * @return the name of the sender event
+     * Sets the title of the notification.
+     * @param title the title to set.
      */
-    public String getEventName(){
-        return eventName;
-    }
+    public void setTitle(String title) { this.title = title; }
 
     /**
-     * Set the name of the event sending the notification
-     * @param name The new name of sender event
+     * Gets the message (body text) of the notification.
+     * @return the message of the notification.
      */
-    public void setEventName(String name){
-        this.eventName = name;
-    }
+    public String getMessage() { return message; }
 
     /**
-     * Return the userID of the notification receiver
-     * @return
+     * Sets the message (body text) of the notification.
+     * @param message the message to set.
      */
-    public String getToUser(){
-        return toUser;
-    }
+    public void setMessage(String message) { this.message = message; }
 
     /**
-     * Set the userId of the notification receiver
-     * @param to the new userID of the receiver
+     * Gets the ID of the notification channel.
+     * @return the notification channel ID.
      */
-    public void setToUser(String to){
-        this.toUser = to;
-    }
+    public String getChannelID() { return channelID; }
 
     /**
-     * Getter for notification type of notificaiton object
-     * @return the type of notification object is, made from enum notiftype
+     * Sets the ID of the notification channel.
+     * @param channelID the channel ID to set.
      */
-    public notifType getNotificationType(){
-        return notificationType;
-    }
+    public void setChannelID(String channelID) { this.channelID = channelID; }
 
-    /**
-     * Setter for notification type
-     * @param type new notification type of obj, made from enum notifytype
-     */
-    public void setNotificationType(notifType type){
-        this.notificationType = type;
-    }
-
-    /**
-     * Getter for string message that is sent in notificaion
-     * @return the string message
-     */
-    public String getMessage(){
-        return message;
-    }
-
-    /**
-     * Setter for the message being sent
-     * @param msg String for new message text
-     */
-    public void setMessage(String msg){
-        this.message = msg;
-    }
 }
+
+

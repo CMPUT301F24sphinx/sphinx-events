@@ -19,6 +19,10 @@ material = "1.12.0"
 activity = "1.9.2"
 constraintlayout = "2.1.4"
 junitJupiter = "5.8.1"
+osmdroidAndroid = "6.1.10"
+playServicesLocation = "21.3.0"
+playServicesLocationVersion = "21.0.1"
+playServicesMaps = "19.0.0"
 zxingver = "4.3.0"
 zxingAndroidEmbedded = "4.3.0"
 glide2ver = "7.2.0"
@@ -46,6 +50,10 @@ material = { group = "com.google.android.material", name = "material", version.r
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiter" }
+osmdroid-android = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroidAndroid" }
+play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
+play-services-location-v2101 = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocationVersion" }
+play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
 zxing-android-embedded = { module = "com.journeyapps:zxing-android-embedded", version.ref = "zxingAndroidEmbedded" }
 zxing = { module = "com.journeyapps:zxing-android-embedded", version.ref = "zxingver"}
 glide2 = { module = "com.firebaseui:firebase-ui-storage", version.ref = "glide2ver"}

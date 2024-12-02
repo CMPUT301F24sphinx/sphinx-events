@@ -27,7 +27,7 @@ public class ScanQRCode extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_event);
+        setContentView(R.layout.activity_view_scanned_event);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -62,9 +62,9 @@ public class ScanQRCode extends AppCompatActivity {
      */
     ActivityResultLauncher<ScanOptions> barcodeLauncher = registerForActivityResult(new ScanContract(), result -> {
         if (result.getContents() != null) {
-            Intent LoadEventIntent = new Intent(ScanQRCode.this, ViewEventDetails.class);
+            Intent LoadEventIntent = new Intent(ScanQRCode.this, ViewScannedEvent.class);
             String QRResultStr = result.getContents();
-            LoadEventIntent.putExtra("eventCode", QRResultStr);
+            LoadEventIntent.putExtra("eventId", QRResultStr);
             startActivity(LoadEventIntent);
             finish();
         } else {
