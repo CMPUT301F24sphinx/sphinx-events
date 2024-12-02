@@ -5,6 +5,7 @@
 
 package com.example.sphinxevents;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
@@ -23,6 +24,7 @@ public class RemoveEventsActivity extends AppCompatActivity {
     private Event event;
     private DatabaseManager databaseManager;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +57,12 @@ public class RemoveEventsActivity extends AppCompatActivity {
         eventNameTextView.setText(event.getName());
         eventDescriptionTextView.setText(event.getDescription());
         eventLotteryDeadlineTextView.setText(event.getLotteryEndDate().toString());
-        eventEntrantLimitTextView.setText(event.getEntrantLimit().toString());
+        if (event.getEntrantLimit() == -1) {
+            eventEntrantLimitTextView.setText("No Limit");
+        }
+        else {
+            eventEntrantLimitTextView.setText(event.getEntrantLimit().toString());
+        }
 
         // Set onClickListener for backButton
         backButton.setOnClickListener(v -> {
@@ -70,7 +77,7 @@ public class RemoveEventsActivity extends AppCompatActivity {
     }
 
     private void removeEvent() {
-        databaseManager.removeEvent(event.getName(), new DatabaseManager.EventRemovalCallback() {
+        databaseManager.removeEvent(event.getEventId(), new DatabaseManager.EventRemovalCallback() {
             @Override
             public void onSuccess() {
                 setResult(EventsSearchActivity.EVENTS_REMOVED);
