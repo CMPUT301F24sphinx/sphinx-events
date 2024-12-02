@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="16dp">
+
+    <!-- Profile Picture -->
+    <ImageView
+        android:id="@+id/entrant_profile_picture"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:contentDescription="Profile Picture"
+        android:scaleType="centerCrop"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:background="@drawable/square_border"
+        android:clipToOutline="true" />
+
+    <!-- Entrant Name -->
+    <TextView
+        android:id="@+id/entrant_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Entrant Name"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:ellipsize="end"
+        android:maxLines="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/entrant_profile_picture"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Entrant Email -->
+    <TextView
+        android:id="@+id/entrant_email"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Entrant Email"
+        android:textSize="14sp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/entrant_profile_picture"
+        app:layout_constraintTop_toBottomOf="@id/entrant_name"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

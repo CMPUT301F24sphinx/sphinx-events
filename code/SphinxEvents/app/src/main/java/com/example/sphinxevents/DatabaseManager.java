@@ -1125,7 +1125,7 @@ public class DatabaseManager {
     }
 
     /**
-     * Adds notification object to "notification" collection in the database.
+     * Adds notification to the "notifications" sub-collection of recipients.
      *
      * @param notification The notification object being uploaded.
      * @param recipients   The recipients of the notification.
@@ -1343,11 +1343,18 @@ public class DatabaseManager {
                 throw new FirebaseFirestoreException("User not found", FirebaseFirestoreException.Code.NOT_FOUND);
             }
 
-            // Update the "entrants" list in the event document
-            ArrayList<String> entrants = (ArrayList<String>) eventSnapshot.get("waitingList");
-            if (entrants != null && entrants.contains(userId)) {
-                entrants.remove(userId);
-                transaction.update(eventDocRef, "entrants", entrants);
+            // Update the "lotteryWinners" list in the event document
+            ArrayList<String> lotteryWinners = (ArrayList<String>) eventSnapshot.get("lotteryWinners");
+            if (lotteryWinners != null && lotteryWinners.contains(userId)) {
+                lotteryWinners.remove(userId);
+                transaction.update(eventDocRef, "lotteryWinners", lotteryWinners);
+            }
+
+            // Update the "cancelled" list in the event document
+            ArrayList<String> cancelled = (ArrayList<String>) eventSnapshot.get("cancelled");
+            if (cancelled != null && cancelled.contains(userId)) {
+                cancelled.add(userId);
+                transaction.update(eventDocRef, "cancelled", cancelled);
             }
 
             // Update the "pendingEvents" list in the user document
