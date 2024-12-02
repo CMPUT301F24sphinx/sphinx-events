@@ -20,6 +20,8 @@ import com.journeyapps.barcodescanner.ScanOptions;
  */
 public class ScanQRCode extends AppCompatActivity {
 
+    private DatabaseManager databaseManager;
+
     /**
      * On creating the QR Scan activity scan the QR code
      * @param savedInstanceState
@@ -27,12 +29,14 @@ public class ScanQRCode extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_scanned_event);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+//        setContentView(R.layout.activity_view_scanned_event);
+//        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+//            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+//            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+//            return insets;
+//        });
+
+        databaseManager = DatabaseManager.getInstance();
 
         // Get info from caller intent and if it is Camera scan the qr
         Intent intent = getIntent();
@@ -62,8 +66,20 @@ public class ScanQRCode extends AppCompatActivity {
      */
     ActivityResultLauncher<ScanOptions> barcodeLauncher = registerForActivityResult(new ScanContract(), result -> {
         if (result.getContents() != null) {
-            Intent LoadEventIntent = new Intent(ScanQRCode.this, ViewScannedEvent.class);
+
             String QRResultStr = result.getContents();
+
+            databaseManager.checkEventExistence(QRResultStr, new DatabaseManager.checkEventExistsCallback() {
+                @Override
+                public void onResult(boolean exists) {
+                    if(!exists){
+                        Toast.makeText(getApplicationContext(), "Event corresponding to the QR code doesn't exist", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                }
+            });
+
+            Intent LoadEventIntent = new Intent(ScanQRCode.this, ViewScannedEvent.class);
             LoadEventIntent.putExtra("eventId", QRResultStr);
             startActivity(LoadEventIntent);
             finish();

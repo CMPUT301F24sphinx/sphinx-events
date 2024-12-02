@@ -83,6 +83,16 @@ public class ViewScannedEvent extends AppCompatActivity {
         userManager = UserManager.getInstance();
         databaseManager = DatabaseManager.getInstance();
 
+        databaseManager.checkEventExistence(eventId, new DatabaseManager.checkEventExistsCallback() {
+            @Override
+            public void onResult(boolean exists) {
+                if(!exists){
+                    Toast.makeText(getApplicationContext(), "Event corresponding to the QR code doesn't exist", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            }
+        });
+
         // Obtain xml elements
         eventPosterImageView = findViewById(R.id.event_poster_image_view);
         eventNameTextView = findViewById(R.id.event_name_text_view);

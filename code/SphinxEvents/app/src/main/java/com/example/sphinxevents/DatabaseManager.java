@@ -589,6 +589,35 @@ public class DatabaseManager {
                 });
     }
 
+    /**
+     * Callback interface for event check
+     */
+    public interface checkEventExistsCallback {
+        /**
+         * Called when result is obtained
+         * @param exists boolean on whether event exists
+         */
+        void onResult(boolean exists);
+    }
+
+    /**
+     * Checks if a given eventId corresponds to an event in the database.
+     * @param eventId The deviceId of the user to check.
+     * @param callback A callback to handle the result.
+     */
+    public void checkEventExistence(String eventId, checkEventExistsCallback callback) {
+        database.collection("events")
+                .document(eventId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    callback.onResult(documentSnapshot.exists());
+                })
+                .addOnFailureListener(e -> {
+                    // Handle any errors
+                    callback.onResult(false);
+                });
+    }
+
 
     //--------------------------------------------------------------------------------------------------------
     // TODO: Determine if this function is needed or not depending on how the lottery is implemented
