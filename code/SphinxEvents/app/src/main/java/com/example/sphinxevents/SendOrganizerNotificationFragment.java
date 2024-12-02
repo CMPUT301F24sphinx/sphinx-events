@@ -1,3 +1,9 @@
+/*
+ * Class Name: SendOrganizerNotificationFragment
+ * Date: 2024-11-29
+ *
+ */
+
 package com.example.sphinxevents;
 
 import android.app.AlertDialog;
