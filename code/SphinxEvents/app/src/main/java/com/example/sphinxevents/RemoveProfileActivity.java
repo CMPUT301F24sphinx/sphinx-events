@@ -6,9 +6,11 @@
 package com.example.sphinxevents;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,11 +19,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import com.bumptech.glide.Glide;
+
+import java.io.File;
 
 public class RemoveProfileActivity extends AppCompatActivity {
 
     private Entrant entrant;
     private DatabaseManager databaseManager;
+    private UserManager userManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,14 +54,33 @@ public class RemoveProfileActivity extends AppCompatActivity {
         TextView profileRoleTextView = findViewById(R.id.profile_role_textview);
         TextView profilePhoneNumberTextView = findViewById(R.id.profile_phone_number_textview);
         TextView profiledeviceIDTextView = findViewById(R.id.profile_deviceID_textview);
+        ImageView profileImageView = findViewById(R.id.profileImageView);
 
         Button removeButton = findViewById(R.id.remove_profile_button);
+        Button removePfpImageButton = findViewById(R.id.remove_profileImage_button);
 
         // Sets display
         profileNameTextView.setText(entrant.getName());
         profileRoleTextView.setText(entrant.getRole());
         profilePhoneNumberTextView.setText(entrant.getPhoneNumber());
         profiledeviceIDTextView.setText(entrant.getDeviceId());
+
+        //Setting profile Image Display:
+        String custom_pfp_url = entrant.getCustomPfpUrl();
+        String default_pfp_path = entrant.getDefaultPfpPath();
+        if(custom_pfp_url != ""){
+            // Load image using Glide
+            Glide.with(this)
+                    .load(custom_pfp_url)
+                    .into(profileImageView);
+        } else {
+            // Create a File object
+            File imageFile = new File(default_pfp_path);
+            // Load the image using Glide
+            Glide.with(this)
+                    .load(imageFile) // Load from file
+                    .into(profileImageView);
+        }
 
         // Set onClickListener for backButton
         backButton.setOnClickListener(v -> {
@@ -74,6 +99,24 @@ public class RemoveProfileActivity extends AppCompatActivity {
 
         });
 
+        // Sets onClickListener for removeButton
+        removePfpImageButton.setOnClickListener(v -> {
+            if (custom_pfp_url != "") {
+                deleteCustomPfp();
+                profileImageView.setImageResource(android.R.color.transparent);
+            }
+            else {
+                deleteDefaultPfp();
+                profileImageView.setImageResource(android.R.color.transparent);
+            }
+
+        });
+
+    }
+
+
+    private void deleteDefaultPfp(){
+        databaseManager.removeDefaultProfilePic(entrant.getDeviceId(), getApplicationContext());
     }
 
     private void deleteCustomPfp() {
@@ -116,4 +159,7 @@ public class RemoveProfileActivity extends AppCompatActivity {
             }
         });
     }
+
+
 }
+

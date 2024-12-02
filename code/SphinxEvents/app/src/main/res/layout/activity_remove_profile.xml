@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ManageProfileActivity">
+    tools:context=".RemoveProfileActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/removing_profile_header"
@@ -174,22 +174,65 @@
 
     </LinearLayout>
 
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/remove_profile_button"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/profile_image_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/profile_phone_number_layout"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="15dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/profile_deviceID_layout"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <ImageView
+            android:id="@+id/profileImageView"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:padding="3dp"
+            android:src="@drawable/baseline_person_24"
+            android:background="@drawable/square_border"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/profile_buttons_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:padding="10dp"
-        android:text="@string/remove"
-        android:textColor="@color/black"
-        android:textSize="24sp"
-        android:backgroundTint="@color/facility_negative_button_color"
-        app:cornerRadius="4dp"
-        android:layout_marginEnd="16dp" />
+        android:layout_marginTop="15dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/profile_image_layout"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/remove_profileImage_button"
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"
+            android:text="Remove Profile Image"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            android:padding="10dp"
+            android:backgroundTint="@color/facility_search_header_color"
+            app:cornerRadius="4dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/remove_profile_button"
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"
+            android:text="Remove Profile"
+            android:padding="10dp"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            android:backgroundTint="@color/facility_negative_button_color"
+            app:cornerRadius="4dp"/>
+
+    </LinearLayout>
+
+
 
 
 

@@ -11,6 +11,9 @@
 
 package com.example.sphinxevents;
 
+import static android.content.ContentValues.TAG;
+
+import android.content.Context;
 import android.location.Location;
 import android.net.Uri;
 import android.util.Log;
@@ -492,6 +495,26 @@ public class DatabaseManager {
                 .addOnFailureListener(e -> {
                     // Call the callback on failure
                     callback.onFailure();
+                });
+    }
+
+    public void removeDefaultProfilePic(String deviceId, Context context){
+        DocumentReference defaultProfileRef = database.collection("users").document(deviceId);
+
+        defaultProfileRef
+                .update("defaultPfpPath", "")
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(context, "Default profile picture removed successfully!", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error updating document", e);
+                        Toast.makeText(context, "Unable to remove default profile picture...", Toast.LENGTH_SHORT).show();
+                    }
                 });
     }
 
