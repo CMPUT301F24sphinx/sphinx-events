@@ -2,6 +2,7 @@ package com.example.sphinxevents;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
@@ -71,7 +72,7 @@ public class ViewEventEntrantData extends AppCompatActivity {
 
             @Override
             public void onFailure(Exception e) {
-                Toast.makeText(getApplicationContext(), "Error updating event. Scan QR code again.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Error displaying entrant data.", Toast.LENGTH_SHORT).show();
                 finish();
             }
         });
