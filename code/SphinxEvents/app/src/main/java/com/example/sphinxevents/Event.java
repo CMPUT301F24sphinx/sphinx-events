@@ -155,7 +155,7 @@ public class Event implements Serializable {
      * Sets the entrant limit for the event.
      * @param entrantLimit The maximum number of entrants.
      */
-    public void setEntrantLimit(Integer entrantLimit) {this.entrantLimit = entrantLimit;}
+    public void setEntrantLimit(int entrantLimit) {this.entrantLimit = entrantLimit;}
 
     /**
      * Gets the number of total users who got another chance to join the event after losing the first draw

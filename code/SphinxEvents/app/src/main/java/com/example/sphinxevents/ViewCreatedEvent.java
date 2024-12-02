@@ -228,6 +228,9 @@ public class ViewCreatedEvent extends AppCompatActivity {
         eventListener.stopListening();
     }
 
+    /**
+     * Draws a fragment to get a numeric input and is preconditions pass call a lottery on entrants and send invitations to winners
+     */
     public void drawInputFragment(){
 
         EditText sampleSize = new EditText(this);
@@ -264,6 +267,10 @@ public class ViewCreatedEvent extends AppCompatActivity {
                 .show();
     }
 
+    /**
+     * The function to perform the initial lottery with n people to be chosen.
+     * @param n The number of entrants who will be invited to confirm the event
+     */
     private void performLottery(int n) {
 
         // Shuffles the waiting list of entrants
@@ -317,6 +324,10 @@ public class ViewCreatedEvent extends AppCompatActivity {
         }
     }
 
+    /**
+     * Perform a redraw when n invited entrants cancel and redraw n from the waiting list.
+     * @param n The number of people to redraw
+     */
     private void performRedraw(int n) {
 
         // Don't need to shuffle the entrants as it was done in the first lottery and new users cant join after first draw

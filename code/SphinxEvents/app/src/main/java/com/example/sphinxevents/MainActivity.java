@@ -274,7 +274,9 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
     }
 
     /**
-     * Updates the expandable lists with current user data
+     * Updates the expandable lists with current user data.
+     * Adds joinedEvent, pendingEvent and optionally createdEvents strings with their corresponding count to the headers dropdown menu.
+     * Add respective events, their lottery status, and data in the drop downs.
      */
     public void updateExpandableLists() {
         Entrant currentUser = userManager.getCurrentUser();

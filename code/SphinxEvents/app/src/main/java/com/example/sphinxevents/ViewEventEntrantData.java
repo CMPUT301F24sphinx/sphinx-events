@@ -86,6 +86,9 @@ public class ViewEventEntrantData extends AppCompatActivity {
         });
     }
 
+    /**
+     * Create 4 drop down lists populated with confirmed, cancelled, invited, and waitlist entrants and their data
+     */
     public void updateExpandableLists() {
         headers = new ArrayList<>();
         entrantList = new HashMap<>();
