@@ -19,7 +19,6 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import java.security.AllPermission;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -115,7 +114,7 @@ public class ViewCreatedEvent extends AppCompatActivity {
 
         // Allow organizer to view entrant data
         viewEntrantDataButton.setOnClickListener(v -> {
-            Intent viewEventEntrantDataIntent = new Intent(ViewCreatedEvent.this, ActivityViewEventEntrantData.class);
+            Intent viewEventEntrantDataIntent = new Intent(ViewCreatedEvent.this, ViewEventEntrantData.class);
             viewEventEntrantDataIntent.putExtra("eventId", eventId);
             startActivity(viewEventEntrantDataIntent);
         });
@@ -176,7 +175,7 @@ public class ViewCreatedEvent extends AppCompatActivity {
             displayEntrantCount();
 
             // Determine if to show re-draw button, only if more people have cancelled than the number of people we have re-drawn
-            if((event.getCancelled().size() - event.getRedrawUserCount()) > 0){
+            if((event.getCancelled().size() - (int) event.getRedrawUserCount()) > 0){
                 redrawLotteryButton.setVisibility(View.VISIBLE);
             } else {
                 redrawLotteryButton.setVisibility(View.GONE);

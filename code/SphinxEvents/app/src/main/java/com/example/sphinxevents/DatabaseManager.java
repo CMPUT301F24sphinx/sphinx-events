@@ -195,6 +195,54 @@ public class DatabaseManager {
                 });
     }
 
+    /**
+     * Callback interface for created Entrants retrieval
+     */
+    public interface retrieveEntrantListCallback {
+        /**
+         * Called when entrants are retrieved successfully
+         * @param entrants List of Entrant objects that were retrieved
+         */
+        void onSuccess(List<Entrant> entrants);
+
+        /**
+         * Called when error occurs during entrant retrieval
+         * @param e the exception that occurred
+         */
+        void onFailure(Exception e);
+    }
+
+    /**
+     * Retrieves entrants that match an ArrayList of entrant id's
+     * Used for displaying entrants in home screen
+     * @param entrantsToRetrive list of entrant id's to search for in database
+     * @param callback callback to handle success or failure of entrants list retrieval
+     */
+    public void retrieveEntrantList(ArrayList<String> entrantsToRetrive, retrieveEntrantListCallback callback) {
+        // Handles empty list of events to search for
+        if (entrantsToRetrive.isEmpty()) {
+            callback.onSuccess(new ArrayList<>());
+            return;
+        }
+
+        // Searches database for events whose id's are in the eventsToRetrieve array
+        database.collection("users")
+                .whereIn(FieldPath.documentId(), entrantsToRetrive)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        ArrayList<Entrant> entrants = new ArrayList<>();
+                        for (DocumentSnapshot document : task.getResult()) {
+                            Entrant entrant = document.toObject(Entrant.class);
+                            entrants.add(entrant);
+                        }
+                        callback.onSuccess(entrants);
+                    } else {
+                        callback.onFailure(task.getException());
+                    }
+                });
+    }
+
 
     /**
      * Callback interface for adding facility
@@ -524,6 +572,11 @@ public class DatabaseManager {
                             // Ensure that the waitingList is initialized
                             if (event != null && event.getEntrants() == null) {
                                 event.setEntrants(new ArrayList<>());  // Initialize waitingList if null
+                            }
+
+                            // Ensure that the confirmedlist is initialized
+                            if (event != null && event.getConfirmed() == null) {
+                                event.setConfirmed(new ArrayList<>());  // Initialize waitingList if null
                             }
 
                             callback.onSuccess(event);
