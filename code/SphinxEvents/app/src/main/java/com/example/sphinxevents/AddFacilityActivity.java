@@ -135,7 +135,7 @@ public class AddFacilityActivity extends AppCompatActivity {
                 finish();
             }
             else {  // Edits facility, uses old facilities' location as new facilities' location
-                addFacility(new Facility(facilityName, oldFacility.getLocation(), facilityPhoneNumber, user.getDeviceId()));
+                editFacility(new Facility(facilityName, oldFacility.getLocation(), facilityPhoneNumber, user.getDeviceId()), (Organizer) user);
             }
         }
     }
@@ -148,20 +148,15 @@ public class AddFacilityActivity extends AppCompatActivity {
         databaseManager.addFacility(user.getDeviceId(), newFacility, new DatabaseManager.FacilityCreationCallback() {
             @Override
             public void onSuccess() {
-                user = new Organizer(user.getDeviceId(), user.getName(), user.getEmail(),
-                        user.getPhoneNumber(), user.getDefaultPfpPath(), user.getCustomPfpUrl(),
-                        user.isOrgNotificationsEnabled(), user.isAdminNotificationsEnabled(),
-                        user.getJoinedEvents(), user.getPendingEvents(),
-                        newFacility, new ArrayList<>());
+                    user = new Organizer(user.getDeviceId(), user.getName(), user.getEmail(),
+                            user.getPhoneNumber(), user.getDefaultPfpPath(), user.getCustomPfpUrl(),
+                            user.isOrgNotificationsEnabled(), user.isAdminNotificationsEnabled(),
+                            user.getJoinedEvents(), user.getPendingEvents(),
+                            newFacility, new ArrayList<>());
                 databaseManager.saveUser(user, new DatabaseManager.UserCreationCallback() {
                     @Override
                     public void onSuccess(String deviceId) {
-                        if (activityContext.equals("Add Facility")) {
-                            Toast.makeText(getApplicationContext(), "Facility added!", Toast.LENGTH_SHORT).show();
-                        }
-                        else if (activityContext.equals("Edit Facility")) {
-                            Toast.makeText(getApplicationContext(), "Changes saved!", Toast.LENGTH_SHORT).show();
-                        }
+                        Toast.makeText(getApplicationContext(), "Facility added!", Toast.LENGTH_SHORT).show();
                         finish();
                     }
 
@@ -177,6 +172,32 @@ public class AddFacilityActivity extends AppCompatActivity {
             public void onFailure(Exception e) {
                 Toast.makeText(getApplicationContext(), "Error adding facility. Please try again.", Toast.LENGTH_SHORT).show();
                 finish();
+            }
+        });
+    }
+
+    public void editFacility(Facility newFacility, Organizer organizer) {
+        databaseManager.addFacility(organizer.getDeviceId(), newFacility, new DatabaseManager.FacilityCreationCallback() {
+            @Override
+            public void onSuccess() {
+                organizer.setFacility(newFacility);
+                databaseManager.saveUser(organizer, new DatabaseManager.UserCreationCallback() {
+                    @Override
+                    public void onSuccess(String deviceId) {
+                        Toast.makeText(getApplicationContext(), "Changes saved!", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        Toast.makeText(getApplicationContext(), "Error editing facility. Please try again.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(getApplicationContext(), "Error editing facility. Please try again.", Toast.LENGTH_SHORT).show();
             }
         });
     }

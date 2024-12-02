@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
     private NotificationListener notificationListener;
 
     private ExpandableListView expandableListView;  // expandable list of events
-    private List<String> headers;  // headers/parents/group names
+    private ArrayList<String> headers;  // headers/parents/group names
     private HashMap<String, List<Event>> events;  // map each group name to list of Event objects
     private ExpandableListAdapter listAdapter;
 
@@ -302,18 +302,20 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
                     public void onSuccess(List<Event> pendingEvents) {
                         events.put(headers.get(1), pendingEvents);
 
+                        // Get created events if user is an organizer
                         if (currentUser.getRole().equals("Organizer")) {
                             Organizer organizer = (Organizer) currentUser;
 
-                            // For some reason this line was being executed twice and adding 2 created events headers
-                            if(headers.size() < 3) {
+                            if (headers.size() < 3) {
                                 headers.add(getString(R.string.created_events_header, organizer.getCreatedEvents().size()));
                             }
+
                             databaseManager.retrieveEventList(organizer.getCreatedEvents(), new DatabaseManager.retrieveEventListCallback() {
                                 @Override
                                 public void onSuccess(List<Event> createdEvents) {
                                     headers.set(2, getString(R.string.created_events_header, createdEvents.size()));
                                     events.put(headers.get(2), createdEvents);
+
 
                                     updateExpandableListView(headers, events);
                                 }
