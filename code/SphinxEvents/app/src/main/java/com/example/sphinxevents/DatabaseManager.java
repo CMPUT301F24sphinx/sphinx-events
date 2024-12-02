@@ -343,48 +343,79 @@ public class DatabaseManager {
     }
 
     /**
-     * Removes a facility from database, updates user who owns faciltiy
-     * @param deviceId key for facility
-     * @param callback Callback to handle success or failure of facility deletion
+     * Removes a facility from the database, deletes associated events, their posters, and updates the user who owns the facility.
+     *
+     * @param deviceId The ID of the facility and its associated user.
+     * @param callback Callback to handle success or failure of the facility removal process.
      */
     public void removeFacility(String deviceId, FacilityRemovalCallback callback) {
-        // Remove the facility document from the Firestore collection
-        // TODO: Remove events that facility is hosting
-        database.collection("facilities")
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+
+        // Retrieve the user's document to access the "createdEvents" array
+        database.collection("users")
                 .document(deviceId)
-                .delete()
-                .addOnSuccessListener(aVoid -> {
-                    // Remove facility from user
-                    getUser(deviceId, new UserRetrievalCallback() {
-                        @Override
-                        public void onSuccess(Entrant user) {
-                            // Updates user to be an Entrant
-                            Entrant updatedUser = new Entrant(user.getDeviceId(), user.getName(), user.getEmail(),
-                                    user.getPhoneNumber(), user.getProfilePictureUrl(), user.isCustomPfp(),
-                                    user.isOrgNotificationsEnabled(), user.isAdminNotificationsEnabled(),
-                                    user.getJoinedEvents(), user.getPendingEvents());
-                            saveUser(updatedUser, new UserCreationCallback() {
-                                @Override
-                                public void onSuccess(String deviceId) {
-                                    callback.onSuccess(updatedUser);  // Notify success
-                                }
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        // Get the createdEvents array from the user's document
+                        ArrayList<String> createdEvents = (ArrayList<String>) documentSnapshot.get("createdEvents");
 
-                                @Override
-                                public void onFailure(Exception e) {
-                                    callback.onFailure(new Exception("Failed to remove facility from user"));
-                                }
-                            });
+                        // Delete all events created by this facility
+                        if (createdEvents != null) {
+                            for (String eventId : createdEvents) {
+                                // Delete the event poster from Firebase Storage
+                                StorageReference posterRef = storage.getReference().child("EventPosters/" + eventId + ".jpg");
+                                posterRef.delete()
+                                        .addOnFailureListener(e ->
+                                                callback.onFailure(new Exception("Failed to delete poster for event: " + eventId))
+                                        );
+                                // Delete the QR code of the event from Firebase Storage
+                                StorageReference qrCodeRef = storage.getReference().child("qr_codes/" + eventId + ".jpg");
+                                qrCodeRef.delete()
+                                        .addOnFailureListener(e ->
+                                                callback.onFailure(new Exception("Failed to delete qr code for event: " + eventId))
+                                        );
+
+                                // Delete the event document from Firestore
+                                database.collection("events")
+                                        .document(eventId)
+                                        .delete()
+                                        .addOnFailureListener(e ->
+                                                callback.onFailure(new Exception("Failed to delete event: " + eventId))
+                                        );
+                            }
                         }
 
-                        @Override
-                        public void onFailure(Exception e) {
-                            callback.onFailure(new Exception("Failed to remove facility from user"));
-                        }
-                    });
-
+                        // Remove the facility document and update the user document
+                        database.collection("facilities")
+                                .document(deviceId)
+                                .delete()
+                                .addOnSuccessListener(aVoid -> {
+                                    database.collection("users")
+                                            .document(deviceId)
+                                            .update(
+                                                    "createdEvents", FieldValue.delete(),
+                                                    "facility", FieldValue.delete(),
+                                                    "role", "Entrant"
+                                            )
+                                            .addOnSuccessListener(unused -> {
+                                                callback.onSuccess(null); // Notify success
+                                            })
+                                            .addOnFailureListener(e ->
+                                                    callback.onFailure(new Exception("Failed to update user document"))
+                                            );
+                                })
+                                .addOnFailureListener(e ->
+                                        callback.onFailure(new Exception("Failed to delete facility document"))
+                                );
+                    } else {
+                        callback.onFailure(new Exception("User document not found"));
+                    }
                 })
-                .addOnFailureListener(callback::onFailure);  // Notify failure
+                .addOnFailureListener(e -> callback.onFailure(new Exception("Failed to retrieve user document")));
     }
+
+
 
     /**
      * Callback interface for facility search
@@ -1464,7 +1495,7 @@ public class DatabaseManager {
 
             // Update the "cancelled" list in the event document
             ArrayList<String> cancelled = (ArrayList<String>) eventSnapshot.get("cancelled");
-            if (cancelled != null && cancelled.contains(userId)) {
+            if (cancelled != null && !cancelled.contains(userId)) {
                 cancelled.add(userId);
                 transaction.update(eventDocRef, "cancelled", cancelled);
             }

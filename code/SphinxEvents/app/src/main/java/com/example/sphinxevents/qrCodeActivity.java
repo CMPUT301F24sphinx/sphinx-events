@@ -100,7 +100,7 @@ public class qrCodeActivity extends AppCompatActivity {
         // Compress bitmap to JPEG format and retrieve bytes
         qrBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
         byte[] data = byteArrayOutputStream.toByteArray();
-        String filePath = "qr_codes/" + eventId + "QRCode.jpg";
+        String filePath = "qr_codes/" + eventId + ".jpg";
 
         StorageReference imageRef = storageReference.child(filePath);
         UploadTask uploadTask = imageRef.putBytes(data);
