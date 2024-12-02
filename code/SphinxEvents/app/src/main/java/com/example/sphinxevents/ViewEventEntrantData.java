@@ -89,6 +89,7 @@ public class ViewEventEntrantData extends AppCompatActivity {
         headers.add(getString(R.string.confirmed_entrants, currEvent.getConfirmed().size()));
         headers.add(getString(R.string.entrants_invited_to_apply, currEvent.getLotteryWinners().size()));
         headers.add(getString(R.string.cancelled_entrants, currEvent.getCancelled().size()));
+        headers.add(getString(R.string.entrants, currEvent.getEntrants().size()));
 
         databaseManager.retrieveEntrantList(currEvent.getConfirmed(), new DatabaseManager.retrieveEntrantListCallback() {
             @Override
@@ -114,6 +115,16 @@ public class ViewEventEntrantData extends AppCompatActivity {
             @Override
             public void onSuccess(List<Entrant> entrants) {
                 entrantList.put(headers.get(2), entrants);
+            }
+            @Override
+            public void onFailure(Exception e) {
+            }
+        });
+
+        databaseManager.retrieveEntrantList(currEvent.getEntrants(), new DatabaseManager.retrieveEntrantListCallback() {
+            @Override
+            public void onSuccess(List<Entrant> entrants) {
+                entrantList.put(headers.get(3), entrants);
             }
             @Override
             public void onFailure(Exception e) {

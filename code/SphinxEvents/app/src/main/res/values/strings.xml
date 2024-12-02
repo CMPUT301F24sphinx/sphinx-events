@@ -23,6 +23,7 @@
     <string name="confirmed_entrants">Confirmed Entrants  (%d)</string>
     <string name="entrants_invited_to_apply">Invited To Apply  (%d)</string>
     <string name="cancelled_entrants">Cancelled  (%d)</string>
+    <string name="entrants">Waiting List  (%d)</string>
 
 
     <!--Drawer strings-->
