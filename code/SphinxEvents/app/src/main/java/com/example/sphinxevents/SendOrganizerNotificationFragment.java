@@ -1,16 +1,19 @@
+/*
+ * Class Name: SendOrganizerNotificationFragment
+ * Date: 2024-11-29
+ *
+ */
+
 package com.example.sphinxevents;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -89,13 +92,13 @@ public class SendOrganizerNotificationFragment extends DialogFragment {
                     // Build the recipient list based on selected checkboxes
                     ArrayList<String> recipients = new ArrayList<>();
                     if (cbWaitingList.isChecked()) {
-                        recipients.addAll(event.getWaitingList());
+                        recipients.addAll(event.getEntrants());
                     }
                     if (cbCancelled.isChecked()) {
-                        //recipients.addAll(event.getCancelled());
+                        recipients.addAll(event.getCancelled());
                     }
                     if (cbJoined.isChecked()) {
-                        //recipients.addAll(event.getJoined());
+                        recipients.addAll(event.getConfirmed());
                     }
 
                     // Check if the recipient list is empty
@@ -103,8 +106,7 @@ public class SendOrganizerNotificationFragment extends DialogFragment {
                         Toast.makeText(getContext(), "Please select at least one group", Toast.LENGTH_SHORT).show();
                     } else {
                         // Send the notification if valid
-                        sendNotification(title, message, recipients);
-                        dialog.dismiss();  // Close the dialog
+                        sendNotification(title, message, recipients, dialog);
                     }
                 }
             });
@@ -136,17 +138,19 @@ public class SendOrganizerNotificationFragment extends DialogFragment {
      * @param message    The message content of the notification.
      * @param recipients The list of recipients to send the notification to.
      */
-    private void sendNotification(String title, String message, ArrayList<String> recipients) {
+    private void sendNotification(String title, String message, ArrayList<String> recipients, AlertDialog dialog) {
         // Call the NotificationsHelper to send the notification
         NotificationsHelper.sendCustomNotification(title, message, recipients, new DatabaseManager.NotificationCreationCallback() {
             @Override
             public void onSuccess() {
                 Toast.makeText(getContext(), "Notification sent successfully", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
             }
 
             @Override
             public void onFailure(Exception e) {
                 Toast.makeText(getContext(), "Failed to send notification: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
             }
         });
     }

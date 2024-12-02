@@ -285,7 +285,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="You already joined the waiting list!"
+                android:text="You already joined!"
                 android:textSize="18sp"
                 android:textColor="@color/black"
                 android:textStyle="bold"/>
@@ -295,7 +295,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/QR_cancelOrJoin_layout"
+        android:id="@+id/QR_cancel_or_join_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"

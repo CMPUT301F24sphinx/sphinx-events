@@ -55,6 +55,7 @@ import com.google.firebase.firestore.auth.User;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -70,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
     private NotificationListener notificationListener;
 
     private ExpandableListView expandableListView;  // expandable list of events
-    private List<String> headers;  // headers/parents/group names
+    private ArrayList<String> headers;  // headers/parents/group names
     private HashMap<String, List<Event>> events;  // map each group name to list of Event objects
     private ExpandableListAdapter listAdapter;
 
@@ -146,15 +147,6 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
                         return;
                     }
                 })
-// Optional gallery scan, might do later it keeps breaking
-//            .setPositiveButton(R.string.qr_use_gallery, new DialogInterface.OnClickListener() {
-//                public void onClick(DialogInterface dialog, int id) {
-//                    Intent CamScanIntent = new Intent(MainActivity.this, ScanQRCode.class);
-//                    CamScanIntent.setAction("Gallery");
-//                    startActivity(CamScanIntent);
-//                    return;
-//                }
-//            })
                 .setNegativeButton(R.string.qr_camera_scan, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Intent CamScanIntent = new Intent(MainActivity.this, ScanQRCode.class);
@@ -298,30 +290,120 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         headers.add(getString(R.string.joined_events_header, currentUser.getJoinedEvents().size()));
         headers.add(getString(R.string.pending_events_header, currentUser.getPendingEvents().size()));
 
-        // Displays pending events
-        databaseManager.retrieveEventList(currentUser.getPendingEvents(), new DatabaseManager.retrieveEventListCallback() {
+        // Displays joined events
+        databaseManager.retrieveEventList(currentUser.getJoinedEvents(), new DatabaseManager.retrieveEventListCallback() {
             @Override
-            public void onSuccess(List<Event> pendingEvents) {
-                events.put(headers.get(1), pendingEvents);
+            public void onSuccess(List<Event> joinedEvents) {
+                events.put(headers.get(0), joinedEvents);
+
+                // Displays pending events
+                databaseManager.retrieveEventList(currentUser.getPendingEvents(), new DatabaseManager.retrieveEventListCallback() {
+                    @Override
+                    public void onSuccess(List<Event> pendingEvents) {
+                        events.put(headers.get(1), pendingEvents);
+
+                        // Get created events if user is an organizer
+                        if (currentUser.getRole().equals("Organizer")) {
+                            Organizer organizer = (Organizer) currentUser;
+
+                            if (headers.size() < 3) {
+                                headers.add(getString(R.string.created_events_header, organizer.getCreatedEvents().size()));
+                            }
+
+                            databaseManager.retrieveEventList(organizer.getCreatedEvents(), new DatabaseManager.retrieveEventListCallback() {
+                                @Override
+                                public void onSuccess(List<Event> createdEvents) {
+                                    headers.set(2, getString(R.string.created_events_header, createdEvents.size()));
+                                    events.put(headers.get(2), createdEvents);
+
+                                    updateExpandableListView(headers, events);
+                                }
+
+                                @Override
+                                public void onFailure(Exception e) {
+                                    Toast.makeText(MainActivity.this, "Error Displaying Created Events",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        } else {
+                            updateExpandableListView(headers, events);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        Toast.makeText(MainActivity.this, "Error Displaying Pending Events",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
             public void onFailure(Exception e) {
-                Toast.makeText(MainActivity.this, "Error Displaying Pending Events",
+                Toast.makeText(MainActivity.this, "Error Displaying Joined Events",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /**
+     * Updates the expandable lists with current user data
+     */
+    public void updateExpandableLists2() {
+        Entrant currentUser = userManager.getCurrentUser();
+
+        expandableListView = findViewById(R.id.main_screen_expandable_listview);
+
+        headers = new ArrayList<>();
+        events = new HashMap<>();
+
+        headers.add(getString(R.string.joined_events_header, currentUser.getJoinedEvents().size()));
+        headers.add(getString(R.string.pending_events_header, currentUser.getPendingEvents().size()));
+
+        // Displays joined events
+        databaseManager.retrieveEventList(currentUser.getJoinedEvents(), new DatabaseManager.retrieveEventListCallback() {
+            @Override
+            public void onSuccess(List<Event> joinedEvents) {
+                events.put(headers.get(0), joinedEvents);
+
+                // Displays pending events
+                databaseManager.retrieveEventList(currentUser.getPendingEvents(), new DatabaseManager.retrieveEventListCallback() {
+                    @Override
+                    public void onSuccess(List<Event> pendingEvents) {
+                        events.put(headers.get(1), pendingEvents);
+
+                        updateExpandableListView(headers, events);
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        Toast.makeText(MainActivity.this, "Error Displaying Pending Events",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(MainActivity.this, "Error Displaying Joined Events",
                         Toast.LENGTH_SHORT).show();
             }
         });
 
-        // Displays created events if user is Organizer
+        // Get created events if user is an organizer
         if (currentUser.getRole().equals("Organizer")) {
             Organizer organizer = (Organizer) currentUser;
-            headers.add(getString(R.string.created_events_header, organizer.getCreatedEvents().size()));
+
+            if (headers.size() < 3) {
+                headers.add(getString(R.string.created_events_header, organizer.getCreatedEvents().size()));
+            }
 
             databaseManager.retrieveEventList(organizer.getCreatedEvents(), new DatabaseManager.retrieveEventListCallback() {
                 @Override
                 public void onSuccess(List<Event> createdEvents) {
                     headers.set(2, getString(R.string.created_events_header, createdEvents.size()));
                     events.put(headers.get(2), createdEvents);
+                    updateExpandableListView(headers, events);
                 }
 
                 @Override
@@ -331,20 +413,27 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
                 }
             });
         }
+    }
 
-        listAdapter = new EventExListAdapter(this, headers, events);
+    /**
+     * Updates the ExpandableListView with the provided headers and events data.
+     * Configures the adapter and sets an OnChildClickListener for handling child item clicks.
+     *
+     * @param headers A list of headers representing the group titles.
+     * @param events  A map linking each header to its corresponding list of events.
+     */
+    private void updateExpandableListView(List<String> headers, Map<String, List<Event>> events) {
+        listAdapter = new EventExListAdapter(MainActivity.this, headers, events);
         expandableListView.setAdapter(listAdapter);
 
-        // Clicking event in main screen -> allows user to view event details
         expandableListView.setOnChildClickListener((parent, view, groupPosition, childPosition, id) -> {
             Event clickedEvent = (Event) listAdapter.getChild(groupPosition, childPosition);
             switch (groupPosition) {
                 case 0:
-                    // TODO: Go to viewJoinedEvent activity
-                    break;
-
                 case 1:
-                    // TODO: Got to viewPendingEvent activity
+                    Intent viewEnteredEventIntent = new Intent(MainActivity.this, ViewEnteredEvent.class);
+                    viewEnteredEventIntent.putExtra("eventId", clickedEvent.getEventId());
+                    startActivity(viewEnteredEventIntent);
                     break;
 
                 case 2:
@@ -356,6 +445,8 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
             return true;
         });
     }
+
+
 
     /**
      * Updates the user profile picture to custom or default profile picture
@@ -431,7 +522,11 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         // Update UI elements based on the new currentUser data
         updateProfilePicture();
         updateDrawer();
-        updateExpandableLists();
+        if(deviceId.equals("053f398454114aed")){
+            updateExpandableLists2();
+        } else {
+            updateExpandableLists();
+        }
     }
 
     /**

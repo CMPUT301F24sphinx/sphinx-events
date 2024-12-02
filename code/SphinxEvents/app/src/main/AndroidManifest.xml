@@ -62,6 +62,12 @@
             android:name=".ProfilesSearchActivity"
             android:exported="false" />
         <activity
+            android:name=".EventsSearchActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RemoveEventsActivity"
+            android:exported="false" />
+        <activity
             android:name=".RemoveProfileActivity"
             android:exported="false" />
         <activity
@@ -71,7 +77,13 @@
             android:name=".ScanQRCode"
             android:exported="false" />
         <activity
-            android:name=".ViewEventDetails"
+            android:name=".ViewScannedEvent"
+            android:exported="false" />
+        <activity
+            android:name=".ViewEventEntrantData"
+            android:exported="false" />
+        <activity
+            android:name=".EntrantExListAdapter"
             android:exported="false" />
         <activity
             android:name=".ScanWithCam"

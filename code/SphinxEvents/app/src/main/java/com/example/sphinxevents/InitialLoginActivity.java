@@ -119,7 +119,7 @@ public class InitialLoginActivity extends AppCompatActivity {
 
         Entrant newUser = new Entrant(deviceId, name, email, phone, profilePicturePath,
                 "", true, true,
-                null, null,  null);
+                null, null);
 
         database.saveUser(newUser, new DatabaseManager.UserCreationCallback() {
             @Override

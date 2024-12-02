@@ -35,10 +35,14 @@
     <color name="list_facility_background_color">#EDD6D6</color>
     <color name="list_profile_background_color">#C0DEF8</color>
 
-    <!-- Event Colors -->
-    <color name="list_created_event_color">#55DDFF</color>
+    <!-- List Event Colors -->
+    <color name="list_created_event_color">#85E5FF</color>
 
-    <!-- Manage Event Colors -->
+    <!-- Viewing Pending/Joined Event Colors -->
+    <color name="view_entered_event_header_color">#6F6F6F</color>
+
+    <!-- Managing Created Event Colors -->
+    <color name="view_created_event_header_color">#6F6F6F</color>
     <color name="event_details_background">#EDEDED</color>
     <color name="edit_event_details_button_color">#55DDFF</color>
     <color name="view_qr_code_button_color">#55DDFF</color>

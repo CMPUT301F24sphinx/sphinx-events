@@ -3,13 +3,10 @@ package com.example.sphinxevents;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.icu.text.DateFormat;
 import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -22,22 +19,14 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.auth.User;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Objects;
-import java.util.UUID;
 
-public class ViewEventDetails extends AppCompatActivity {
+public class ViewScannedEvent extends AppCompatActivity {
 
     // Database and manager related attributes
     private EventListener eventListener;
@@ -74,7 +63,7 @@ public class ViewEventDetails extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_event);
+        setContentView(R.layout.activity_view_scanned_event);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -119,7 +108,7 @@ public class ViewEventDetails extends AppCompatActivity {
 
         // Join event waiting list
         joinWaitingListButton.setOnClickListener(v -> {
-            joinEvent();
+            joinEventWaitingList();
         });
 
         // Create the EventListener and start listening for updates to the event
@@ -183,7 +172,6 @@ public class ViewEventDetails extends AppCompatActivity {
 
     /**
      * Displays event registration deadline
-     * If deadline has passed, make warning visible
      */
     private void displayRegistrationDeadline() {
         SimpleDateFormat dateFormatter = new SimpleDateFormat("EEEE, MMMM d, yyyy 'at' hh:mm a z");
@@ -195,7 +183,7 @@ public class ViewEventDetails extends AppCompatActivity {
      * Displays number of people in waiting list and indicated whether there is a limit
      */
     private void displayWaitListCount() {
-        if (event.getEntrantLimit() != null) {  // If there is an entrant limit, display it
+        if (event.getEntrantLimit() != 0) {  // If there is an entrant limit, display it
             waitingListCountTextView.setText(getString(R.string.entrants_and_limit,
                     event.retrieveNumInWaitingList(), event.getEntrantLimit()));
         }
@@ -246,7 +234,7 @@ public class ViewEventDetails extends AppCompatActivity {
 
         // Checks if geolocation must be enabled
         if (event.getGeolocationReq() &&
-                !LocationManager.isLocationPermissionGranted(ViewEventDetails.this)) {
+                !LocationManager.isLocationPermissionGranted(ViewScannedEvent.this)) {
             enableLocationWarning.setVisibility(View.VISIBLE);
             return false;
         }
@@ -255,7 +243,7 @@ public class ViewEventDetails extends AppCompatActivity {
         if (event.getGeolocationReq()) {
             geolocationRequiredWarning.setVisibility(View.VISIBLE);
             // User has not enabled location permissions
-            if (!LocationManager.isLocationPermissionGranted(ViewEventDetails.this)) {
+            if (!LocationManager.isLocationPermissionGranted(ViewScannedEvent.this)) {
                 enableLocationWarning.setVisibility(View.VISIBLE);
                 return false;
             }
@@ -280,8 +268,8 @@ public class ViewEventDetails extends AppCompatActivity {
      * @return boolean indicating whether user has joined event already
      */
     private boolean alreadyJoined() {
-        Entrant currentUser = userManager.getCurrentUser();
-        return currentUser.getJoinedEvents().contains(eventId) || currentUser.getPendingEvents().contains(eventId) ;
+        Entrant user = userManager.getCurrentUser();
+        return user.getJoinedEvents().contains(eventId) || user.getPendingEvents().contains(eventId);
     }
 
     /**
@@ -289,7 +277,7 @@ public class ViewEventDetails extends AppCompatActivity {
      * Assigns isUserTooFar variable to correct boolean
      */
     private void checkUserProximityToFacility() {
-        LocationManager.getLastLocation(ViewEventDetails.this, new LocationManager.OnLocationReceivedListener() {
+        LocationManager.getLastLocation(ViewScannedEvent.this, new LocationManager.OnLocationReceivedListener() {
             @Override
             public void onLocationReceived(Location location) {
                 // Compute distance between user's current location and event facility location
@@ -340,7 +328,7 @@ public class ViewEventDetails extends AppCompatActivity {
     /**
      * Signs user up for waitlist of event
      */
-    private void joinEvent() {
+    private void joinEventWaitingList() {
         databaseManager.joinEventWaitingList(userManager.getCurrentUser().getDeviceId(), userLocation, eventId, new DatabaseManager.joinWaitingListCallback() {
             @Override
             public void onSuccess() {

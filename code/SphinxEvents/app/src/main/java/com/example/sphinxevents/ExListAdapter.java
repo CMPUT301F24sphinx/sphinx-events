@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Adapter for expandable lists
@@ -50,7 +51,7 @@ public abstract class ExListAdapter<C> extends BaseExpandableListAdapter {
      */
     @Override
     public int getChildrenCount(int groupPosition) {
-        return children.get(parents.get(groupPosition)).size();
+        return Objects.requireNonNull(children.get(parents.get(groupPosition))).size();
     }
 
     /**

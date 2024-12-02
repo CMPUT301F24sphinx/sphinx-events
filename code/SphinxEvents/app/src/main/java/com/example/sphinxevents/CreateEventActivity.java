@@ -155,10 +155,15 @@ public class CreateEventActivity extends AppCompatActivity {
             return;
         }
 
+        if (!entrantLimitString.isEmpty() && Integer.parseInt(entrantLimitString) <= 0){
+            Toast.makeText(this, "Entrant limit must be greater than 0", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         // Converts input into proper types
         Integer entrantLimit;
         try {
-            entrantLimit = entrantLimitString.isEmpty() ? null : Integer.valueOf(entrantLimitString);
+            entrantLimit = entrantLimitString.isEmpty() ? null : Integer.parseInt(entrantLimitString);
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Invalid entrant limit", Toast.LENGTH_SHORT).show();
             return;
@@ -171,8 +176,6 @@ public class CreateEventActivity extends AppCompatActivity {
             Toast.makeText(this, "Invalid date format", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        ArrayList<String> entrants = new ArrayList<String>();
 
         // Create a new Event object
         Organizer organizer = (Organizer) userManager.getCurrentUser();

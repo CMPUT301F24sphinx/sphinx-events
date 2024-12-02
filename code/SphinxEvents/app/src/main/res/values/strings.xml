@@ -19,6 +19,12 @@
     <string name="waiting_for_registration_deadline">Lottery can\'t be drawn yet. Registration is still open.</string>
     <string name="lottery_has_been_drawn">Lottery has been drawn!</string>
     <string name="lottery_is_ready_to_be_drawn">Lottery is ready to be drawn!</string>
+    <string name="view_event_entrants_data">Event Entrant Data</string>
+    <string name="confirmed_entrants">Confirmed Entrants  (%d)</string>
+    <string name="entrants_invited_to_apply">Invited To Apply  (%d)</string>
+    <string name="cancelled_entrants">Cancelled  (%d)</string>
+    <string name="entrants">Waiting List  (%d)</string>
+
 
     <!--Drawer strings-->
     <string name="close_drawer_speakable_text">Close side drawer button</string>
@@ -82,12 +88,22 @@
     <string name="create_an_event">Create an Event</string>
     <string name="event_description">Event Description*</string>
 
+    <!-- Search query Event String-->
+    <string name="event_search_query">\"%s\"</string>
+
+
+    <!-- Managing Event String-->
+    <string name="manageevent_event_details">Event Details</string>
+
     <!-- Managing Event String-->
     <string name="manage_event_event_details">Event Details</string>
+
     <string name="view_qrcode_button">View QR Code</string>
     <string name="edit_event_details_button">Edit Event Details</string>
     <string name="view_entrant_data_button">View Entrant Data</string>
     <string name="notify_entrants_button">Send Message</string>
+    <string name="leave_event_waitlist">Leave Waitlist</string>
+    <string name="do_event_draw">Draw Lottery</string>
 
     <!--Notifications-->
     <string name="channel_name">NotificationChannel</string>
