@@ -1,3 +1,11 @@
+/*
+ * Class Name: ViewQRCodeActivity
+ * Date: 2024-11-06
+ *
+ * Description:
+ * Allows the viewing of the QR code for an event
+ */
+
 package com.example.sphinxevents;
 
 import android.content.Intent;
@@ -16,6 +24,9 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+/**
+ * Displays the QR code for a created event
+ */
 public class ViewQRCodeActivity extends AppCompatActivity {
 
     private String eventId;

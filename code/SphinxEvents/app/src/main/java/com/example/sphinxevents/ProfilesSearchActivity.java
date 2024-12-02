@@ -1,4 +1,9 @@
 /*
+ * Class Name: ProfileSearchActivity
+ * Date: 2024-12-01
+ *
+ *
+ * Description:
  * Displays results of profiles whose name matches the administrator's query
  * Allows administrator to click on profile in list in order to view all details and remove it
  */
@@ -23,6 +28,10 @@ import androidx.core.view.WindowInsetsCompat;
 
 import java.util.ArrayList;
 
+/**
+ * Activity for searching and managing profiles. It allows users to search for profiles, view the results,
+ * and remove profiles. The display is refreshed after a profile is removed.
+ */
 public class ProfilesSearchActivity extends AppCompatActivity {
 
     // Attributes for result list

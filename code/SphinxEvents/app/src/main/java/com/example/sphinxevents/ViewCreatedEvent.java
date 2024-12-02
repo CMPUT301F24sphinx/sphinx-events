@@ -1,3 +1,13 @@
+/*
+ * Class Name: ViewCreatedEvent
+ * Date: 2024-11-30
+ *
+ * Description:
+ * Displays the details of a created event to the user. Gives the user the option to view the event poster,
+ * the QR code, and entrant data. Also allows the user to send a notification to the entrants as well as
+ * trigger a lottery when applicable.
+ */
+
 package com.example.sphinxevents;
 
 import android.app.AlertDialog;
@@ -23,6 +33,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 
+/**
+ * Displays the details of a created event to the user. Gives the user the option to view the event poster,
+ * the QR code, and entrant data. Also allows the user to send a notification to the entrants as well as
+ * trigger a lottery when applicable.
+ */
 public class ViewCreatedEvent extends AppCompatActivity {
 
     private EventListener eventListener;

@@ -1584,4 +1584,57 @@ public class DatabaseManager {
         }).addOnFailureListener(callback::onFailure);
     }
 
+
+    /**
+     * Callback interface for QR deletion
+     */
+    public interface QRRemovalCallback {
+        /**
+         * Called when QR is successfully removed
+         */
+        void onSuccess();
+
+        /**
+         * Called when error occurs during QR deletion
+         * @param e the exception that occurred
+         */
+        void onFailure(Exception e);
+    }
+
+    /**
+     * Removes QR code from database
+     * @param eventId key for event
+     * @param callback Callback to handle success or failure of QR deletion
+     */
+    public void removeQR(String eventId, QRRemovalCallback callback) {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        // Retrieve the event document from the "events" collection
+        database.collection("events").document(eventId).get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot eventSnapshot = task.getResult();
+                        if (eventSnapshot.exists()) {
+                            // Delete the QR code of the event from Firebase Storage
+                            StorageReference qrCodeRef = storage.getReference().child("qr_codes/" + eventId + ".jpg");
+                            qrCodeRef.delete()
+                                    .addOnSuccessListener(aVoid -> {
+                                        // QR code successfully deleted
+                                        callback.onSuccess();
+                                    })
+                                    .addOnFailureListener(e ->
+                                            callback.onFailure(new Exception("Failed to delete qr code for event: " + eventId))
+                                    );
+
+                        } else {
+                            // Event document does not exist
+                            callback.onFailure(new Exception("Event not found"));
+                        }
+                    } else {
+                        // Failure retrieving the event document
+                        callback.onFailure(task.getException());
+                    }
+                });
+    }
+
+
 }

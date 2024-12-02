@@ -1,7 +1,12 @@
 /*
+ * Class Name: RemoveProfileActivity
+ * Date: 2024-11-30
+ *
+ * Description:
  * Displays all information of profile that was clicked by administrator in ProfilesSearchActivity
- * Allows administrator to remove user profile
+ * Allows administrator to remove user profile.
  */
+
 
 package com.example.sphinxevents;
 
@@ -25,6 +30,9 @@ import com.bumptech.glide.Glide;
 
 import java.io.File;
 
+/**
+ * Activity for removing a user profile, including associated data such as profile pictures and facilities.
+ */
 public class RemoveProfileActivity extends AppCompatActivity {
 
     private Entrant entrant;
@@ -69,20 +77,17 @@ public class RemoveProfileActivity extends AppCompatActivity {
         profilePhoneNumberTextView.setText(entrant.getPhoneNumber());
         profiledeviceIDTextView.setText(entrant.getDeviceId());
 
-        //Setting profile Image Display:
-
+        // Setting profile image display
         String profilePictureUrl = entrant.getProfilePictureUrl();
-        if(!profilePictureUrl.isEmpty()){
+        if (!profilePictureUrl.isEmpty()) {
             // Load image using Glide
             Glide.with(this)
                     .load(profilePictureUrl)
                     .centerCrop()
                     .into(profileImageView);
-
         } else {
             profileImageView.setImageResource(android.R.color.transparent);
         }
-
 
         // Set onClickListener for backButton
         backButton.setOnClickListener(v -> {
@@ -98,18 +103,19 @@ public class RemoveProfileActivity extends AppCompatActivity {
                 deleteUserPfp();
             }
             removeProfile();
-
         });
 
-        // Sets onClickListener for removeButton
+        // Sets onClickListener for remove profile image button
         removePfpImageButton.setOnClickListener(v -> {
             if (!profilePictureUrl.isEmpty()) {
                 deleteUserPfp();
             }
         });
-
     }
 
+    /**
+     * Deletes the user's profile picture from the database and updates the UI.
+     */
     private void deleteUserPfp() {
         databaseManager.deleteProfilePicture(entrant.getDeviceId(), new DatabaseManager.DeleteProfilePictureCallback() {
             @Override
@@ -125,6 +131,9 @@ public class RemoveProfileActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Removes the user's associated facility from the database.
+     */
     private void removeUserFacility() {
         databaseManager.removeFacility(entrant.getDeviceId(), new DatabaseManager.FacilityRemovalCallback() {
             @Override
@@ -138,6 +147,9 @@ public class RemoveProfileActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Removes the user's profile from the database and finishes the activity.
+     */
     private void removeProfile() {
         databaseManager.removeProfile(entrant.getDeviceId(), new DatabaseManager.ProfileRemovalCallback() {
             @Override
@@ -146,12 +158,13 @@ public class RemoveProfileActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Profile removed!", Toast.LENGTH_SHORT).show();
                 finish();
             }
+
             @Override
             public void onFailure(Exception e) {
                 Toast.makeText(getApplicationContext(), "Error removing profile from database", Toast.LENGTH_SHORT).show();
             }
         });
     }
-
 }
+
 

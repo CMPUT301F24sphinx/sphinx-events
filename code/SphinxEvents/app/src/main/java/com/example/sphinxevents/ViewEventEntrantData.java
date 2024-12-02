@@ -1,3 +1,13 @@
+/*
+ * Class Name: ViewEventEntrantData
+ * Date: 2024-12-01
+ *
+ * Description:
+ * Allows Organizer to view entrants in the waiting list, cancelled entrants, entrants who won the lottery,
+ * and entrants who have accepted an invitation. Also allows user to cancel entrants who have won but have
+ * yet to accept an invitation.
+ */
+
 package com.example.sphinxevents;
 
 import android.content.Intent;
@@ -18,6 +28,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Allows Organizer to view entrants in the waiting list, cancelled entrants, entrants who won the lottery,
+ * and entrants who have accepted an invitation. Also allows user to cancel entrants who have won but have
+ * yet to accept an invitation.
+ */
 public class ViewEventEntrantData extends AppCompatActivity {
 
     private DatabaseManager databaseManager;

@@ -1,4 +1,9 @@
 /*
+ * Class Name: RemoveFacilityActivity
+ * Date: 2024-11-28
+ *
+ *
+ * Description:
  * Displays all information of facility that was clicked by administrator in FacilitySearchActivity
  * Allows administrator to remove facility
  */
