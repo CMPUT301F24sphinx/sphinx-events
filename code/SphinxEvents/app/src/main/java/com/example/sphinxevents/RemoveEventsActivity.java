@@ -80,13 +80,16 @@ public class RemoveEventsActivity extends AppCompatActivity {
         eventNameTextView.setText(event.getName());
         eventDescriptionTextView.setText(event.getDescription());
         eventLotteryDeadlineTextView.setText(event.getLotteryEndDate().toString());
-        eventEntrantLimitTextView.setText(event.getEntrantLimit().toString());
+        if (event.getEntrantLimit() == -1) {
+            eventEntrantLimitTextView.setText("No Limit");
+        }
+        else {
+            eventEntrantLimitTextView.setText(event.getEntrantLimit().toString());
+        }
 
         // Setting imageview to Poster Image:
         String posterId = event.getPoster();
         displayEventPoster(posterId, eventPosterView);
-
-
 
         // Set onClickListener for backButton
         backButton.setOnClickListener(v -> {
@@ -141,7 +144,7 @@ public class RemoveEventsActivity extends AppCompatActivity {
     }
 
     private void removeEvent() {
-        databaseManager.removeEvent(event.getName(), new DatabaseManager.EventRemovalCallback() {
+        databaseManager.removeEvent(event.getEventId(), new DatabaseManager.EventRemovalCallback() {
             @Override
             public void onSuccess() {
                 setResult(EventsSearchActivity.EVENTS_REMOVED);

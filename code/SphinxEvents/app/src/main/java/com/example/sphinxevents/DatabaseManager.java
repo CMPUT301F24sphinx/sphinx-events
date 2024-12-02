@@ -628,7 +628,7 @@ public class DatabaseManager {
 
                             // Ensure that the confirmedlist is initialized
                             if (event != null && event.getConfirmed() == null) {
-                                event.setConfirmed(new ArrayList<>());  // Initialize waitingList if null
+                                event.setConfirmed(new ArrayList<>());  // Initialize confirmedList if null
                             }
 
                             callback.onSuccess(event);
@@ -1094,7 +1094,7 @@ public class DatabaseManager {
      * @param eventsToRetrieve list of event id's to search for in database
      * @param callback callback to handle success or failure of event list retrieval
      */
-    public void retrieveEventList(ArrayList<String> eventsToRetrieve, retrieveEventListCallback callback) {
+    public void retrieveEventList(ArrayList<String> eventsToRetrieve, String userId, String eventType, retrieveEventListCallback callback) {
         // Handles empty list of events to search for
         if (eventsToRetrieve.isEmpty()) {
             callback.onSuccess(new ArrayList<>());
@@ -1420,27 +1420,85 @@ public class DatabaseManager {
 
     /**
      * Removes an event from database
-     * @param name key for event
+     * @param eventId key for event
      * @param callback Callback to handle success or failure of event deletion
      */
-    public void removeEvent(String name, EventRemovalCallback callback) {
-        // event name:
-        String event_name = name;
-
-        // deleting event based on if the parameter 'name' matches the field name
-        database.collection("events")
-                .whereEqualTo("name", event_name)
-                .get()
+    public void removeEvent(String eventId, EventRemovalCallback callback) {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        // Retrieve the event document from the "events" collection
+        database.collection("events").document(eventId).get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        for (DocumentSnapshot document : task.getResult()) {
-                            document.getReference().delete()
-                                    .addOnSuccessListener(aVoid -> {
-                                        // Notify success via callback
-                                        callback.onSuccess();
-                                    })
-                                    .addOnFailureListener(callback::onFailure);
+                        DocumentSnapshot eventSnapshot = task.getResult();
+                        if (eventSnapshot.exists()) {
+                            // Delete the event poster from Firebase Storage
+                            StorageReference posterRef = storage.getReference().child("EventPosters/" + eventId + ".jpg");
+                            posterRef.delete()
+                                    .addOnFailureListener(e ->
+                                            callback.onFailure(new Exception("Failed to delete poster for event: " + eventId))
+                                    );
+                            // Delete the QR code of the event from Firebase Storage
+                            StorageReference qrCodeRef = storage.getReference().child("qr_codes/" + eventId + ".jpg");
+                            qrCodeRef.delete()
+                                    .addOnFailureListener(e ->
+                                            callback.onFailure(new Exception("Failed to delete qr code for event: " + eventId))
+                                    );
+
+                            // Extract the arrays from the event document
+                            List<String> entrants = (List<String>) eventSnapshot.get("entrants");
+                            List<String> lotteryWinners = (List<String>) eventSnapshot.get("lotteryWinners");
+                            List<String> confirmed = (List<String>) eventSnapshot.get("confirmed");
+                            String organizerId = eventSnapshot.getString("organizerId");
+
+                            // Create a batch write to perform multiple updates at once
+                            WriteBatch batch = database.batch();
+
+                            // Remove eventId from each user's pendingEvents or joinedEvents
+                            if (entrants != null) {
+                                for (String userId : entrants) {
+                                    DocumentReference userRef = database.collection("users").document(userId);
+                                    batch.update(userRef, "pendingEvents", FieldValue.arrayRemove(eventId));
+                                }
+                            }
+
+                            if (lotteryWinners != null) {
+                                for (String userId : lotteryWinners) {
+                                    DocumentReference userRef = database.collection("users").document(userId);
+                                    batch.update(userRef, "pendingEvents", FieldValue.arrayRemove(eventId));
+                                }
+                            }
+
+                            if (confirmed != null) {
+                                for (String userId : confirmed) {
+                                    DocumentReference userRef = database.collection("users").document(userId);
+                                    batch.update(userRef, "joinedEvents", FieldValue.arrayRemove(eventId));
+                                }
+                            }
+
+                            // Remove eventId from organizer's createdEvents
+                            if (organizerId != null && !organizerId.isEmpty()) {
+                                DocumentReference organizerRef = database.collection("users").document(organizerId);
+                                batch.update(organizerRef, "createdEvents", FieldValue.arrayRemove(eventId));
+                            }
+
+                            // After updating users, delete the event document itself
+                            DocumentReference eventRef = database.collection("events").document(eventId);
+                            batch.delete(eventRef);
+
+                            // Commit the batch operation
+                            // Call onFailure callback if there was an error during the batch operation
+                            batch.commit().addOnSuccessListener(aVoid -> {
+                                // Call onSuccess callback if the event and user updates are successful
+                                callback.onSuccess();
+                            }).addOnFailureListener(callback::onFailure);
+
+                        } else {
+                            // Event document does not exist
+                            callback.onFailure(new Exception("Event not found"));
                         }
+                    } else {
+                        // Failure retrieving the event document
+                        callback.onFailure(task.getException());
                     }
                 });
     }

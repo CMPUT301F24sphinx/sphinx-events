@@ -288,13 +288,13 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         headers.add(getString(R.string.pending_events_header, currentUser.getPendingEvents().size()));
 
         // Displays joined events
-        databaseManager.retrieveEventList(currentUser.getJoinedEvents(), new DatabaseManager.retrieveEventListCallback() {
+        databaseManager.retrieveEventList(currentUser.getJoinedEvents(), deviceId, "joinedEvents", new DatabaseManager.retrieveEventListCallback() {
             @Override
             public void onSuccess(List<Event> joinedEvents) {
                 events.put(headers.get(0), joinedEvents);
 
                 // Displays pending events
-                databaseManager.retrieveEventList(currentUser.getPendingEvents(), new DatabaseManager.retrieveEventListCallback() {
+                databaseManager.retrieveEventList(currentUser.getPendingEvents(), deviceId, "pendingEvents", new DatabaseManager.retrieveEventListCallback() {
                     @Override
                     public void onSuccess(List<Event> pendingEvents) {
                         events.put(headers.get(1), pendingEvents);
@@ -307,7 +307,7 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
                                 headers.add(getString(R.string.created_events_header, organizer.getCreatedEvents().size()));
                             }
 
-                            databaseManager.retrieveEventList(organizer.getCreatedEvents(), new DatabaseManager.retrieveEventListCallback() {
+                            databaseManager.retrieveEventList(organizer.getCreatedEvents(), deviceId, "createdEvents", new DatabaseManager.retrieveEventListCallback() {
                                 @Override
                                 public void onSuccess(List<Event> createdEvents) {
                                     headers.set(2, getString(R.string.created_events_header, createdEvents.size()));
@@ -346,6 +346,8 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
     /**
      * Updates the expandable lists with current user data
      */
+    // Daniel - I commented this out cuz I was trying to improve the retrieveEventList function, and this code would raise errors
+    /*
     public void updateExpandableLists2() {
         Entrant currentUser = userManager.getCurrentUser();
 
@@ -411,6 +413,7 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
             });
         }
     }
+     */
 
     /**
      * Updates the ExpandableListView with the provided headers and events data.
@@ -527,8 +530,8 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         // Update UI elements based on the new currentUser data
         updateProfilePicture();
         updateDrawer();
-        if(deviceId.equals("053f398454114aed")){
-            updateExpandableLists2();
+        if (deviceId.equals("053f398454114aed")){
+            // updateExpandableLists2();
         } else {
             updateExpandableLists();
         }

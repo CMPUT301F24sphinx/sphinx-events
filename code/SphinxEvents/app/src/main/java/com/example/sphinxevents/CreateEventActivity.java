@@ -180,8 +180,8 @@ public class CreateEventActivity extends AppCompatActivity {
         // Create a new Event object
         Organizer organizer = (Organizer) userManager.getCurrentUser();
         UserLocation facilityLocation = organizer.getFacility().getLocation();
-        Event newEvent = new Event(eventName, eventDesc, regDate, entrantLimit,
-                geolocationReq, new ArrayList<String>(), facilityLocation);
+        Event newEvent = new Event(userManager.getCurrentUser().getDeviceId(), eventName, eventDesc,
+                regDate, entrantLimit, geolocationReq, new ArrayList<String>(), facilityLocation);
 
         databaseManager.createEvent(newEvent, new DatabaseManager.EventCreationCallback() {
             @Override
