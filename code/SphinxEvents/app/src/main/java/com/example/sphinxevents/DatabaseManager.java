@@ -1503,6 +1503,7 @@ public class DatabaseManager {
                 });
     }
 
+
     /**
      * Callback interface for entrant cancellation for an event.
      */
