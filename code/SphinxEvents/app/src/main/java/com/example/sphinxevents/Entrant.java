@@ -72,11 +72,7 @@ public class Entrant implements Serializable {
         this.pendingEvents = pendingEvents != null ? pendingEvents : new ArrayList<>();
     }
 
-    /**
-     * Copy constructor that creates a new Entrant object with the same values as the given Entrant.
-     *
-     * @param other The Entrant to copy data from.
-     */
+
     public Entrant(Entrant other) {
         this.deviceId = other.deviceId;
         this.role = other.role;
@@ -230,11 +226,6 @@ public class Entrant implements Serializable {
      */
     public void addPendingEvent(String eventId) { pendingEvents.add(eventId); }
 
-    /**
-     * Creates a clone of the current Entrant object.
-     *
-     * @return A new Entrant object with the same values as the current one.
-     */
     @NonNull
     public Entrant clone() {
         return new Entrant(this);

@@ -18,6 +18,7 @@ import android.location.Location;
 
 
 import android.net.Uri;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -520,7 +521,8 @@ public class DatabaseManager {
     }
 
     /**
-     * Deletes a profile picture from Firebase Storage.
+     * Deletes a profile picture from Firebase Storage and updates the user's profilePictureUrl to an empty string.
+     *
      * @param deviceId The device ID of the user whose profile picture is being deleted.
      * @param callback Callback to handle success or failure of the deletion.
      */
@@ -532,34 +534,27 @@ public class DatabaseManager {
         // Delete the profile picture
         profilePicRef.delete()
                 .addOnSuccessListener(aVoid -> {
-                    // Call the callback on success
-                    callback.onSuccess();
+                    // Update the user's profilePictureUrl to an empty string in the Firestore database
+                    FirebaseFirestore.getInstance()
+                            .collection("users")
+                            .document(deviceId)
+                            .update("profilePictureUrl", "")
+                            .addOnSuccessListener(unused -> {
+                                // Call the callback on success
+                                callback.onSuccess();
+                            })
+                            .addOnFailureListener(e -> {
+                                // Call the callback on failure to update Firestore
+                                callback.onFailure();
+                            });
                 })
                 .addOnFailureListener(e -> {
-                    // Call the callback on failure
+                    // Call the callback on failure to delete the profile picture
                     callback.onFailure();
                 });
     }
 
-    public void removeDefaultProfilePic(String deviceId, Context context){
-        DocumentReference defaultProfileRef = database.collection("users").document(deviceId);
 
-        defaultProfileRef
-                .update("defaultPfpPath", "")
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Toast.makeText(context, "Default profile picture removed successfully!", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error updating document", e);
-                        Toast.makeText(context, "Unable to remove default profile picture...", Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
 
     // ---------------------------------------------------------------------------------------------
 
@@ -1418,8 +1413,6 @@ public class DatabaseManager {
                     }
                 });
     }
-
-}
 
     /**
      * Callback interface for entrant cancellation for an event.
