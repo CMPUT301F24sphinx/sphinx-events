@@ -316,7 +316,6 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
                                     headers.set(2, getString(R.string.created_events_header, createdEvents.size()));
                                     events.put(headers.get(2), createdEvents);
 
-
                                     updateExpandableListView(headers, events);
                                 }
 
@@ -377,8 +376,6 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
             return true;
         });
     }
-
-
 
     /**
      * Updates the user profile picture to custom or default profile picture
