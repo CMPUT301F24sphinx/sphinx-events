@@ -600,11 +600,10 @@ public class DatabaseManager {
 
 
     public void joinEventWaitingList(String userId, UserLocation userLocation, String eventId, joinWaitingListCallback callback) {
-        // Step 1: Add the user to the event's waiting list
+        // Add the user to the event's waiting list
         database.collection("events")
                 .document(eventId)
                 .update("entrants", FieldValue.arrayUnion(userId))
-                // Aniket: I changed the field from waitingList to entrants as were just using that as the waiting list pool and the losers pool
                 .addOnSuccessListener(aVoid -> {
                     // Add the eventId to the user's pendingEvents field
                     database.collection("users")
@@ -720,7 +719,7 @@ public class DatabaseManager {
 
     /**
      * Removes userID from list of entrants in events document
-     * Removes EventID from list of joinedEvents in users document
+     * Removes EventID from list of pendingEvents in users document
      * @param userID ID of user being removed
      * @param eventID ID of event being removed
      */
@@ -755,7 +754,7 @@ public class DatabaseManager {
     }
 
     /**
-     * Adds userId to confirm array of eventId and moves eventId form panding to joined events in user document
+     * Adds userId to confirmed array of event and moves eventId from pending to joined events in user document
      * @param userID ID of user being added
      * @param eventID ID of event being updated
      */
@@ -820,7 +819,7 @@ public class DatabaseManager {
     }
 
     /**
-     * Adds userId to confirm array of eventId and moves eventId form panding to joined events in user document
+     * Removes userId to winners array of Event and removes eventId from pendingEvents in user document
      * @param userID ID of user being added
      * @param eventID ID of event being updated
      */

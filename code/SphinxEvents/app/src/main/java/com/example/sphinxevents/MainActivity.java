@@ -359,15 +359,10 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
             Event clickedEvent = (Event) listAdapter.getChild(groupPosition, childPosition);
             switch (groupPosition) {
                 case 0:
-                    Intent viewJoinedEventIntent = new Intent(MainActivity.this, ViewEventDetails.class);
-                    viewJoinedEventIntent.putExtra("eventId", clickedEvent.getEventId());
-                    startActivity(viewJoinedEventIntent);
-                    break;
-
                 case 1:
-                    Intent viewPendingEventIntent = new Intent(MainActivity.this, ViewEventDetails.class);
-                    viewPendingEventIntent.putExtra("eventId", clickedEvent.getEventId());
-                    startActivity(viewPendingEventIntent);
+                    Intent viewEnteredEventIntent = new Intent(MainActivity.this, ViewEnteredEvent.class);
+                    viewEnteredEventIntent.putExtra("eventId", clickedEvent.getEventId());
+                    startActivity(viewEnteredEventIntent);
                     break;
 
                 case 2:
