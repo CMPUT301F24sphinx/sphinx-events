@@ -275,7 +275,7 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
     public String getDeviceId(Context context) {
         return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
     }
-    
+
     /**
      * Updates the expandable lists with current user data
      */

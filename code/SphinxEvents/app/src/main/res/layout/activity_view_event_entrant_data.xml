@@ -11,7 +11,8 @@ tools:context=".ViewEventEntrantData">
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:gravity="center_horizontal">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -43,6 +44,26 @@ tools:context=".ViewEventEntrantData">
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/main_screen_header_background"
+        android:paddingHorizontal="15dp"
+        android:paddingVertical="8dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/view_map_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="View Map"
+            android:textColor="@color/black"
+            android:textSize="22sp"
+            android:backgroundTint="@color/view_map_button_color"
+            app:cornerRadius="4dp" />
+
+    </LinearLayout>
 
     <ExpandableListView
         android:id="@+id/entrant_data_expandable_listview"

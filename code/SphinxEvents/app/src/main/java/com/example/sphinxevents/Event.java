@@ -15,7 +15,7 @@ public class Event implements Serializable {
     private String description;  // The description of the event
     private String poster;  // The url of the poster location
     private Date lotteryEndDate;  // The end date of the lottery
-    private Integer entrantLimit;  // The entrant limit for the event
+    private int entrantLimit;  // The entrant limit for the event
     private Integer redrawUserCount; // The total number of users we invite to join again after someone cancels
     private Boolean geolocationReq;  // Boolean indicating if geolocation is required
     private UserLocation facilityLocation;  // The location of the facility event belongs to
@@ -40,7 +40,7 @@ public class Event implements Serializable {
      * @param joinedUsers The list of users who have joined the event.
      * @param facilityLocation The location of the event's facility.
      */
-    Event(String name, String description, Date lotteryEndDate, Integer entrantLimit,
+    Event(String name, String description, Date lotteryEndDate, int entrantLimit,
           Boolean geolocationReq, ArrayList<String> joinedUsers, UserLocation facilityLocation) {
         this.eventId = null;
         this.name = name;

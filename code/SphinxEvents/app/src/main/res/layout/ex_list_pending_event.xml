@@ -5,7 +5,7 @@
     android:padding="8dp"
     android:orientation="vertical"
     android:id="@+id/event_layout"
-    android:background="@drawable/list_created_event_background">
+    android:background="@drawable/list_pending_event_background">
 
     <LinearLayout
         android:layout_width="match_parent"
