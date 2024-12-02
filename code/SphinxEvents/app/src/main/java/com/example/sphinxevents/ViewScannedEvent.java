@@ -1,3 +1,11 @@
+/*
+ * Class Name: ViewScannedEvent
+ * Date: 2024-11_30
+ *
+ * Description:
+ * Handles the viewing of event details when QR code is scanned
+ */
+
 package com.example.sphinxevents;
 
 import android.content.Intent;
@@ -27,6 +35,9 @@ import com.google.firebase.storage.StorageReference;
 
 import java.text.SimpleDateFormat;
 
+/**
+ * Handles the viewing of event details when QR code is scanned
+ */
 public class ViewScannedEvent extends AppCompatActivity {
 
     // Database and manager related attributes

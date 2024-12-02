@@ -1,3 +1,13 @@
+/*
+ * Class Name: qrCodeActivity
+ * Date: 2024-11-26
+ *
+ *
+ * Description:
+ * Activity for generating and displaying a QR code based on an event's poster ID.
+ * The QR code is also uploaded to Firebase Storage.
+ */
+
 package com.example.sphinxevents;
 
 import android.content.Intent;

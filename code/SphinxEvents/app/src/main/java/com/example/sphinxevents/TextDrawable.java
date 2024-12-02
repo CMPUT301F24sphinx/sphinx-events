@@ -4,10 +4,7 @@
  *
  *
  * Description:
- * TextDrawable is a helper class for creating Drawables with text centered on a square background.
- * It’s mainly used to make default profile pictures. You can customize
- * the text, color, and size of these Drawables, and each one will get a randomly chosen background color.
- * The class also has a method to turn any Drawable into a Bitmap.
+ * Utility class for creating text-based Drawables with random background colors.
  */
 
 package com.example.sphinxevents;
@@ -23,7 +20,7 @@ import android.graphics.drawable.Drawable;
 import java.util.Random;
 
 /**
- *
+ * Utility class for creating text-based Drawables with random background colors.
  */
 public class TextDrawable {
 
@@ -84,5 +81,4 @@ public class TextDrawable {
 
         return (0xFF << 24) | (red << 16) | (green << 8) | blue; // Alpha set to 255 (opaque)
     }
-
 }

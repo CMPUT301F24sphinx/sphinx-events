@@ -1,3 +1,11 @@
+/*
+ * Class Name: ViewEventPosterActivity
+ * Date: 2024-11-30
+ *
+ * Description:
+ * Allows the viewing and updating of event poster
+ */
+
 package com.example.sphinxevents;
 
 import android.content.Intent;
@@ -27,6 +35,9 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.UUID;
 
+/**
+ * Fetches and displays an event poster for an Organizer. Allows user to update the poster as well.
+ */
 public class ViewEventPosterActivity extends AppCompatActivity {
 
     private String eventId;
