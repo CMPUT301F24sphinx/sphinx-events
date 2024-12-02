@@ -302,33 +302,7 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
                     public void onSuccess(List<Event> pendingEvents) {
                         events.put(headers.get(1), pendingEvents);
 
-                        // Get created events if user is an organizer
-                        if (currentUser.getRole().equals("Organizer")) {
-                            Organizer organizer = (Organizer) currentUser;
-
-                            if (headers.size() < 3) {
-                                headers.add(getString(R.string.created_events_header, organizer.getCreatedEvents().size()));
-                            }
-
-                            databaseManager.retrieveEventList(organizer.getCreatedEvents(), new DatabaseManager.retrieveEventListCallback() {
-                                @Override
-                                public void onSuccess(List<Event> createdEvents) {
-                                    headers.set(2, getString(R.string.created_events_header, createdEvents.size()));
-                                    events.put(headers.get(2), createdEvents);
-
-
-                                    updateExpandableListView(headers, events);
-                                }
-
-                                @Override
-                                public void onFailure(Exception e) {
-                                    Toast.makeText(MainActivity.this, "Error Displaying Created Events",
-                                            Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        } else {
-                            updateExpandableListView(headers, events);
-                        }
+                        updateExpandableListView(headers, events);
                     }
 
                     @Override
@@ -345,6 +319,30 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
                         Toast.LENGTH_SHORT).show();
             }
         });
+
+        // Get created events if user is an organizer
+        if (currentUser.getRole().equals("Organizer")) {
+            Organizer organizer = (Organizer) currentUser;
+
+            if (headers.size() < 3) {
+                headers.add(getString(R.string.created_events_header, organizer.getCreatedEvents().size()));
+            }
+
+            databaseManager.retrieveEventList(organizer.getCreatedEvents(), new DatabaseManager.retrieveEventListCallback() {
+                @Override
+                public void onSuccess(List<Event> createdEvents) {
+                    headers.set(2, getString(R.string.created_events_header, createdEvents.size()));
+                    events.put(headers.get(2), createdEvents);
+                    updateExpandableListView(headers, events);
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    Toast.makeText(MainActivity.this, "Error Displaying Created Events",
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     /**
