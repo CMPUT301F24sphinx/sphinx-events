@@ -60,7 +60,9 @@ public class AdminSearchActivity extends AppCompatActivity {
                 startActivity(profilesSearchIntent);
             }
             else {
-                // TODO: LAUNCH EVENT SEARCH ACTIVITY (NEXT SPRINT)
+                Intent eventsSearchIntent = new Intent(this, EventsSearchActivity.class);
+                eventsSearchIntent.putExtra("query", query);
+                startActivity(eventsSearchIntent);
             }
         });
 
