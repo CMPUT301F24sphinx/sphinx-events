@@ -1464,7 +1464,7 @@ public class DatabaseManager {
 
             // Update the "cancelled" list in the event document
             ArrayList<String> cancelled = (ArrayList<String>) eventSnapshot.get("cancelled");
-            if (cancelled != null && cancelled.contains(userId)) {
+            if (cancelled != null && !cancelled.contains(userId)) {
                 cancelled.add(userId);
                 transaction.update(eventDocRef, "cancelled", cancelled);
             }
