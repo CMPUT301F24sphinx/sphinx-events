@@ -88,8 +88,16 @@
     <string name="create_an_event">Create an Event</string>
     <string name="event_description">Event Description*</string>
 
+    <!-- Search query Event String-->
+    <string name="event_search_query">\"%s\"</string>
+
+
+    <!-- Managing Event String-->
+    <string name="manageevent_event_details">Event Details</string>
+
     <!-- Managing Event String-->
     <string name="manage_event_event_details">Event Details</string>
+
     <string name="view_qrcode_button">View QR Code</string>
     <string name="edit_event_details_button">Edit Event Details</string>
     <string name="view_entrant_data_button">View Entrant Data</string>
