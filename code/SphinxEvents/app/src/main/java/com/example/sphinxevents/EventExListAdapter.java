@@ -87,7 +87,7 @@ public class EventExListAdapter extends ExListAdapter {
             } else {
                 numberOfEntrantsTextView.setText(context.getString(R.string.number_of_entrants, event.getEntrants().size()));
             }
-            if (event.getEntrantLimit() == null || event.getEntrantLimit() == 0 ) {
+            if (event.getEntrantLimit() == 0 ) {
                 limitOfEntrantsTextView.setVisibility(View.GONE);
             }
             else {
