@@ -31,7 +31,6 @@ public class Event implements Serializable {
     // No-argument constructor
     public Event() {}
 
-    Event(String name, String description, String poster, Date lotteryEndDate, Integer entrantLimit, Boolean geolocationReq, ArrayList<String> joinedUsers) {
     /**
      * Constructs an Event with the specified attributes.
      *
@@ -43,8 +42,7 @@ public class Event implements Serializable {
      * @param joinedUsers The list of users who have joined the event.
      * @param facilityLocation The location of the event's facility.
      */
-    Event(String name, String description, Date lotteryEndDate, Integer entrantLimit,
-          Boolean geolocationReq, ArrayList<String> joinedUsers, UserLocation facilityLocation) {
+    Event(String name, String description, Date lotteryEndDate, Integer entrantLimit, Boolean geolocationReq, ArrayList<String> joinedUsers, UserLocation facilityLocation) {
         this.eventId = null;
         this.name = name;
         this.description = description;

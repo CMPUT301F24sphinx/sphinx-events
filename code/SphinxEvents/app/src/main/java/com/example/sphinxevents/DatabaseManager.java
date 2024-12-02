@@ -18,6 +18,7 @@ import android.location.Location;
 
 
 import android.net.Uri;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -1421,65 +1422,65 @@ public class DatabaseManager {
 
 }
 
-    /**
-     * Callback interface for entrant cancellation for an event.
-     */
-    public interface CancelEntrantCallback {
-        /**
-         * Called when entrant is successfully cancelled from event.
-         */
-        void onSuccess();
+//    /**
+//     * Callback interface for entrant cancellation for an event.
+//     */
+//    public interface CancelEntrantCallback {
+//        /**
+//         * Called when entrant is successfully cancelled from event.
+//         */
+//        void onSuccess();
+//
+//        /**
+//         * Called when error occurs during entrant cancellation for event.
+//         * @param e The exception that occurred.
+//         */
+//        void onFailure(Exception e);
+//    }
 
-        /**
-         * Called when error occurs during entrant cancellation for event.
-         * @param e The exception that occurred.
-         */
-        void onFailure(Exception e);
-    }
+//    /**
+//     * Cancels an entrant from participation in an event
+//     * @param eventId The ID of the event to cancel entrant from
+//     * @param userId The ID of the user to be cancelled
+//     * @param callback Callback to handle success or failure of entrant cancellation
+//     */
+//    public void cancelEntrant(String eventId, String userId, CancelEntrantCallback callback) {
+//
+//        database.runTransaction(transaction -> {
+//            // References to the documents
+//            DocumentReference eventDocRef = database.collection("events").document(eventId);
+//            DocumentReference userDocRef = database.collection("users").document(userId);
+//
+//            // Fetch the event document
+//            DocumentSnapshot eventSnapshot = transaction.get(eventDocRef);
+//            if (!eventSnapshot.exists()) {
+//                throw new FirebaseFirestoreException("Event not found", FirebaseFirestoreException.Code.NOT_FOUND);
+//            }
+//
+//            // Fetch the user document
+//            DocumentSnapshot userSnapshot = transaction.get(userDocRef);
+//            if (!userSnapshot.exists()) {
+//                throw new FirebaseFirestoreException("User not found", FirebaseFirestoreException.Code.NOT_FOUND);
+//            }
+//
+//            // Update the "entrants" list in the event document
+//            ArrayList<String> entrants = (ArrayList<String>) eventSnapshot.get("waitingList");
+//            if (entrants != null && entrants.contains(userId)) {
+//                entrants.remove(userId);
+//                transaction.update(eventDocRef, "entrants", entrants);
+//            }
+//
+//            // Update the "pendingEvents" list in the user document
+//            ArrayList<String> pendingEvents = (ArrayList<String>) userSnapshot.get("pendingEvents");
+//            if (pendingEvents != null && pendingEvents.contains(eventId)) {
+//                pendingEvents.remove(eventId);
+//                transaction.update(userDocRef, "pendingEvents", pendingEvents);
+//            }
+//
+//            return null; // Transaction success
+//        }).addOnSuccessListener(aVoid -> {
+//            callback.onSuccess();
+//        }).addOnFailureListener(callback::onFailure);
+//    }
 
-    /**
-     * Cancels an entrant from participation in an event
-     * @param eventId The ID of the event to cancel entrant from
-     * @param userId The ID of the user to be cancelled
-     * @param callback Callback to handle success or failure of entrant cancellation
-     */
-    public void cancelEntrant(String eventId, String userId, CancelEntrantCallback callback) {
-
-        database.runTransaction(transaction -> {
-            // References to the documents
-            DocumentReference eventDocRef = database.collection("events").document(eventId);
-            DocumentReference userDocRef = database.collection("users").document(userId);
-
-            // Fetch the event document
-            DocumentSnapshot eventSnapshot = transaction.get(eventDocRef);
-            if (!eventSnapshot.exists()) {
-                throw new FirebaseFirestoreException("Event not found", FirebaseFirestoreException.Code.NOT_FOUND);
-            }
-
-            // Fetch the user document
-            DocumentSnapshot userSnapshot = transaction.get(userDocRef);
-            if (!userSnapshot.exists()) {
-                throw new FirebaseFirestoreException("User not found", FirebaseFirestoreException.Code.NOT_FOUND);
-            }
-
-            // Update the "entrants" list in the event document
-            ArrayList<String> entrants = (ArrayList<String>) eventSnapshot.get("waitingList");
-            if (entrants != null && entrants.contains(userId)) {
-                entrants.remove(userId);
-                transaction.update(eventDocRef, "entrants", entrants);
-            }
-
-            // Update the "pendingEvents" list in the user document
-            ArrayList<String> pendingEvents = (ArrayList<String>) userSnapshot.get("pendingEvents");
-            if (pendingEvents != null && pendingEvents.contains(eventId)) {
-                pendingEvents.remove(eventId);
-                transaction.update(userDocRef, "pendingEvents", pendingEvents);
-            }
-
-            return null; // Transaction success
-        }).addOnSuccessListener(aVoid -> {
-            callback.onSuccess();
-        }).addOnFailureListener(callback::onFailure);
-    }
-
-}
+//}

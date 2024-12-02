@@ -7,6 +7,8 @@ package com.example.sphinxevents;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -68,19 +70,22 @@ public class RemoveProfileActivity extends AppCompatActivity {
         //Setting profile Image Display:
         String custom_pfp_url = entrant.getCustomPfpUrl();
         String default_pfp_path = entrant.getDefaultPfpPath();
+
         if(custom_pfp_url != ""){
             // Load image using Glide
             Glide.with(this)
                     .load(custom_pfp_url)
                     .into(profileImageView);
+
         } else {
-            // Create a File object
+            //Create a File object
             File imageFile = new File(default_pfp_path);
             // Load the image using Glide
             Glide.with(this)
                     .load(imageFile) // Load from file
                     .into(profileImageView);
         }
+
 
         // Set onClickListener for backButton
         backButton.setOnClickListener(v -> {
