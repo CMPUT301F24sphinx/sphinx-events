@@ -18,8 +18,8 @@ public class Event implements Serializable {
     private Integer entrantLimit;  // The entrant limit for the event
     private Integer redrawUserCount; // The total number of users we invite to join again after someone cancels
     private Boolean geolocationReq;  // Boolean indicating if geolocation is required
-    private ArrayList<String> entrants;  // The list of entrants who have joined the event
     private UserLocation facilityLocation;  // The location of the facility event belongs to
+    private ArrayList<String> entrants;  // The list of entrants who have joined the waiting list
     private ArrayList<String> lotteryWinners; // The list of entrants who won the initial lottery
     private ArrayList<String> confirmed; // the list of entrants who choose to confirm the event
     private ArrayList<String> cancelled; // The list of entrants who won the lottery and cancelled
@@ -314,7 +314,7 @@ public class Event implements Serializable {
      * @return boolean representing whether waiting list is full
      */
     public boolean checkIfWaitingListFull() {
-        return this.entrantLimit != null && this.entrants.size() == this.entrantLimit;
+        return this.entrantLimit != 0 && this.entrants.size() == this.entrantLimit;
     }
 
     //-------------------------------------------------------------------------------------------

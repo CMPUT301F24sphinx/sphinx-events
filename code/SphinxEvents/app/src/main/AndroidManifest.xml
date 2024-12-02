@@ -71,7 +71,7 @@
             android:name=".ScanQRCode"
             android:exported="false" />
         <activity
-            android:name=".ViewEventDetails"
+            android:name=".ViewScannedEvent"
             android:exported="false" />
         <activity
             android:name=".ActivityViewEventEntrantData"

@@ -3,13 +3,10 @@ package com.example.sphinxevents;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.icu.text.DateFormat;
 import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -22,27 +19,19 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.auth.User;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Objects;
-import java.util.UUID;
 
-public class ViewEventDetails extends AppCompatActivity {
+public class ViewScannedEvent extends AppCompatActivity {
 
     // Database and manager related attributes
-    private DatabaseManager databaseManager;
     private EventListener eventListener;
     private UserManager userManager;
+    private DatabaseManager databaseManager;
     private String eventId;
     private Event event;
 
@@ -53,9 +42,6 @@ public class ViewEventDetails extends AppCompatActivity {
     private TextView registrationDeadlineTextView;
     private TextView waitingListCountTextView;
     private Button joinWaitingListButton;
-    private Button leaveWaitingListButton;
-    private Button confirmEventButton;
-    private Button cancelEventButton;
 
     // Warning/Indicator UI elements
     private LinearLayout alreadyJoinedEvent;
@@ -66,8 +52,6 @@ public class ViewEventDetails extends AppCompatActivity {
     private LinearLayout geolocationReqNotMetWarning;
     private LinearLayout geolocationReqMet;
     private LinearLayout ableToJoinWaitingList;
-    private LinearLayout confirmEventWin;
-    private LinearLayout lotteryLossWarning;
 
     private boolean isUserTooFar;  // boolean representing if geolocation requirements are met
     private UserLocation userLocation;  // user's location when scanning QR code if geolocation is required
@@ -79,7 +63,7 @@ public class ViewEventDetails extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_event);
+        setContentView(R.layout.activity_view_scanned_event);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -108,9 +92,6 @@ public class ViewEventDetails extends AppCompatActivity {
         waitingListFullWarning = findViewById(R.id.waiting_list_full_warning);
         Button goBackButton = findViewById(R.id.go_back_button);
         joinWaitingListButton = findViewById(R.id.join_waiting_list_button);
-        leaveWaitingListButton = findViewById(R.id.leave_waiting_list_button);
-        confirmEventButton = findViewById(R.id.confirm_event_button);
-        cancelEventButton = findViewById(R.id.cancel_event_button);
         alreadyJoinedEvent = findViewById(R.id.already_joined_event);
         geolocationRequiredWarning = findViewById(R.id.geolocation_required_warning);
         deadlinePassedWarning = findViewById(R.id.deadline_passed_warning);
@@ -119,8 +100,6 @@ public class ViewEventDetails extends AppCompatActivity {
         geolocationReqNotMetWarning = findViewById(R.id.geolocation_not_met_warning);
         geolocationReqMet = findViewById(R.id.geolocation_requirement_met);
         ableToJoinWaitingList = findViewById(R.id.able_to_join_waiting_list);
-        confirmEventWin = findViewById(R.id.confirm_event_win);
-        lotteryLossWarning = findViewById(R.id.lottery_loss_warning);
 
         // Exit the activity with back button
         goBackButton.setOnClickListener(v -> {
@@ -129,24 +108,7 @@ public class ViewEventDetails extends AppCompatActivity {
 
         // Join event waiting list
         joinWaitingListButton.setOnClickListener(v -> {
-            joinEvent();
-        });
-
-        // Leave the event
-        leaveWaitingListButton.setOnClickListener(v -> {
-            leaveEvent();
-            finish();
-        });
-
-        // Confirm the event
-        confirmEventButton.setOnClickListener(v -> {
-            confirmEvent();
-        });
-
-        // Cancel the event
-        cancelEventButton.setOnClickListener(v -> {
-            cancelEvent();
-            finish();
+            joinEventWaitingList();
         });
 
         // Create the EventListener and start listening for updates to the event
@@ -166,21 +128,6 @@ public class ViewEventDetails extends AppCompatActivity {
         eventListener.startListening();  // Start listening for changes to event
     }
 
-    private void confirmEvent() {
-        databaseManager.confirmEvent(userManager.getCurrentUser().getDeviceId(), event.getEventId());
-        Toast.makeText(getApplicationContext(), "You have confirmed " + event.getName(), Toast.LENGTH_LONG).show();
-    }
-
-    private void cancelEvent() {
-        databaseManager.cancelEvent(userManager.getCurrentUser().getDeviceId(), event.getEventId());
-        Toast.makeText(getApplicationContext(), "You have cancelled " + event.getName(), Toast.LENGTH_LONG).show();
-    }
-
-    private void leaveEvent() {
-        databaseManager.leaveEvent(userManager.getCurrentUser().getDeviceId(), event.getEventId());
-        Toast.makeText(getApplicationContext(), "You have left " + event.getName(), Toast.LENGTH_LONG).show();
-    }
-
     /**
      * Sets display of event details
      */
@@ -193,19 +140,12 @@ public class ViewEventDetails extends AppCompatActivity {
         displayWaitListCount();
 
         // Displays warnings / messages and determines if user can join event
-        clearButtons();
-        clearWarnings();
-        if(userCanJoinEvent()){
+        clearWarnings();  // First, clears current warnings
+        if (userCanJoinEvent()) {
             joinWaitingListButton.setVisibility(View.VISIBLE);
-        } else if (userHasConfirmed()){
-            clearWarnings();
-        } else if (userHasConfirmed()) {
-            clearWarnings();
-        } else if (userWonLottery()){
-            confirmEventButton.setVisibility(View.VISIBLE);
-            cancelEventButton.setVisibility(View.VISIBLE);
-        } else if(!userWonLottery()){
-            leaveWaitingListButton.setVisibility(View.VISIBLE);
+        }
+        else {
+            joinWaitingListButton.setVisibility(View.GONE);
         }
     }
 
@@ -232,7 +172,6 @@ public class ViewEventDetails extends AppCompatActivity {
 
     /**
      * Displays event registration deadline
-     * If deadline has passed, make warning visible
      */
     private void displayRegistrationDeadline() {
         SimpleDateFormat dateFormatter = new SimpleDateFormat("EEEE, MMMM d, yyyy 'at' hh:mm a z");
@@ -266,30 +205,6 @@ public class ViewEventDetails extends AppCompatActivity {
         geolocationReqNotMetWarning.setVisibility(View.GONE);
         geolocationReqMet.setVisibility(View.GONE);
         ableToJoinWaitingList.setVisibility(View.GONE);
-        lotteryLossWarning.setVisibility(View.GONE);
-        confirmEventWin.setVisibility(View.GONE);
-    }
-
-    /**
-     * Clears all event interaction buttons
-     */
-    private void clearButtons(){
-        confirmEventButton.setVisibility(View.GONE);
-        cancelEventButton.setVisibility(View.GONE);
-        joinWaitingListButton.setVisibility(View.GONE);
-        leaveWaitingListButton.setVisibility(View.GONE);
-    }
-
-    private boolean userWonLottery(){
-        return event.getLotteryWinners().contains(userManager.getCurrentUser().getDeviceId());
-    }
-
-    private boolean userHasConfirmed() {
-        return event.getConfirmed().contains(userManager.getCurrentUser().getDeviceId());
-    }
-
-    private boolean userHasCancelled() {
-        return event.getCancelled().contains(userManager.getCurrentUser().getDeviceId());
     }
 
     /**
@@ -319,7 +234,7 @@ public class ViewEventDetails extends AppCompatActivity {
 
         // Checks if geolocation must be enabled
         if (event.getGeolocationReq() &&
-                !LocationManager.isLocationPermissionGranted(ViewEventDetails.this)) {
+                !LocationManager.isLocationPermissionGranted(ViewScannedEvent.this)) {
             enableLocationWarning.setVisibility(View.VISIBLE);
             return false;
         }
@@ -328,7 +243,7 @@ public class ViewEventDetails extends AppCompatActivity {
         if (event.getGeolocationReq()) {
             geolocationRequiredWarning.setVisibility(View.VISIBLE);
             // User has not enabled location permissions
-            if (!LocationManager.isLocationPermissionGranted(ViewEventDetails.this)) {
+            if (!LocationManager.isLocationPermissionGranted(ViewScannedEvent.this)) {
                 enableLocationWarning.setVisibility(View.VISIBLE);
                 return false;
             }
@@ -345,7 +260,6 @@ public class ViewEventDetails extends AppCompatActivity {
 
         // All checks passed, display proper message and return true
         ableToJoinWaitingList.setVisibility(View.VISIBLE);
-        clearButtons();
         return true;
     }
 
@@ -354,8 +268,8 @@ public class ViewEventDetails extends AppCompatActivity {
      * @return boolean indicating whether user has joined event already
      */
     private boolean alreadyJoined() {
-        Entrant currentUser = userManager.getCurrentUser();
-        return currentUser.getJoinedEvents().contains(eventId) || currentUser.getPendingEvents().contains(eventId) ;
+        Entrant user = userManager.getCurrentUser();
+        return user.getJoinedEvents().contains(eventId) || user.getPendingEvents().contains(eventId);
     }
 
     /**
@@ -363,7 +277,7 @@ public class ViewEventDetails extends AppCompatActivity {
      * Assigns isUserTooFar variable to correct boolean
      */
     private void checkUserProximityToFacility() {
-        LocationManager.getLastLocation(ViewEventDetails.this, new LocationManager.OnLocationReceivedListener() {
+        LocationManager.getLastLocation(ViewScannedEvent.this, new LocationManager.OnLocationReceivedListener() {
             @Override
             public void onLocationReceived(Location location) {
                 // Compute distance between user's current location and event facility location
@@ -414,7 +328,7 @@ public class ViewEventDetails extends AppCompatActivity {
     /**
      * Signs user up for waitlist of event
      */
-    private void joinEvent() {
+    private void joinEventWaitingList() {
         databaseManager.joinEventWaitingList(userManager.getCurrentUser().getDeviceId(), userLocation, eventId, new DatabaseManager.joinWaitingListCallback() {
             @Override
             public void onSuccess() {

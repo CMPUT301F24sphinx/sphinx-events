@@ -6,7 +6,9 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,142 +25,170 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 
-/**
- * This will be used to view events that entrants have joined
- * Empty for now I just made it in tandem with viewCreatedEvent - Aniket
- */
 public class ViewEnteredEvent extends AppCompatActivity {
 
-    // db stuff
-    private FirebaseStorage storage;
-    private StorageReference storageReference;
+    // Manager attributes
+    private EventListener eventListener;
+    private UserManager userManager;
     private DatabaseManager databaseManager;
+    private String eventId;
+    private Event event;
 
     // Layout items
-    private ImageView eventPosterLayout;
-    private TextView eventNameLayout;
-    private TextView eventDescLayout;
-    private TextView eventDateLayout;
-    private TextView eventLimitLayout;
-    private TextView eventLocationReqLayout;
+    private ImageView eventPosterImageView;
+    private TextView eventNameTextView;
+    private TextView eventDescriptionTextView;
+    private TextView registrationDeadlineTextView;
+    private TextView lotteryMessageTextView;
+    private Button leaveWaitingListButton;
+    private LinearLayout invitationOptionsLayout;
+    private Button declineInvitationButton;
+    private Button acceptInvitationButton;
 
-    // Entrants in the event waiting list
-    private ArrayList<String> eventEntrants;
-    private Integer eventEntrantLimit;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_joined_event);
+        setContentView(R.layout.activity_view_entered_event);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        String currUser = UserManager.getInstance().getCurrentUser().getDeviceId();
-
-        // ID of event being viewed
-        String eventCode;
-        databaseManager = DatabaseManager.getInstance();
-
-        // Connect layout stuff to xml views
-        eventPosterLayout = findViewById(R.id.eventPoster);
-        eventNameLayout = findViewById(R.id.eventName);
-        eventDescLayout = findViewById(R.id.eventDescription);
-        eventDateLayout = findViewById(R.id.eventTimeRemaining);
-        eventLimitLayout = findViewById(R.id.eventLimit);
-        eventLocationReqLayout = findViewById(R.id.eventLocationReq);
-        Button eventGoBackLayout = findViewById(R.id.cancel_event_button);
-        Button eventEnterEventLayout = findViewById(R.id.add_event_button);
-
-        // Extract passed event code from previous activity and then query that Event from db
+        // Obtain passed eventId from intent
         Intent intent = getIntent();
         if (intent != null ) {
-            eventCode = intent.getStringExtra("eventId");
-            getEvent(eventCode);
-        } else{
-            Toast.makeText(this, "QR Scan failed in ViewEventDetails", Toast.LENGTH_SHORT).show();
-            finish(); // exit activity if failed
+            eventId = intent.getStringExtra("eventId");
+        }
+        else {
+            Toast.makeText(this, "Failed to load event details", Toast.LENGTH_SHORT).show();
+            finish(); // exit activity
         }
 
-        // Exit the activity with back button
-        eventGoBackLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
+        userManager = UserManager.getInstance();
+        databaseManager = DatabaseManager.getInstance();
+
+        // Obtain XML elements
+        ImageButton backButton = findViewById(R.id.back_button);
+        eventPosterImageView = findViewById(R.id.event_poster_image_view);
+        eventNameTextView = findViewById(R.id.event_name_text_view);
+        eventDescriptionTextView = findViewById(R.id.event_description_text_view);
+        registrationDeadlineTextView = findViewById(R.id.registration_deadline_text_view);
+        lotteryMessageTextView = findViewById(R.id.lottery_message_text_view);
+        leaveWaitingListButton = findViewById(R.id.leave_waiting_list_button);
+        invitationOptionsLayout = findViewById(R.id.invitation_options_layout);
+        declineInvitationButton = findViewById(R.id.decline_invitation_button);
+        acceptInvitationButton = findViewById(R.id.accept_invitation_button);
+
+        backButton.setOnClickListener(v -> {
+            finish();
         });
 
-        // Leave the event waitlist
-        eventEnterEventLayout.setOnClickListener(new View.OnClickListener() {
+        // Create the EventListener and start listening for updates to the event
+        eventListener = new EventListener(eventId, new EventListener.EventUpdateCallback() {
             @Override
-            public void onClick(View view) {
-                databaseManager.leaveEvent(currUser, intent.getStringExtra("eventId"));
+            public void onEventUpdated(Event updatedEvent) {
+                event = updatedEvent;
+                setDisplay();
             }
-        });
-    }
 
-
-    /**
-     * Get event obj with eventCode eventID
-     * Sets the activity layout text and image to event data queried
-     * @param eventCode eventID of event we want
-     */
-    public void getEvent(String eventCode) {
-
-        databaseManager.getEvent(eventCode, new DatabaseManager.eventRetrievalCallback() {
-            @Override
-            public void onSuccess(Event event) {
-
-                // Get information of event
-                String posterCode = event.getPoster();
-                SimpleDateFormat dateFormatter = new SimpleDateFormat("EEEE, MMMM d, yyyy 'at' h:m:s a z");
-                String formattedDate = dateFormatter.format(event.getLotteryEndDate());
-
-                // Set private var to event waitlist
-                eventEntrants = event.getEntrants();
-                if(eventEntrants == null){
-                    eventEntrants = new ArrayList<>();
-                }
-                eventEntrantLimit = event.getEntrantLimit();
-
-                // Set layout items to information gotten above
-                eventNameLayout.setText(event.getName());
-                eventDescLayout.setText(event.getDescription());
-                eventDateLayout.setText(formattedDate);
-                eventLimitLayout.setText(event.getEntrantLimit() != null ? event.getEntrantLimit().toString() : "0");
-
-                // If location is required change the text otherwise the default says no location required
-                // when joining events is fully implements this will have to check users locaion or else fail
-                if(event.getGeolocationReq() == true){
-                    eventLocationReqLayout.setText("Your location has to match the Event's Facility Location");
-                }
-
-                // Get poster from database using filepath of poster
-                storageReference = FirebaseStorage.getInstance().getReference().child(posterCode);
-                final long ONE_MEGABYTE = 2048 * 2048;
-                storageReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                    @Override
-                    public void onSuccess(byte[] bytes) {
-                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                        eventPosterLayout.setImageBitmap(bitmap);
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Handle any errors
-                        Toast.makeText(getApplicationContext(), "Failed to retrieve event poster", Toast.LENGTH_LONG).show();
-                    }
-                });
-            }
             @Override
             public void onFailure(Exception e) {
-                Toast.makeText(getApplicationContext(), "Error getting event. Please try again.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Error loading event information.", Toast.LENGTH_SHORT).show();
                 finish();
             }
         });
+        eventListener.startListening();  // Start listening for changes to event
+
+        leaveWaitingListButton.setOnClickListener(v -> {
+            databaseManager.leaveEvent(userManager.getCurrentUser().getDeviceId(), eventId);
+            Toast.makeText(getApplicationContext(), "You have left " + event.getName(), Toast.LENGTH_LONG).show();
+            finish();
+        });
+
+        declineInvitationButton.setOnClickListener(v -> {
+            databaseManager.cancelEvent(userManager.getCurrentUser().getDeviceId(), eventId);
+            Toast.makeText(getApplicationContext(), "You have cancelled " + event.getName(), Toast.LENGTH_LONG).show();
+        });
+
+        acceptInvitationButton.setOnClickListener(v -> {
+            databaseManager.confirmEvent(userManager.getCurrentUser().getDeviceId(), eventId);
+            Toast.makeText(getApplicationContext(), "You have confirmed " + event.getName(), Toast.LENGTH_LONG).show();
+        });
     }
+
+    /**
+     * Sets display depending on if user has won lottery or already joined
+     */
+    private void setDisplay() {
+        Entrant user = userManager.getCurrentUser();
+
+        // Displays event details
+        displayEventPoster();
+        eventNameTextView.setText(event.getName());
+        eventDescriptionTextView.setText(event.getDescription());
+        displayRegistrationDeadline();
+
+        // Sets display of UI elements that changes depending on lottery state
+        resetDisplay();
+        if (event.getLotteryWasDrawn()) {  // Event lottery was drawn
+            if (event.getLotteryWinners().contains(user.getDeviceId())) {  // User won the lottery
+                lotteryMessageTextView.setText("You won the lottery! Please accept or decline the event invitation.");
+                invitationOptionsLayout.setVisibility(View.VISIBLE);
+            }
+            else if (event.getEntrants().contains(user.getDeviceId())) {  // User lost the lottery
+                lotteryMessageTextView.setText("You lost the lottery, but you can still be drawn if others decline.");
+                leaveWaitingListButton.setVisibility(View.VISIBLE);
+            }
+            else {  // User is confirmed or cancelled
+                lotteryMessageTextView.setVisibility(View.GONE);
+            }
+        }
+        else {  // Lottery was not drawn
+            lotteryMessageTextView.setText("Waiting for lottery to be drawn.");
+            leaveWaitingListButton.setVisibility(View.VISIBLE);
+        }
+    }
+
+    /**
+     * Displays the event poster
+     */
+    private void displayEventPoster() {
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference().child(event.getPoster());
+        final long ONE_MEGABYTE = 2048 * 2048;
+        storageReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                eventPosterImageView.setImageBitmap(bitmap);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+                Toast.makeText(getApplicationContext(), "Failed to retrieve event poster", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    /**
+     * Displays event registration deadline
+     */
+    private void displayRegistrationDeadline() {
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("EEEE, MMMM d, yyyy 'at' hh:mm a z");
+        String formattedDate = dateFormatter.format(event.getLotteryEndDate());
+        registrationDeadlineTextView.setText(formattedDate);
+    }
+
+    /**
+     * Resets the display of UI elements that depend on lottery status
+     */
+    private void resetDisplay() {
+        lotteryMessageTextView.setVisibility(View.VISIBLE);
+        leaveWaitingListButton.setVisibility(View.GONE);
+        invitationOptionsLayout.setVisibility(View.GONE);
+    }
+
 }
