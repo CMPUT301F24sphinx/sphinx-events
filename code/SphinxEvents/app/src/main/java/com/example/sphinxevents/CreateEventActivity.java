@@ -161,9 +161,9 @@ public class CreateEventActivity extends AppCompatActivity {
         }
 
         // Converts input into proper types
-        Integer entrantLimit;
+        int entrantLimit;
         try {
-            entrantLimit = entrantLimitString.isEmpty() ? null : Integer.parseInt(entrantLimitString);
+            entrantLimit = entrantLimitString.isEmpty() ? -1 : Integer.parseInt(entrantLimitString);
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Invalid entrant limit", Toast.LENGTH_SHORT).show();
             return;

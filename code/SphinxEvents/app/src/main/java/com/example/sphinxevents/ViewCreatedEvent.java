@@ -142,15 +142,6 @@ public class ViewCreatedEvent extends AppCompatActivity {
             performRedraw(event.getCancelled().size());
 
         });
-
-
-        // TODO: Move this logic to the view entrant data activity that noobray is working on
-        Button viewMapButton = findViewById(R.id.view_map_button);
-        viewMapButton.setOnClickListener(v -> {
-            Intent viewMapIntent = new Intent(ViewCreatedEvent.this, ViewMapActivity.class);
-            viewMapIntent.putExtra("event", event);
-            startActivity(viewMapIntent);
-        });
     }
 
     /**
@@ -211,7 +202,7 @@ public class ViewCreatedEvent extends AppCompatActivity {
      * Displays number of people in waiting list and indicated whether there is a limit
      */
     private void displayEntrantCount() {
-        if (event.getEntrantLimit() != 0) {  // If there is an entrant limit, display it
+        if (event.getEntrantLimit() != -1) {  // If there is an entrant limit, display it
             numOfLotteryEntrantsTextView.setText(getString(R.string.entrants_and_limit,
                     event.retrieveNumInWaitingList(), event.getEntrantLimit()));
         }

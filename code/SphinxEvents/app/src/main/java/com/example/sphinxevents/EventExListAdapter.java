@@ -50,52 +50,32 @@ public class EventExListAdapter extends ExListAdapter {
         // Change the layoutId based on the groupPosition
         switch (groupPosition) {
             case 0:
-                layoutId = R.layout.ex_list_event;  // Use a different layout for group 0
+                layoutId = R.layout.ex_list_joined_event;
                 break;
             case 1:
-                layoutId = R.layout.ex_list_event;  // Use a different layout for group 1
+                layoutId = R.layout.ex_list_pending_event;
                 break;
             default:
-                layoutId = R.layout.ex_list_created_event;  // Default layout if groupPosition doesn't match specific cases
+                layoutId = R.layout.ex_list_created_event;
                 break;
         }
 
 
-        if (convertView == null || (int) convertView.getId() != layoutId) {
+        if (convertView == null || !convertView.getTag().equals(layoutId)) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(layoutId, parent, false);
+            view.setTag(layoutId);
         }
         else {
             view = convertView;
         }
 
-        // Sets XML elements that are common in all type of events
-        // TODO: Set other common elements
-        TextView eventTextView = view.findViewById(R.id.event_name_text_view);
-        eventTextView.setText(event.getName());
+        TextView eventNameTextView = view.findViewById(R.id.event_name_text_view);
+        TextView eventDescriptionTextView = view.findViewById(R.id.event_description_text_view);
+        eventNameTextView.setText(event.getName());
+        eventDescriptionTextView.setText(event.getDescription());
 
-
-        //TODO: Set unique pending and joined event layout elements
-
-        // Set unique created event layout elements
-        if (groupPosition == 2) {
-            // Sets display of number of entrants who joined lottery and the entrant limit
-            TextView numberOfEntrantsTextView = view.findViewById(R.id.number_of_entrants_text_view);
-            TextView limitOfEntrantsTextView = view.findViewById(R.id.limit_of_entrants_text_view);
-            if(event.getEntrants() == null){
-                numberOfEntrantsTextView.setText(context.getString(R.string.number_of_entrants, 0));
-            } else {
-                numberOfEntrantsTextView.setText(context.getString(R.string.number_of_entrants, event.getEntrants().size()));
-            }
-            if (event.getEntrantLimit() == null || event.getEntrantLimit() == 0 ) {
-                limitOfEntrantsTextView.setVisibility(View.GONE);
-            }
-            else {
-                limitOfEntrantsTextView.setText(context.getString(R.string.entrant_limit, event.getEntrantLimit()));
-            }
-
-            setLotteryTime(view, event);  // Sets the time remaining until lottery
-        }
+        setLotteryIndicator(view, event);  // Sets the time remaining until lottery
 
         return view;
     }
@@ -109,14 +89,12 @@ public class EventExListAdapter extends ExListAdapter {
      * @param view the view of the event
      * @param event the Event object associated with the view
      */
-    private void setLotteryTime(View view, Event event) {
+    private void setLotteryIndicator(View view, Event event) {
         // Obtains relevant XML elements
         LinearLayout lotteryTimerLinearLayout = view.findViewById(R.id.lottery_timer_linear_layout);
         TextView lotteryTimeRemainingTextView = view.findViewById(R.id.lottery_time_remaining_text_view);
         ImageView clockImage = view.findViewById(R.id.clock_image_view);
 
-
-        // TODO: Fix this logic in case things were changed in the Event class
         // Sets lottery time remaining to proper display
         if (event.getLotteryWasDrawn()) {
             lotteryTimeRemainingTextView.setText(R.string.lottery_drawn);
@@ -126,7 +104,7 @@ public class EventExListAdapter extends ExListAdapter {
         else {
             Date lotteryEndDate = event.getLotteryEndDate();
             Date currentDate = new Date();
-            if (lotteryEndDate.compareTo(currentDate) <= 0) {  // Waiting for organizer to initiate lottery
+            if (event.canLotteryBeDrawn()) {  // Waiting for organizer to initiate lottery
                 lotteryTimeRemainingTextView.setText(R.string.awaiting_lottery);
                 clockImage.setVisibility(View.GONE);
             }

@@ -76,6 +76,13 @@ public class ViewEventEntrantData extends AppCompatActivity {
             }
         });
         eventListener.startListening();  // Start listening for changes to event
+
+        Button viewMapButton = findViewById(R.id.view_map_button);
+        viewMapButton.setOnClickListener(v -> {
+            Intent viewMapIntent = new Intent(ViewEventEntrantData.this, ViewMapActivity.class);
+            viewMapIntent.putExtra("event", currEvent);
+            startActivity(viewMapIntent);
+        });
     }
 
     public void updateExpandableLists() {
