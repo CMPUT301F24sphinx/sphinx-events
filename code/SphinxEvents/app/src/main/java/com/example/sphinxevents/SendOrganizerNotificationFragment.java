@@ -2,6 +2,10 @@
  * Class Name: SendOrganizerNotificationFragment
  * Date: 2024-11-29
  *
+ * Description:
+ * Fragment that allows the organizer to send a notification to selected recipient groups.
+ * The recipient groups are represented by checkboxes for the waiting list, cancelled list,
+ * and joined list. After entering a title and message, the notification is sent to the selected groups.
  */
 
 package com.example.sphinxevents;

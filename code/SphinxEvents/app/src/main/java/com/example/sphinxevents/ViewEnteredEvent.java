@@ -1,3 +1,13 @@
+/*
+ * Class Name: ViewEnteredEvent
+ * Date: 2024-11-30
+ *
+ * Description:
+ * Allows the user to view the details of an event they have joined. The user can leave the
+ * waiting list for the event and they are also given the option to accept or decline an invitation
+ * for if they have won the lottery.
+ */
+
 package com.example.sphinxevents;
 
 import android.content.Intent;
@@ -26,6 +36,11 @@ import com.google.firebase.storage.StorageReference;
 
 import java.text.SimpleDateFormat;
 
+/**
+ * Allows the user to view the details of an event they have joined. The user can leave the
+ * waiting list for the event and they are also given the option to accept or decline an invitation
+ * for if they have won the lottery.
+ */
 public class ViewEnteredEvent extends AppCompatActivity {
 
     // Manager attributes

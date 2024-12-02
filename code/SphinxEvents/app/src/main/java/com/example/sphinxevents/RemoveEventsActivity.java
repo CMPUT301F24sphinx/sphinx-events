@@ -1,7 +1,13 @@
 /*
+ * Class Name: RemoveEventsActivity
+ * Date: 2024-12-01
+ *
+ *
+ * Description:
  * Displays event information that was clicked by administrator in EventsSearchActivity
  * Allows administrator to remove event
  */
+
 
 package com.example.sphinxevents;
 
@@ -40,6 +46,10 @@ import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 
+/**
+ * Activity to handle the removal of events from the database.
+ * Provides options to remove an event or delete its poster.
+ */
 public class RemoveEventsActivity extends AppCompatActivity {
 
     private Event event;
@@ -131,6 +141,13 @@ public class RemoveEventsActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Deletes the event's poster from storage and updates the database.
+     *
+     * @param posterId   The ID of the poster in storage.
+     * @param eventId    The ID of the event in the database.
+     * @param posterView The ImageView displaying the poster.
+     */
     private void deleteEventPoster(String posterId, String eventId, ImageView posterView) {
         // Reference to the poster in Firebase Storage
         StorageReference storageReference = FirebaseStorage.getInstance().getReference().child(posterId);
@@ -164,6 +181,9 @@ public class RemoveEventsActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Removes the event from the database.
+     */
     private void removeEvent() {
         databaseManager.removeEvent(event.getEventId(), new DatabaseManager.EventRemovalCallback() {
             @Override
@@ -179,6 +199,12 @@ public class RemoveEventsActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Displays the event's poster in an ImageView.
+     *
+     * @param posterId        The ID of the poster in storage.
+     * @param eventPosterView The ImageView to display the poster in.
+     */
     private void displayEventPoster(String posterId, ImageView eventPosterView){
         StorageReference storageReference = FirebaseStorage.getInstance().getReference().child(posterId);
         final long ONE_MEGABYTE = 2048 * 2048;

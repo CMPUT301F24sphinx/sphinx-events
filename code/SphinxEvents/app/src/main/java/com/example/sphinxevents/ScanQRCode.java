@@ -1,3 +1,11 @@
+/*
+ * Class Name: ScanQRCode
+ * Date: 2024-11-28
+ *
+ * Description:
+ * Activity that uses the users camera to scan a QR code
+ */
+
 package com.example.sphinxevents;
 
 import static android.widget.Toast.makeText;
