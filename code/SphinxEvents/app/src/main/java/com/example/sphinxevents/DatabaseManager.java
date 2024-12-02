@@ -383,9 +383,9 @@ public class DatabaseManager {
                                     database.collection("users")
                                             .document(deviceId)
                                             .update(
+                                                    "role", "Entrant",
                                                     "createdEvents", FieldValue.delete(),
-                                                    "facility", FieldValue.delete(),
-                                                    "role", "Entrant"
+                                                    "facility", FieldValue.delete()
                                             )
                                             .addOnSuccessListener(unused -> {
                                                 callback.onSuccess(null); // Notify success
