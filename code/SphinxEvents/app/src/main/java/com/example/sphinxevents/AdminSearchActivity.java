@@ -1,3 +1,12 @@
+/*
+ * Class Name: AdminSearchActivity
+ * Date: 2024-11-07
+ *
+ * Description:
+ * Allows admin to browse facilities, events, or profiles in the database
+ * Admin can enter query to search for specific facilities, events, or profiles
+ */
+
 package com.example.sphinxevents;
 
 import android.content.Intent;
@@ -14,6 +23,10 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+/**
+ * Allows admin to browse facilities, events, or profiles in the database
+ * Admin can enter query to search for specific facilities, events, or profiles
+ */
 public class AdminSearchActivity extends AppCompatActivity {
 
     @Override

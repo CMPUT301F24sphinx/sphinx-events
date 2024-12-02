@@ -2,11 +2,11 @@
  * Class Name: Notification
  * Date: 2024-11-06
  *
- * Copyright (c) 2024
- * All rights reserved.
+ * Description:
+ * Represents a system notification to be displayed on the user's device.
+ * This class holds the necessary data to generate and display Android system notifications.
  *
  */
-
 
 package com.example.sphinxevents;
 

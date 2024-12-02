@@ -1,7 +1,12 @@
 /*
+ * Class Name: ManageFacilityActivity
+ * Date: 2024-11-25
+ *
+ * Description:
  * Displays user's facility information if they have one
  * Gives Entrants the option to add a facility to their profile
  * Gives Organizers the option to remove or edit their facility
+ *
  */
 
 package com.example.sphinxevents;

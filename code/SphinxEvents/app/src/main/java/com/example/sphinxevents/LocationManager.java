@@ -1,3 +1,13 @@
+/*
+ * Class Name: LocationManager
+ * Date: 2024-11-25
+ *
+ * Description:
+ * This class manages location services, including checking for location permissions,
+ * requesting them if necessary, and retrieving the device's last known location.
+ * It uses Google's FusedLocationProviderClient to obtain location data and handles
+ * location permission requests for Android devices.
+ */
 
 package com.example.sphinxevents;
 
@@ -16,23 +26,49 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+/**
+ * This class manages location services, including checking for location permissions,
+ * requesting them if necessary, and retrieving the device's last known location.
+ * It uses Google's FusedLocationProviderClient to obtain location data and handles
+ * location permission requests for Android devices.
+ */
 public class LocationManager {
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 123;
 
-    // Interface to handle location callbacks
+    /**
+     * Interface to handle location callbacks.
+     * Implement this interface to receive location updates or handle errors.
+     */
     public interface OnLocationReceivedListener {
+        /**
+         * Called when the location is successfully received.
+         * @param location the received location object
+         */
         void onLocationReceived(Location location);
+
+        /**
+         * Called when there is an error in retrieving the location.
+         */
         void onLocationError();
     }
 
-    // Method to check location permission
+    /**
+     * Checks if location permissions are granted.
+     * @param context the context in which the permission check is performed
+     * @return true if location permissions are granted, false otherwise
+     */
     public static boolean isLocationPermissionGranted(Context context) {
         return ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
-    // Method to request location permission
+
+    /**
+     * Requests location permissions from the user.
+     * If permissions are not granted, it prompts the user to grant location access.
+     * @param activity the activity from which the request is made
+     */
     public static void requestLocationPermission(Activity activity) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!isLocationPermissionGranted(activity)) {
@@ -43,7 +79,12 @@ public class LocationManager {
         }
     }
 
-    // Method to get the current location
+    /**
+     * Retrieves the device's last known location.
+     * Uses the FusedLocationProviderClient to fetch the most recent location and sends it to the listener.
+     * @param context the context from which the method is called
+     * @param listener the listener that receives the location or an error
+     */
     public static void getLastLocation(Context context, OnLocationReceivedListener listener) {
         // Check if location permission is granted
         if (isLocationPermissionGranted(context)) {

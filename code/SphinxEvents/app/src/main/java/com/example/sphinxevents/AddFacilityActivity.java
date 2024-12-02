@@ -27,8 +27,9 @@ import androidx.core.view.WindowInsetsCompat;
 import java.util.ArrayList;
 
 /**
- * Allows entrant to add/edit their facility
- * User can input/edit name, location, and phone number of their facility
+ * Allows user to add/edit their facility
+ * User can input/edit name and phone number of their facility
+ * The facility location is the location of the user when they are creating the facility
  */
 public class AddFacilityActivity extends AppCompatActivity {
 
@@ -135,6 +136,7 @@ public class AddFacilityActivity extends AppCompatActivity {
         }
         else if (activityContext.equals("Edit Facility")) {
             Facility oldFacility = ((Organizer) user).getFacility();
+            // If nothing changed, don't need to access the database
             if (nothingChanged(oldFacility, facilityName, facilityPhoneNumber)) {
                 Toast.makeText(getApplicationContext(), "No changes were made", Toast.LENGTH_SHORT).show();
                 finish();
@@ -146,7 +148,8 @@ public class AddFacilityActivity extends AppCompatActivity {
     }
 
     /**
-     * Saves facility to user's database document
+     * Adds facility to database
+     * Makes user become an Organizer
      */
     public void addFacility(Facility newFacility) {
         // Adds facility to database
@@ -181,6 +184,11 @@ public class AddFacilityActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Updates user's facility in database
+     * @param newFacility the new version of the facility with the updated field(s)
+     * @param organizer  the organizer who is editing their facility
+     */
     public void editFacility(Facility newFacility, Organizer organizer) {
         databaseManager.addFacility(organizer.getDeviceId(), newFacility, new DatabaseManager.FacilityCreationCallback() {
             @Override

@@ -1,3 +1,14 @@
+/*
+ * Class Name: EntrantExListAdapter
+ * Date: 2024-11-27
+ *
+ * Description:
+ * Adapter for Entrant objects in expandable lists
+ * Displays the details of entrants
+ *
+ */
+
+
 package com.example.sphinxevents;
 
 import android.content.Context;
@@ -10,16 +21,23 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Used in displaying the data of event entrants by an organizer
+ * Adapter for Entrant objects in expandable lists
+ * Displays the details of entrants
  */
 public class EntrantExListAdapter extends ExListAdapter {
 
+    /**
+     * Constructor for EntrantExListAdapter
+     * @param context  context of where this adapter is used
+     * @param headers  array of headers
+     * @param entrants  map of headers and an array of entrants
+     */
     EntrantExListAdapter(Context context, List<String> headers, Map<String, List<Entrant>> entrants) {
         super(context, headers, entrants);
     }
 
     /**
-     * Displays the events within ex-list
+     * Displays the entrants within ex-list
      *
      * @param groupPosition index of group
      * @param childPosition index of event within group
@@ -43,10 +61,12 @@ public class EntrantExListAdapter extends ExListAdapter {
             view = convertView;
         }
 
+        // Obtains UI elements
         TextView entrantNameTextView = view.findViewById(R.id.entrant_name_text_view);
         TextView entrantEmailTextView = view.findViewById(R.id.entrant_data_email);
         TextView entrantPhoneTextView = view.findViewById(R.id.entrant_data_phone_number);
 
+        // Sets details of entrant
         entrantNameTextView.setText(entrant.getName());
         entrantEmailTextView.setText(entrant.getEmail());
         entrantPhoneTextView.setText(entrant.getPhoneNumber());

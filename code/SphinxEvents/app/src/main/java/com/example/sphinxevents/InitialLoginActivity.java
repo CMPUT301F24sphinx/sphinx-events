@@ -2,8 +2,12 @@
  * Class Name: InitialLoginActivity
  * Date: 2024-11-06
  *
- * Copyright (c) 2024
- * All rights reserved.
+ * Description:
+ * InitialLoginActivity is the activity that handles the initial login process for users.
+ * Users are allowed to implement a name, email, and optional phone number. The activity also
+ * conducts basic input validation. A deterministic profile picture based on the users name is
+ * generated when the user is ready to create their profile. The user data is stored in the
+ * Firebase FireStore database.
  *
  */
 
@@ -31,13 +35,14 @@ import java.io.IOException;
  * Users are allowed to implement a name, email, and optional phone number. The activity also
  * conducts basic input validation. A deterministic profile picture based on the users name is
  * generated when the user is ready to create their profile. The user data is stored in the
- * Firebase Firestore database.
+ * Firebase FireStore database.
  */
 public class InitialLoginActivity extends AppCompatActivity {
 
-    private String deviceId;
+    private String deviceId;  // device id of new user
     private DatabaseManager database;
 
+    // UI elements
     private EditText nameEditText;
     private EditText emailEditText;
     private EditText phoneEditText;

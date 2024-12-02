@@ -1,6 +1,11 @@
 /*
+ * Class Name: ExListAdapter
+ * Date: 2024-11-25
+ *
+ * Description:
  * Adapter for expandable lists
  * Implements all functionalities of expandable lists except the getChildView()
+ *
  */
 
 package com.example.sphinxevents;

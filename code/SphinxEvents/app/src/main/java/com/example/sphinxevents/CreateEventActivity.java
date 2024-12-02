@@ -1,3 +1,14 @@
+/*
+ * Class Name: CreateEventActivity
+ * Date: 2024-11-25
+ *
+ * Description:
+ * Activity for creating a new event.
+ * This activity allows the user to input event details, set a registration deadline,
+ *     upload an event poster, and save the event to Firebase.
+ *
+ */
+
 package com.example.sphinxevents;
 
 import android.app.DatePickerDialog;
@@ -51,7 +62,6 @@ public class CreateEventActivity extends AppCompatActivity {
     private EditText entrantLimitEditText;
     private CheckBox geolocationReqCheckbox;
 
-
     // Event poster attributes
     private ImageView posterImage;
     private Uri posterUri;
@@ -70,6 +80,7 @@ public class CreateEventActivity extends AppCompatActivity {
             return insets;
         });
 
+        // Initialize database attributes
         databaseManager = DatabaseManager.getInstance();
         userManager = UserManager.getInstance();
         organizerId = userManager.getCurrentUser().getDeviceId();
@@ -169,6 +180,7 @@ public class CreateEventActivity extends AppCompatActivity {
             return;
         }
 
+        // Obtains registration deadline
         Date regDate;
         try {
             regDate = new SimpleDateFormat("yyyy/MM/dd").parse(dateString);
@@ -183,24 +195,27 @@ public class CreateEventActivity extends AppCompatActivity {
         Event newEvent = new Event(userManager.getCurrentUser().getDeviceId(), eventName, eventDesc,
                 regDate, entrantLimit, geolocationReq, new ArrayList<String>(), facilityLocation);
 
+        // Adds event and stores poster in database
         databaseManager.createEvent(newEvent, new DatabaseManager.EventCreationCallback() {
             @Override
-            public void onSuccess(DocumentReference eventRef) {
+            public void onSuccess(Event createdEvent) {
                 // Adds Event to user and updates current user
-                String eventId = eventRef.getId();
-                String posterId = "EventPosters/" + eventId + ".jpg";
-                newEvent.setEventId(eventId);
-                newEvent.setPoster(posterId);
+                // String eventId = eventRef.getId();
+                // String posterId = "EventPosters/" + eventId + ".jpg";
+                // newEvent.setEventId(eventId);
+                // newEvent.setPoster(posterId);
+                /*
                 Organizer currentUser = (Organizer) userManager.getCurrentUser();
                 currentUser.addCreatedEvent(eventId);
                 userManager.setCurrentUser(currentUser);
+                 */
 
                 // Updates user in database
-                databaseManager.updateOrganizerCreatedEvents(organizerId, eventId);
-                uploadPosterImage(posterId);
+                databaseManager.updateOrganizerCreatedEvents(organizerId, createdEvent.getEventId());
+                uploadPosterImage(createdEvent.getPoster());
                 Toast.makeText(getApplicationContext(), "Event created successfully", Toast.LENGTH_SHORT).show();
 
-                startQrCodeActivity(eventId);
+                startQrCodeActivity(createdEvent.getEventId());
                 finish();
             }
 

@@ -1,5 +1,11 @@
 /*
- * Adapter for expandable lists that holds events
+ * Class Name: EventExListAdapter
+ * Date: 2024-11-07
+ *
+ * Description:
+ * Adapter for Event objects in expandable lists
+ * Displays the details of Event, and differentiates joined, pending, and created events
+ *
  */
 
 package com.example.sphinxevents;
@@ -22,10 +28,17 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Adapter for expandable lists that holds events
+ * Adapter for Event objects in expandable lists
+ * Displays the details of Event, and differentiates joined, pending, and created events
  */
 public class EventExListAdapter extends ExListAdapter {
 
+    /**
+     * Constructor for EntrantExListAdapter
+     * @param context  context of where this adapter is used
+     * @param headers  array of headers
+     * @param events  map of headers and an array of events
+     */
     EventExListAdapter(Context context, List<String> headers, Map<String, List<Event>> events) {
         super(context, headers, events);
     }
@@ -60,7 +73,6 @@ public class EventExListAdapter extends ExListAdapter {
                 break;
         }
 
-
         if (convertView == null || !convertView.getTag().equals(layoutId)) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(layoutId, parent, false);
@@ -70,6 +82,7 @@ public class EventExListAdapter extends ExListAdapter {
             view = convertView;
         }
 
+        // Sets Event details
         TextView eventNameTextView = view.findViewById(R.id.event_name_text_view);
         TextView eventDescriptionTextView = view.findViewById(R.id.event_description_text_view);
         eventNameTextView.setText(event.getName());
@@ -95,6 +108,7 @@ public class EventExListAdapter extends ExListAdapter {
         TextView lotteryTimeRemainingTextView = view.findViewById(R.id.lottery_time_remaining_text_view);
         ImageView clockImage = view.findViewById(R.id.clock_image_view);
 
+        // Determine proper message to display
         Date lotteryEndDate = event.getLotteryEndDate();
         Date currentDate = new Date();
         if (event.canLotteryBeDrawn() || event.getLotteryWasDrawn()) {  // Waiting for organizer to initiate lottery

@@ -1,6 +1,11 @@
 /*
+ * Class Name: Organizer
+ * Date: 2024-10-20
+ *
+ * Description:
  * Represents a user who adds a facility to their profile
  * Adds facility and createdEvents attributes to the already created Entrant class attributes
+ *
  */
 
 package com.example.sphinxevents;
@@ -19,10 +24,27 @@ public class Organizer extends Entrant {
     private ArrayList<String> createdEvents;
     private Facility facility;
 
-    // Empty Constructor
+    /**
+     * Empty constructor
+     */
     public Organizer() {
     }
 
+    /**
+     * Constructor for Organizer
+     * @param deviceId id of user's device
+     * @param name name of user
+     * @param email email of user
+     * @param phoneNumber phone number of user
+     * @param profilePictureUrl profile picture url of user
+     * @param isCustomPfp boolean on if user has custom pfp
+     * @param orgNotificationsEnabled boolean on if user has organizer notifications enabled
+     * @param adminNotificationsEnabled boolean on if user has admin notifications enabled
+     * @param joinedEvents array of event Id's that the user has joined
+     * @param pendingEvents array of event Id's that the user has joined the waiting list for
+     * @param facility the user's facility
+     * @param createdEvents array of event Id's that the user has created
+     */
     public Organizer(String deviceId, String name, String email, String phoneNumber, String profilePictureUrl,
                      boolean isCustomPfp, boolean orgNotificationsEnabled, boolean adminNotificationsEnabled,
                      ArrayList<String> joinedEvents, ArrayList<String> pendingEvents,

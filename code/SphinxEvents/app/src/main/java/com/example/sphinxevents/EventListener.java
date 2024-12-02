@@ -1,3 +1,13 @@
+/*
+ * Class Name: EventListener
+ * Date: 2024-11-25
+ *
+ * Description:
+ * Listens for changes in a given event in the database
+ * Notifies listeners for changes
+ *
+ */
+
 package com.example.sphinxevents;
 
 import android.util.Log;
@@ -6,12 +16,16 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 
+/**
+ *  Listens for changes in a given event in the database
+ *  Notifies listeners for changes
+ */
 public class EventListener {
 
-    private FirebaseFirestore db;
-    private ListenerRegistration listenerRegistration;
-    private String eventID;
-    private EventUpdateCallback callback;
+    private FirebaseFirestore db;  // Reference to the database
+    private ListenerRegistration listenerRegistration;  // Used to manage a real-time listener on an event
+    private String eventID;  // The Id of the event to listen to changes for
+    private EventUpdateCallback callback;  // The callback to notify listeners for changes
 
     /**
      * Constructs the EventListener
@@ -49,7 +63,7 @@ public class EventListener {
                         Event updatedEvent = documentSnapshot.toObject(Event.class);
 
                         if (updatedEvent != null) {
-                            callback.onEventUpdated(updatedEvent); // Callback to update the UI
+                            callback.onEventUpdated(updatedEvent); // Callback to listeners to notify change
                         }
                     }
                 });
