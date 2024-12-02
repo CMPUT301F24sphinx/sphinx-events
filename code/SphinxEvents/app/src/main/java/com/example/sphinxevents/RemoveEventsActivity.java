@@ -44,6 +44,7 @@ public class RemoveEventsActivity extends AppCompatActivity {
 
     private Event event;
     private DatabaseManager databaseManager;
+    private FirebaseFirestore database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,9 +73,10 @@ public class RemoveEventsActivity extends AppCompatActivity {
         TextView eventEntrantLimitTextView = findViewById(R.id.event_entrant_limit_textview);
         ImageView eventPosterView = findViewById(R.id.event_imageView);
 
-
+        // Button XML elements:
         Button removeButton = findViewById(R.id.remove_event_button);
         Button removePosterButton = findViewById(R.id.remove_event_poster_button);
+        Button removeQRButton = findViewById(R.id.remove_QR_button);
 
         // Sets display
         eventNameTextView.setText(event.getName());
@@ -108,6 +110,25 @@ public class RemoveEventsActivity extends AppCompatActivity {
             deleteEventPoster(posterId, eventID, eventPosterView);
         });
 
+        // Sets onClickListener for removeQRButton
+        removeQRButton.setOnClickListener(v -> {
+            removeQRfunction();
+        });
+
+    }
+
+    private void removeQRfunction() {
+        databaseManager.removeQR(event.getEventId(), new DatabaseManager.QRRemovalCallback() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(getApplicationContext(), "QR removed!", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(getApplicationContext(), "Error removing QR from database", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void deleteEventPoster(String posterId, String eventId, ImageView posterView) {
@@ -156,7 +177,7 @@ public class RemoveEventsActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Error removing event from database", Toast.LENGTH_SHORT).show();
             }
         });
-   }
+    }
 
     private void displayEventPoster(String posterId, ImageView eventPosterView){
         StorageReference storageReference = FirebaseStorage.getInstance().getReference().child(posterId);
