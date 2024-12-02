@@ -36,6 +36,8 @@
     <color name="list_profile_background_color">#C0DEF8</color>
 
     <!-- List Event Colors -->
+    <color name="list_joined_event_color">#B4FB68</color>
+    <color name="list_pending_event_color">#F8DA7A</color>
     <color name="list_created_event_color">#85E5FF</color>
 
     <!-- Viewing Pending/Joined Event Colors -->

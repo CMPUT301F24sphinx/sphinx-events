@@ -32,7 +32,6 @@ public class AdminSearchActivity extends AppCompatActivity {
         EditText searchBar = findViewById(R.id.searchBar);
         Button searchButton = findViewById(R.id.searchButton);
         RadioGroup filterRadioGroup = findViewById(R.id.filter_radio_group);
-        Button seeAllImagesButton = findViewById(R.id.see_all_images_button);
 
         // Sets onClickListener for back arrow -> go back to main screen
         backButton.setOnClickListener(v -> {
@@ -60,13 +59,11 @@ public class AdminSearchActivity extends AppCompatActivity {
                 startActivity(profilesSearchIntent);
             }
             else {
-                // TODO: LAUNCH EVENT SEARCH ACTIVITY (NEXT SPRINT)
+                Intent eventsSearchIntent = new Intent(this, EventsSearchActivity.class);
+                eventsSearchIntent.putExtra("query", query);
+                startActivity(eventsSearchIntent);
             }
         });
 
-        // Sets onClickListener for see all images button
-        seeAllImagesButton.setOnClickListener(v -> {
-            // TODO: IMPLEMENT SEE ALL IMAGES ACTIVITY (NEXT SPRINT)
-        });
     }
 }

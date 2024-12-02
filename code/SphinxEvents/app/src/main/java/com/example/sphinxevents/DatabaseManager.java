@@ -11,7 +11,14 @@
 
 package com.example.sphinxevents;
 
+import static android.content.ContentValues.TAG;
+
+import android.content.Context;
+import android.location.Location;
+
+
 import android.net.Uri;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -336,48 +343,68 @@ public class DatabaseManager {
     }
 
     /**
-     * Removes a facility from database, updates user who owns faciltiy
-     * @param deviceId key for facility
-     * @param callback Callback to handle success or failure of facility deletion
+     * Removes a facility from the database, deletes associated events, their posters, and updates the user who owns the facility.
+     *
+     * @param deviceId The ID of the facility and its associated user.
+     * @param callback Callback to handle success or failure of the facility removal process.
      */
     public void removeFacility(String deviceId, FacilityRemovalCallback callback) {
-        // Remove the facility document from the Firestore collection
-        // TODO: Remove events that facility is hosting
-        database.collection("facilities")
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+
+        // Retrieve the user's document to access the "createdEvents" array
+        database.collection("users")
                 .document(deviceId)
-                .delete()
-                .addOnSuccessListener(aVoid -> {
-                    // Remove facility from user
-                    getUser(deviceId, new UserRetrievalCallback() {
-                        @Override
-                        public void onSuccess(Entrant user) {
-                            // Updates user to be an Entrant
-                            Entrant updatedUser = new Entrant(user.getDeviceId(), user.getName(), user.getEmail(),
-                                    user.getPhoneNumber(), user.getDefaultPfpPath(), user.getCustomPfpUrl(),
-                                    user.isOrgNotificationsEnabled(), user.isAdminNotificationsEnabled(),
-                                    user.getJoinedEvents(), user.getPendingEvents());
-                            saveUser(updatedUser, new UserCreationCallback() {
-                                @Override
-                                public void onSuccess(String deviceId) {
-                                    callback.onSuccess(updatedUser);  // Notify success
-                                }
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        // Get the createdEvents array from the user's document
+                        ArrayList<String> createdEvents = (ArrayList<String>) documentSnapshot.get("createdEvents");
 
-                                @Override
-                                public void onFailure(Exception e) {
-                                    callback.onFailure(new Exception("Failed to remove facility from user"));
-                                }
-                            });
+                        // Delete all events created by this facility
+                        if (createdEvents != null) {
+                            for (String eventId : createdEvents) {
+                                removeEvent(eventId, new EventRemovalCallback() {
+                                    @Override
+                                    public void onSuccess() {
+                                    }
+
+                                    @Override
+                                    public void onFailure(Exception e) {
+                                    }
+                                });
+                            }
                         }
 
-                        @Override
-                        public void onFailure(Exception e) {
-                            callback.onFailure(new Exception("Failed to remove facility from user"));
-                        }
-                    });
-
+                        // Remove the facility document and update the user document
+                        database.collection("facilities")
+                                .document(deviceId)
+                                .delete()
+                                .addOnSuccessListener(aVoid -> {
+                                    database.collection("users")
+                                            .document(deviceId)
+                                            .update(
+                                                    "role", "Entrant",
+                                                    "createdEvents", FieldValue.delete(),
+                                                    "facility", FieldValue.delete()
+                                            )
+                                            .addOnSuccessListener(unused -> {
+                                                callback.onSuccess(null); // Notify success
+                                            })
+                                            .addOnFailureListener(e ->
+                                                    callback.onFailure(new Exception("Failed to update user document"))
+                                            );
+                                })
+                                .addOnFailureListener(e ->
+                                        callback.onFailure(new Exception("Failed to delete facility document"))
+                                );
+                    } else {
+                        callback.onFailure(new Exception("User document not found"));
+                    }
                 })
-                .addOnFailureListener(callback::onFailure);  // Notify failure
+                .addOnFailureListener(e -> callback.onFailure(new Exception("Failed to retrieve user document")));
     }
+
+
 
     /**
      * Callback interface for facility search
@@ -514,7 +541,8 @@ public class DatabaseManager {
     }
 
     /**
-     * Deletes a profile picture from Firebase Storage.
+     * Deletes a profile picture from Firebase Storage and updates the user's profilePictureUrl to an empty string.
+     *
      * @param deviceId The device ID of the user whose profile picture is being deleted.
      * @param callback Callback to handle success or failure of the deletion.
      */
@@ -526,14 +554,27 @@ public class DatabaseManager {
         // Delete the profile picture
         profilePicRef.delete()
                 .addOnSuccessListener(aVoid -> {
-                    // Call the callback on success
-                    callback.onSuccess();
+                    // Update the user's profilePictureUrl to an empty string in the Firestore database
+                    FirebaseFirestore.getInstance()
+                            .collection("users")
+                            .document(deviceId)
+                            .update("profilePictureUrl", "")
+                            .addOnSuccessListener(unused -> {
+                                // Call the callback on success
+                                callback.onSuccess();
+                            })
+                            .addOnFailureListener(e -> {
+                                // Call the callback on failure to update Firestore
+                                callback.onFailure();
+                            });
                 })
                 .addOnFailureListener(e -> {
-                    // Call the callback on failure
+                    // Call the callback on failure to delete the profile picture
                     callback.onFailure();
                 });
     }
+
+
 
     // ---------------------------------------------------------------------------------------------
 
@@ -576,7 +617,7 @@ public class DatabaseManager {
 
                             // Ensure that the confirmedlist is initialized
                             if (event != null && event.getConfirmed() == null) {
-                                event.setConfirmed(new ArrayList<>());  // Initialize waitingList if null
+                                event.setConfirmed(new ArrayList<>());  // Initialize confirmedList if null
                             }
 
                             callback.onSuccess(event);
@@ -1042,7 +1083,7 @@ public class DatabaseManager {
      * @param eventsToRetrieve list of event id's to search for in database
      * @param callback callback to handle success or failure of event list retrieval
      */
-    public void retrieveEventList(ArrayList<String> eventsToRetrieve, retrieveEventListCallback callback) {
+    public void retrieveEventList(ArrayList<String> eventsToRetrieve, String userId, String eventType, retrieveEventListCallback callback) {
         // Handles empty list of events to search for
         if (eventsToRetrieve.isEmpty()) {
             callback.onSuccess(new ArrayList<>());
@@ -1125,7 +1166,7 @@ public class DatabaseManager {
     }
 
     /**
-     * Adds notification object to "notification" collection in the database.
+     * Adds notification to the "notifications" sub-collection of recipients.
      *
      * @param notification The notification object being uploaded.
      * @param recipients   The recipients of the notification.
@@ -1301,6 +1342,155 @@ public class DatabaseManager {
                 .addOnFailureListener(callback::onFailure);  // Notify failure
 
     }
+  
+    //---------------------------------------------------------------------------------------------
+    //Admin events search handling:
+
+    /**
+     * Callback interface for events search
+     */
+    public interface EventsSearchCallback {
+        /**
+         * Called when event search is successful
+         * @param events array of events that match query
+         */
+        void onSuccess(ArrayList<Event> events);
+
+        /**
+         * Called when error occurs during events search
+         * @param e the exception that occurred
+         */
+        void onFailure(Exception e);
+    }
+
+    /**
+     * Searches database for events that match name
+     * @param query the event name to find in database
+     * @param callback Callback to handle success or failure of searching database
+     */
+    public void searchEvents(String query, EventsSearchCallback callback) {
+        // Ensure the query is not case-sensitive and add a termination character to simulate a "contains" query
+        String endQuery = query + "\uf8ff"; // \uf8ff is a high Unicode character
+
+        // Query the users collection for documents with names containing the query
+        database.collection("events")
+                .whereGreaterThanOrEqualTo("name", query)
+                .whereLessThanOrEqualTo("name", endQuery)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        ArrayList<Event> events = new ArrayList<>();
+                        for (DocumentSnapshot document : task.getResult()) {
+                            Event event = document.toObject(Event.class);
+                            events.add(event);
+                        }
+                        callback.onSuccess(events);
+                    } else {
+                        callback.onFailure(task.getException());
+                    }
+                });
+    }
+
+    /**
+     * Callback interface for event deletion
+     */
+    public interface EventRemovalCallback {
+        /**
+         * Called when event is successfully removed
+         */
+        void onSuccess();
+
+        /**
+         * Called when error occurs during event deletion
+         * @param e the exception that occurred
+         */
+        void onFailure(Exception e);
+    }
+
+    /**
+     * Removes an event from database
+     * @param eventId key for event
+     * @param callback Callback to handle success or failure of event deletion
+     */
+    public void removeEvent(String eventId, EventRemovalCallback callback) {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        // Retrieve the event document from the "events" collection
+        database.collection("events").document(eventId).get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot eventSnapshot = task.getResult();
+                        if (eventSnapshot.exists()) {
+                            // Delete the event poster from Firebase Storage
+                            StorageReference posterRef = storage.getReference().child("EventPosters/" + eventId + ".jpg");
+                            posterRef.delete()
+                                    .addOnFailureListener(e ->
+                                            callback.onFailure(new Exception("Failed to delete poster for event: " + eventId))
+                                    );
+                            // Delete the QR code of the event from Firebase Storage
+                            StorageReference qrCodeRef = storage.getReference().child("qr_codes/" + eventId + ".jpg");
+                            qrCodeRef.delete()
+                                    .addOnFailureListener(e ->
+                                            callback.onFailure(new Exception("Failed to delete qr code for event: " + eventId))
+                                    );
+
+                            // Extract the arrays from the event document
+                            List<String> entrants = (List<String>) eventSnapshot.get("entrants");
+                            List<String> lotteryWinners = (List<String>) eventSnapshot.get("lotteryWinners");
+                            List<String> confirmed = (List<String>) eventSnapshot.get("confirmed");
+                            String organizerId = eventSnapshot.getString("organizerId");
+
+                            // Create a batch write to perform multiple updates at once
+                            WriteBatch batch = database.batch();
+
+                            // Remove eventId from each user's pendingEvents or joinedEvents
+                            if (entrants != null) {
+                                for (String userId : entrants) {
+                                    DocumentReference userRef = database.collection("users").document(userId);
+                                    batch.update(userRef, "pendingEvents", FieldValue.arrayRemove(eventId));
+                                }
+                            }
+
+                            if (lotteryWinners != null) {
+                                for (String userId : lotteryWinners) {
+                                    DocumentReference userRef = database.collection("users").document(userId);
+                                    batch.update(userRef, "pendingEvents", FieldValue.arrayRemove(eventId));
+                                }
+                            }
+
+                            if (confirmed != null) {
+                                for (String userId : confirmed) {
+                                    DocumentReference userRef = database.collection("users").document(userId);
+                                    batch.update(userRef, "joinedEvents", FieldValue.arrayRemove(eventId));
+                                }
+                            }
+
+                            // Remove eventId from organizer's createdEvents
+                            if (organizerId != null && !organizerId.isEmpty()) {
+                                DocumentReference organizerRef = database.collection("users").document(organizerId);
+                                batch.update(organizerRef, "createdEvents", FieldValue.arrayRemove(eventId));
+                            }
+
+                            // After updating users, delete the event document itself
+                            DocumentReference eventRef = database.collection("events").document(eventId);
+                            batch.delete(eventRef);
+
+                            // Commit the batch operation
+                            // Call onFailure callback if there was an error during the batch operation
+                            batch.commit().addOnSuccessListener(aVoid -> {
+                                // Call onSuccess callback if the event and user updates are successful
+                                callback.onSuccess();
+                            }).addOnFailureListener(callback::onFailure);
+
+                        } else {
+                            // Event document does not exist
+                            callback.onFailure(new Exception("Event not found"));
+                        }
+                    } else {
+                        // Failure retrieving the event document
+                        callback.onFailure(task.getException());
+                    }
+                });
+    }
 
     /**
      * Callback interface for entrant cancellation for an event.
@@ -1343,11 +1533,18 @@ public class DatabaseManager {
                 throw new FirebaseFirestoreException("User not found", FirebaseFirestoreException.Code.NOT_FOUND);
             }
 
-            // Update the "entrants" list in the event document
-            ArrayList<String> entrants = (ArrayList<String>) eventSnapshot.get("waitingList");
-            if (entrants != null && entrants.contains(userId)) {
-                entrants.remove(userId);
-                transaction.update(eventDocRef, "entrants", entrants);
+            // Update the "lotteryWinners" list in the event document
+            ArrayList<String> lotteryWinners = (ArrayList<String>) eventSnapshot.get("lotteryWinners");
+            if (lotteryWinners != null && lotteryWinners.contains(userId)) {
+                lotteryWinners.remove(userId);
+                transaction.update(eventDocRef, "lotteryWinners", lotteryWinners);
+            }
+
+            // Update the "cancelled" list in the event document
+            ArrayList<String> cancelled = (ArrayList<String>) eventSnapshot.get("cancelled");
+            if (cancelled != null && !cancelled.contains(userId)) {
+                cancelled.add(userId);
+                transaction.update(eventDocRef, "cancelled", cancelled);
             }
 
             // Update the "pendingEvents" list in the user document

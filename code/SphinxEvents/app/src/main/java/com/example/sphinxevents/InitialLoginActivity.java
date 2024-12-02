@@ -2,50 +2,41 @@
  * Class Name: InitialLoginActivity
  * Date: 2024-11-06
  *
- * Description:
- * InitialLoginActivity is the activity that handles the initial login process for users.
- * Users are allowed to implement a name, email, and optional phone number. The activity also
- * conducts basic input validation. A deterministic profile picture based on the users name is
- * generated when the user is ready to create their profile. The user data is stored in the
- * Firebase Firestore database.
+ * Copyright (c) 2024
+ * All rights reserved.
+ *
  */
 
 package com.example.sphinxevents;
 
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
+import android.net.Uri;
 import android.os.Bundle;
-import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import android.Manifest;
-
-
-import com.example.sphinxevents.DatabaseManager;
-
-import java.util.ArrayList;
+import java.io.IOException;
 
 /**
- * Activity for handling the initial login process where users can create their profile.
+ * InitialLoginActivity is the activity that handles the initial login process for users.
+ * Users are allowed to implement a name, email, and optional phone number. The activity also
+ * conducts basic input validation. A deterministic profile picture based on the users name is
+ * generated when the user is ready to create their profile. The user data is stored in the
+ * Firebase Firestore database.
  */
 public class InitialLoginActivity extends AppCompatActivity {
 
     private String deviceId;
     private DatabaseManager database;
-    private UserManager userManager;
 
     private EditText nameEditText;
     private EditText emailEditText;
@@ -64,8 +55,6 @@ public class InitialLoginActivity extends AppCompatActivity {
 
         deviceId = getIntent().getStringExtra("DEVICE_ID");
         database = DatabaseManager.getInstance();
-
-        userManager = UserManager.getInstance();
 
         nameEditText = findViewById(R.id.initial_login_name_edit_text);
         emailEditText = findViewById(R.id.initial_login_email_edit_text);
@@ -104,7 +93,6 @@ public class InitialLoginActivity extends AppCompatActivity {
             return;
         }
 
-
         // Generate deterministic profile picture for user
         Drawable profilePicture = TextDrawable.createTextDrawable(
                 this,
@@ -113,33 +101,57 @@ public class InitialLoginActivity extends AppCompatActivity {
                 140
         );
 
-        Bitmap profilePictureBitmap = TextDrawable.drawableToBitmap(profilePicture);
-        String profilePicturePath = userManager.saveBitmapToLocalStorage(this,
-                profilePictureBitmap, deviceId);
+        try {
+            // Convert Drawable to Bitmap
+            Bitmap bitmap = ProfilePictureHelper.drawableToBitmap(profilePicture, 140, 140);
 
-        Entrant newUser = new Entrant(deviceId, name, email, phone, profilePicturePath,
-                "", true, true,
-                null, null);
+            // Save Bitmap to a temporary file and get its URI
+            Uri pfpUri = ProfilePictureHelper.saveBitmapToFile(this, bitmap, "profile_picture.png");
 
-        database.saveUser(newUser, new DatabaseManager.UserCreationCallback() {
-            @Override
-            public void onSuccess(String deviceId) {
-                // Show success toast
-                Toast.makeText(InitialLoginActivity.this, "Profile created successfully!",
-                        Toast.LENGTH_SHORT).show();
+            // Upload the profile picture to Firebase Storage
+            DatabaseManager databaseManager = new DatabaseManager();
+            databaseManager.uploadProfilePicture(deviceId, pfpUri, new DatabaseManager.UploadProfilePictureCallback() {
+                @Override
+                public void onSuccess(String profilePictureUrl) {
+                    // Create new Entrant object with the profile picture URL
+                    Entrant newUser = new Entrant(deviceId, name, email, phone,
+                            profilePictureUrl, false, true, true,
+                            null, null);
 
-                // Ask user to allow location
-                LocationManager.requestLocationPermission(InitialLoginActivity.this);
+                    // Save the user to the database
+                    database.saveUser(newUser, new DatabaseManager.UserCreationCallback() {
+                        @Override
+                        public void onSuccess(String deviceId) {
+                            // Show success toast
+                            Toast.makeText(InitialLoginActivity.this, "Profile created successfully!",
+                                    Toast.LENGTH_SHORT).show();
 
-                finish();  // Close InitialLoginActivity
-            }
+                            // Ask user to allow location
+                            LocationManager.requestLocationPermission(InitialLoginActivity.this);
 
-            @Override
-            public void onFailure(Exception e) {
-                // Show failure toast
-                Toast.makeText(InitialLoginActivity.this, "Failed to create profile: " +
-                        e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+                            finish();  // Close InitialLoginActivity
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            // Show failure toast
+                            Toast.makeText(InitialLoginActivity.this, "Failed to create profile: " +
+                                    e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailure() {
+                    // Show failure toast if profile picture upload fails
+                    Toast.makeText(InitialLoginActivity.this, "Failed to upload profile picture.", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        } catch (IOException e) {
+            // Handle file saving error
+            e.printStackTrace();
+            Toast.makeText(this, "Error saving profile picture.", Toast.LENGTH_SHORT).show();
+        }
     }
 }

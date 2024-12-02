@@ -1,6 +1,8 @@
 
 package com.example.sphinxevents;
 
+import com.google.firebase.firestore.auth.User;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -10,6 +12,7 @@ import java.util.Date;
  */
 public class Event implements Serializable {
 
+    private String organizerId;  // The id of the organizer who created the event
     private String eventId;  // The id of the event in the database
     private String name;  // The name of the event
     private String description;  // The description of the event
@@ -25,9 +28,8 @@ public class Event implements Serializable {
     private ArrayList<String> cancelled; // The list of entrants who won the lottery and cancelled
     private boolean lotteryWasDrawn = false;  // Boolean indicating if lottery has been drawn
 
-    // Empty Constructor
-    public Event() {
-    }
+    // No-argument constructor
+    public Event() {}
 
     /**
      * Constructs an Event with the specified attributes.
@@ -40,8 +42,9 @@ public class Event implements Serializable {
      * @param joinedUsers The list of users who have joined the event.
      * @param facilityLocation The location of the event's facility.
      */
-    Event(String name, String description, Date lotteryEndDate, Integer entrantLimit,
+    Event(String organizerId, String name, String description, Date lotteryEndDate, int entrantLimit,
           Boolean geolocationReq, ArrayList<String> joinedUsers, UserLocation facilityLocation) {
+        this.organizerId = organizerId;
         this.eventId = null;
         this.name = name;
         this.description = description;
@@ -51,15 +54,23 @@ public class Event implements Serializable {
         this.geolocationReq = geolocationReq;
         this.entrants = joinedUsers;
         this.facilityLocation = facilityLocation;
-        this.lotteryWinners = new ArrayList<String>();
-        this.confirmed = new ArrayList<String>();
-        this.cancelled = new ArrayList<String>();
+        this.lotteryWinners = new ArrayList<>();
+        this.confirmed = new ArrayList<>();
+        this.cancelled = new ArrayList<>();
         this.lotteryWasDrawn = false;
         this.redrawUserCount = 0;
     }
 
     /**
-     * gGets ID of Event
+     * Gets id of organizer
+     * @return ID of organizer
+     */
+    public String getOrganizerId() {
+        return organizerId;
+    }
+
+    /**
+     * Gets ID of Event
      * @return ID of event
      */
     public String getEventId() {

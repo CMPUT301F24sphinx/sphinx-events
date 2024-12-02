@@ -11,6 +11,8 @@
 
 package com.example.sphinxevents;
 
+import androidx.annotation.NonNull;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -30,8 +32,8 @@ public class Entrant implements Serializable {
     private String name;
     private String email;
     private String phoneNumber;
-    private String defaultPfpPath;  // Path to the default profile picture in local stroage
-    private String customPfpUrl;  // Url of the custom profile picture in Firebase Storage
+    private String profilePictureUrl;  // Url of the profile picture in Firebase Storage
+    private boolean isCustomPfp; // true if user uploaded custom pfp, false otherwise
     private boolean orgNotificationsEnabled; // Notifications from organizers preference
     private boolean adminNotificationsEnabled; // Notifications from administrators preference
     private ArrayList<String> joinedEvents;  // List of event IDs the user has accepted invitation to
@@ -50,25 +52,39 @@ public class Entrant implements Serializable {
      * @param name           the name of the entrant.
      * @param email          the email of the entrant.
      * @param phoneNumber    the phone number of the entrant.
-     * @param defaultPfpPath the path to the default profile picture.
-     * @param customPfpUrl   the URL for the custom profile picture.
+     * @param profilePictureUrl   the URL for the profile picture.
      * @param joinedEvents   a list of event IDs that the entrant has joined.
      * @param pendingEvents  a list of event IDs that are pending for the entrant.
      */
-    public Entrant(String deviceId, String name, String email, String phoneNumber, String defaultPfpPath,
-                   String customPfpUrl, boolean orgNotificationsEnabled, boolean adminNotificationsEnabled,
+    public Entrant(String deviceId, String name, String email, String phoneNumber,
+                   String profilePictureUrl, boolean isCustomPfp, boolean orgNotificationsEnabled, boolean adminNotificationsEnabled,
                    ArrayList<String> joinedEvents, ArrayList<String> pendingEvents) {
         this.deviceId = deviceId;
         this.role = "Entrant";
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
-        this.defaultPfpPath = defaultPfpPath;
-        this.customPfpUrl = customPfpUrl;
+        this.profilePictureUrl = profilePictureUrl;
+        this.isCustomPfp = isCustomPfp;
         this.orgNotificationsEnabled = orgNotificationsEnabled;
         this.adminNotificationsEnabled = adminNotificationsEnabled;
         this.joinedEvents = joinedEvents != null ? joinedEvents : new ArrayList<>();
         this.pendingEvents = pendingEvents != null ? pendingEvents : new ArrayList<>();
+    }
+
+
+    public Entrant(Entrant other) {
+        this.deviceId = other.deviceId;
+        this.role = other.role;
+        this.name = other.name;
+        this.email = other.email;
+        this.phoneNumber = other.phoneNumber;
+        this.profilePictureUrl = other.profilePictureUrl;
+        this.isCustomPfp = other.isCustomPfp;
+        this.orgNotificationsEnabled = other.orgNotificationsEnabled;
+        this.adminNotificationsEnabled = other.adminNotificationsEnabled;
+        this.joinedEvents = other.joinedEvents;
+        this.pendingEvents = other.pendingEvents;
     }
 
     /**
@@ -107,29 +123,34 @@ public class Entrant implements Serializable {
      */
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
 
-    /**
-     * Gets the default profile picture path.
-     * @return the default profile picture path.
-     */
-    public String getDefaultPfpPath() { return this.defaultPfpPath; }
-
-    /**
-     * Sets the default profile picture path.
-     * @param profilePicture the path of the default profile picture.
-     */
-    public void setDefaultPfpPath(String profilePicture) { this.defaultPfpPath = profilePicture; }
 
     /**
      * Gets the custom profile picture URL.
      * @return the custom profile picture URL.
      */
-    public String getCustomPfpUrl() { return customPfpUrl; }
+    public String getProfilePictureUrl() { return profilePictureUrl; }
 
     /**
      * Sets the custom profile picture URL.
-     * @param customPfpUrl the URL of the custom profile picture.
+     * @param profilePictureUrl the URL of the custom profile picture.
      */
-    public void setCustomPfpUrl(String customPfpUrl) { this.customPfpUrl = customPfpUrl; }
+    public void setProfilePictureUrl(String profilePictureUrl) { this.profilePictureUrl = profilePictureUrl; }
+
+    /**
+     * Gets the isCustomPfp attribute of the user
+     * @return boolean representing whether custom pfp is selected or not
+     */
+    public boolean isCustomPfp() {
+        return isCustomPfp;
+    }
+
+    /**
+     * Sets the isCustomPfp attribute of the user
+     * @param isCustomPfp The new value of isCustomPfp
+     */
+    public void setCustomPfp(boolean isCustomPfp) {
+        this.isCustomPfp = isCustomPfp;
+    }
 
     /**
      * Gets the user's device ID.
@@ -204,5 +225,10 @@ public class Entrant implements Serializable {
      * @param eventId the ID of the event to add.
      */
     public void addPendingEvent(String eventId) { pendingEvents.add(eventId); }
+
+    @NonNull
+    public Entrant clone() {
+        return new Entrant(this);
+    }
 
 }

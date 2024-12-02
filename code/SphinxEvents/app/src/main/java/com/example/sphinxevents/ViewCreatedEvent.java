@@ -140,16 +140,6 @@ public class ViewCreatedEvent extends AppCompatActivity {
         // Allow organizer to do another lottery for the people who lost
         redrawLotteryButton.setOnClickListener(v -> {
             performRedraw(event.getCancelled().size());
-
-        });
-
-
-        // TODO: Move this logic to the view entrant data activity that noobray is working on
-        Button viewMapButton = findViewById(R.id.view_map_button);
-        viewMapButton.setOnClickListener(v -> {
-            Intent viewMapIntent = new Intent(ViewCreatedEvent.this, ViewMapActivity.class);
-            viewMapIntent.putExtra("event", event);
-            startActivity(viewMapIntent);
         });
     }
 
@@ -211,7 +201,7 @@ public class ViewCreatedEvent extends AppCompatActivity {
      * Displays number of people in waiting list and indicated whether there is a limit
      */
     private void displayEntrantCount() {
-        if (event.getEntrantLimit() != 0) {  // If there is an entrant limit, display it
+        if (event.getEntrantLimit() != -1) {  // If there is an entrant limit, display it
             numOfLotteryEntrantsTextView.setText(getString(R.string.entrants_and_limit,
                     event.retrieveNumInWaitingList(), event.getEntrantLimit()));
         }
@@ -257,6 +247,8 @@ public class ViewCreatedEvent extends AppCompatActivity {
                                 Toast.makeText(ViewCreatedEvent.this, "Enter non-zero positive count", Toast.LENGTH_SHORT).show();
                             } else if (event.getEntrants().isEmpty()) {
                                 Toast.makeText(ViewCreatedEvent.this, "There are no entrants for the event", Toast.LENGTH_LONG).show();
+                            } else if (n > event.getEntrants().size()) {
+                                Toast.makeText(ViewCreatedEvent.this, "There are insufficient entrants to select that many", Toast.LENGTH_LONG).show();
                             } else {
                                 performLottery(n);
                             }
@@ -280,27 +272,24 @@ public class ViewCreatedEvent extends AppCompatActivity {
 
         // new arrays for winners and losers
         ArrayList<String> tempWinners = new ArrayList<>();
-        ArrayList<String> tempLosers = new ArrayList<>();
 
-        // Ugly for-loop to assign IDs to temp arrays because java doesn't have a method to convert List<Str> to ArrayList<Str>
+        // Pops last entrant and removes them. Losers remain in tempEventEntrants array after loop.
         for(int i = 0; i < n; i++){
-            tempWinners.add(event.getEntrants().get(i));
-        }
-        for(int i = n; i < event.getEntrants().size(); i++){
-            tempLosers.add(event.getEntrants().get(i));
+            tempWinners.add(tempEventEntrants.remove(tempEventEntrants.size() - 1));
         }
 
         // The winners put in the winner array
         // The losers stay in the entrants array
         event.setLotteryWinners(tempWinners);
-        event.setEntrants(tempLosers);
+        event.setEntrants(tempEventEntrants);
 
         // Update the database arrays
         databaseManager.updateEventWinners(event.getEventId(), tempWinners);
-        databaseManager.updateEntrants(event.getEventId(), tempLosers);
+        databaseManager.updateEntrants(event.getEventId(), tempEventEntrants);
 
         event.setLotteryWasDrawn(true);
         databaseManager.updateLotteryWasDrawn(event.getEventId());
+
 
 
         // Send notifications to the winners and losers
@@ -315,8 +304,8 @@ public class ViewCreatedEvent extends AppCompatActivity {
                 }
             });
         }
-        if(!tempLosers.isEmpty()) {
-            NotificationsHelper.sendLotteryLossNotification(organizer.getFacility().getName(), event.getName(), tempLosers, new DatabaseManager.NotificationCreationCallback() {
+        if(!tempEventEntrants.isEmpty()) {
+            NotificationsHelper.sendLotteryLossNotification(organizer.getFacility().getName(), event.getName(), tempEventEntrants, new DatabaseManager.NotificationCreationCallback() {
                 @Override
                 public void onSuccess() {
                 }

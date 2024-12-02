@@ -183,7 +183,7 @@ public class ViewScannedEvent extends AppCompatActivity {
      * Displays number of people in waiting list and indicated whether there is a limit
      */
     private void displayWaitListCount() {
-        if (event.getEntrantLimit() != 0) {  // If there is an entrant limit, display it
+        if (event.getEntrantLimit() != -1) {  // If there is an entrant limit, display it
             waitingListCountTextView.setText(getString(R.string.entrants_and_limit,
                     event.retrieveNumInWaitingList(), event.getEntrantLimit()));
         }

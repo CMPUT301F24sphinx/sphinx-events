@@ -162,7 +162,7 @@ public class ManageFacilityActivity extends AppCompatActivity
         if (user.getRole().equals("Organizer")) {
             entrantVisibility = View.GONE;
             organizerVisibility = View.VISIBLE;
-            setOrganizerDisplay();  // sets TextView values for user's facility
+            setOrganizerDisplay((Organizer) user);  // sets TextView values for user's facility
         }
 
         // sets visibility of XML elements
@@ -178,19 +178,10 @@ public class ManageFacilityActivity extends AppCompatActivity
      * Obtains user's facility from database
      * Sets facility details to be displayed
      */
-    public void setOrganizerDisplay() {
-        databaseManager.getFacility(user.getDeviceId(), new DatabaseManager.facilityRetrievalCallback() {
-            @Override
-            public void onSuccess(Facility facility) {
-                facilityNameTextView.setText(facility.getName());
-                facilityPhoneNumberTextView.setText(facility.getPhoneNumber());
-            }
-            @Override
-            public void onFailure(Exception e) {
-                Toast.makeText(getApplicationContext(), "Error managing facility. Please try again.", Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        });
+    public void setOrganizerDisplay(Organizer organizer) {
+        Facility facility = organizer.getFacility();
+        facilityNameTextView.setText(facility.getName());
+        facilityPhoneNumberTextView.setText(facility.getPhoneNumber());
     }
 
     /**

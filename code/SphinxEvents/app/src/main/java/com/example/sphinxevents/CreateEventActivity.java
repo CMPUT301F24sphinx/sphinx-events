@@ -156,14 +156,14 @@ public class CreateEventActivity extends AppCompatActivity {
         }
 
         if (!entrantLimitString.isEmpty() && Integer.parseInt(entrantLimitString) <= 0){
-            Toast.makeText(this, "Entrant limit must be greater than 0", Toast.LENGTH_SHORT).show();
+            entrantLimitEditText.setError("Entrant limit must be greater than 0");
             return;
         }
 
         // Converts input into proper types
-        Integer entrantLimit;
+        int entrantLimit;
         try {
-            entrantLimit = entrantLimitString.isEmpty() ? 0 : Integer.parseInt(entrantLimitString);
+            entrantLimit = entrantLimitString.isEmpty() ? -1 : Integer.parseInt(entrantLimitString);
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Invalid entrant limit", Toast.LENGTH_SHORT).show();
             return;
@@ -180,8 +180,8 @@ public class CreateEventActivity extends AppCompatActivity {
         // Create a new Event object
         Organizer organizer = (Organizer) userManager.getCurrentUser();
         UserLocation facilityLocation = organizer.getFacility().getLocation();
-        Event newEvent = new Event(eventName, eventDesc, regDate, entrantLimit,
-                geolocationReq, new ArrayList<String>(), facilityLocation);
+        Event newEvent = new Event(userManager.getCurrentUser().getDeviceId(), eventName, eventDesc,
+                regDate, entrantLimit, geolocationReq, new ArrayList<String>(), facilityLocation);
 
         databaseManager.createEvent(newEvent, new DatabaseManager.EventCreationCallback() {
             @Override
