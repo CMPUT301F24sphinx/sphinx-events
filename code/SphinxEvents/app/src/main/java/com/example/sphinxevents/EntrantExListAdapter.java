@@ -9,6 +9,9 @@ import android.widget.TextView;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Used in displaying the data of event entrants by an organizer
+ */
 public class EntrantExListAdapter extends ExListAdapter {
 
     EntrantExListAdapter(Context context, List<String> headers, Map<String, List<Entrant>> entrants) {
