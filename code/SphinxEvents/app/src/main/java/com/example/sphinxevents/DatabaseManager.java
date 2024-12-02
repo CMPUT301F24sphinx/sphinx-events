@@ -363,26 +363,15 @@ public class DatabaseManager {
                         // Delete all events created by this facility
                         if (createdEvents != null) {
                             for (String eventId : createdEvents) {
-                                // Delete the event poster from Firebase Storage
-                                StorageReference posterRef = storage.getReference().child("EventPosters/" + eventId + ".jpg");
-                                posterRef.delete()
-                                        .addOnFailureListener(e ->
-                                                callback.onFailure(new Exception("Failed to delete poster for event: " + eventId))
-                                        );
-                                // Delete the QR code of the event from Firebase Storage
-                                StorageReference qrCodeRef = storage.getReference().child("qr_codes/" + eventId + ".jpg");
-                                qrCodeRef.delete()
-                                        .addOnFailureListener(e ->
-                                                callback.onFailure(new Exception("Failed to delete qr code for event: " + eventId))
-                                        );
+                                removeEvent(eventId, new EventRemovalCallback() {
+                                    @Override
+                                    public void onSuccess() {
+                                    }
 
-                                // Delete the event document from Firestore
-                                database.collection("events")
-                                        .document(eventId)
-                                        .delete()
-                                        .addOnFailureListener(e ->
-                                                callback.onFailure(new Exception("Failed to delete event: " + eventId))
-                                        );
+                                    @Override
+                                    public void onFailure(Exception e) {
+                                    }
+                                });
                             }
                         }
 
@@ -1502,7 +1491,6 @@ public class DatabaseManager {
                     }
                 });
     }
-
 
     /**
      * Callback interface for entrant cancellation for an event.
