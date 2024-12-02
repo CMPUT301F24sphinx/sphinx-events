@@ -2,8 +2,8 @@
  * Class Name: NotificationListener
  * Date: 2024-11-06
  *
- * Copyright (c) 2024
- * All rights reserved.
+ * Description:
+ * Listens for notification changes in FireStore and triggers system notifications on the user's device.
  *
  */
 
@@ -25,7 +25,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 
 /**
- * Listens for notification changes in Firestore and triggers system notifications on the user's device.
+ * Listens for notification changes in FireStore and triggers system notifications on the user's device.
  */
 public class NotificationListener {
 

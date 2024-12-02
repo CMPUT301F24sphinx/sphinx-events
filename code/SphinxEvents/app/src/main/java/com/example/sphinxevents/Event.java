@@ -1,3 +1,11 @@
+/*
+ * Class Name: Event
+ * Date: 2024-10-07
+ *
+ * Description:
+ * Represents an Event that entrants can join, or organizers can create
+ * Stores Event data and provides methods for retrieving and setting this data
+ */
 
 package com.example.sphinxevents;
 
@@ -8,7 +16,8 @@ import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * Represents an event object
+ * Represents an Event that entrants can join, or organizers can create
+ * Stores Event data and provides methods for retrieving and setting this data
  */
 public class Event implements Serializable {
 
@@ -28,7 +37,9 @@ public class Event implements Serializable {
     private ArrayList<String> cancelled; // The list of entrants who won the lottery and cancelled
     private boolean lotteryWasDrawn = false;  // Boolean indicating if lottery has been drawn
 
-    // No-argument constructor
+    /**
+     * No argument constructor
+     */
     public Event() {}
 
     /**
@@ -205,18 +216,6 @@ public class Event implements Serializable {
      */
     public void setLotteryWinners(ArrayList<String> winners) {this.lotteryWinners = winners;}
 
-//    /**
-//     * Gets the list of entrants who lost the lottery.
-//     * @return The list of losers.
-//     */
-//    public ArrayList<String> getLotteryLosers() {return lotteryLosers;}
-//
-//    /**
-//     * Sets the list of losers of the lottery.
-//     * @param losers The list of losers.
-//     */
-//    public void setLotteryLosers(ArrayList<String> losers) {this.lotteryLosers = losers;}
-
     /**
      * Gets the list of entrants who confirmed the event.
      * @return The list of losers.
@@ -248,18 +247,6 @@ public class Event implements Serializable {
     public UserLocation getFacilityLocation() {
         return this.facilityLocation;
     }
-
-    //----------------------------------------------------------------------------------------
-    // TODO: Determine which of these functions are used / useful
-
-
-//    public ArrayList<String> getWaitingList() {
-//        return waitingList;
-//    }
-//
-//    public void setWaitingList(ArrayList<String> waitingList) {
-//        this.waitingList = waitingList;
-//    }
 
     /**
      * Sets whether lottery for event has been drawn
@@ -298,21 +285,6 @@ public class Event implements Serializable {
         return currentDate.after(lotteryEndDate);
     }
 
-//    /**
-//     * Returns number of people in waiting list
-//     * @return size of waiting list
-//     */
-//    public int retrieveNumInWaitingList() {
-//        return waitingList != null ? waitingList.size() : 0;
-//    }
-//    /**
-//     * Returns whether waiting list is full
-//     * @return boolean representing whether waiting list is full
-//     */
-//    public boolean checkIfWaitingListFull() {
-//        return this.entrantLimit != null && this.waitingList.size() == this.entrantLimit;
-//    }
-
     /**
      * Returns number of people in waiting list
      * @return size of waiting list
@@ -327,7 +299,5 @@ public class Event implements Serializable {
     public boolean checkIfWaitingListFull() {
         return this.entrantLimit != 0 && this.entrants.size() == this.entrantLimit;
     }
-
-    //-------------------------------------------------------------------------------------------
 }
 

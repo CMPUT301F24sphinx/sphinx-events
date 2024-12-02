@@ -1,6 +1,11 @@
 /*
+ * Class Name: FacilitySearchActivity
+ * Date: 2024-11-04
+ *
+ * Description:
  * Displays results of facilities whose name matches the administrator's query
  * Allows administrator to click on facility in list in order to view all details and remove it
+ *
  */
 
 package com.example.sphinxevents;

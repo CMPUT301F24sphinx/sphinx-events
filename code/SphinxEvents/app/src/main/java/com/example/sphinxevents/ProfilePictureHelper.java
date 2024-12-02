@@ -1,10 +1,10 @@
 /*
  * Class Name: ProfilePictureHelper
- * Version: 1.0
  * Date: 2024-12-01
  *
- * Copyright (c) 2024 Adam Paunovic
- * All rights reserved.
+ * Description:
+ * A utility class for managing profile pictures, including generating default profile pictures,
+ * saving and retrieving Bitmaps, and uploading them to Firebase Storage.
  *
  */
 

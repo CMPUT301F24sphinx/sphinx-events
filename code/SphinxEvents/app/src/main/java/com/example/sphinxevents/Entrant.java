@@ -40,7 +40,7 @@ public class Entrant implements Serializable {
     private ArrayList<String> pendingEvents;  // List of event IDs the user has joined lottery for
 
     /**
-     * Default constructor for Entrant. Initializes an empty entrant.
+     * No argument constructor
      */
     public Entrant() {
     }
@@ -73,6 +73,10 @@ public class Entrant implements Serializable {
     }
 
 
+    /**
+     * Constructor for cloning
+     * @param other entrant to clone
+     */
     public Entrant(Entrant other) {
         this.deviceId = other.deviceId;
         this.role = other.role;
@@ -226,6 +230,10 @@ public class Entrant implements Serializable {
      */
     public void addPendingEvent(String eventId) { pendingEvents.add(eventId); }
 
+    /**
+     * Clones entrant
+     * @return copy of entrant
+     */
     @NonNull
     public Entrant clone() {
         return new Entrant(this);

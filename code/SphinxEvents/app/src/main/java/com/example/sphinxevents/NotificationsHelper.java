@@ -2,8 +2,9 @@
  * Class Name: NotificationsHelper
  * Date: 2024-11-06
  *
- * Copyright (c) 2024
- * All rights reserved.
+ * Description:
+ * A helper class for sending notifications to users. Defines the channel IDs for consistency.
+ * Implements multiple methods that act as a template for certain automated notifications.
  *
  */
 

@@ -1,6 +1,11 @@
 /*
+ * Class Name: EventsSearchActivity
+ * Date: 2024-11-25
+ *
+ * Description:
  * Displays results of events whose name matches the administrator's query
  * Allows administrator to click on event in list in order to view details and remove it
+ *
  */
 
 package com.example.sphinxevents;
@@ -23,6 +28,10 @@ import androidx.core.view.WindowInsetsCompat;
 
 import java.util.ArrayList;
 
+/**
+ * Displays results of events whose name matches the administrator's query
+ * Allows administrator to click on event in list in order to view details and remove it
+ */
 public class EventsSearchActivity extends AppCompatActivity {
 
     // Attributes for result list

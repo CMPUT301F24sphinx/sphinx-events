@@ -1,4 +1,3 @@
-
 /*
  * Class Name: DatabaseManager
  * Date: 2024-11-06
@@ -6,7 +5,7 @@
  * Description:
  * This class is responsible for managing interactions with Firebase Firestore and Firebase Storage.
  * It includes functionality for storing and retrieving data, as well as handling operations related to
- * user and event management. Some methods are currently under development and will be added as needed.
+ * user, facility, and event management.
  */
 
 package com.example.sphinxevents;
@@ -44,11 +43,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-//TODO: Add a more descriptive comment for the class when more functionality is implemented.
 /**
  * This class manages interactions with a Firebase Firestore database and Firebase Storage.
  * It provides methods for handling data storage, retrieval, and other operations related to
- * user and event management.
+ * user, facility, and event management.
  */
 public class DatabaseManager {
     private static DatabaseManager instance;
@@ -78,9 +76,9 @@ public class DatabaseManager {
     public interface EventCreationCallback {
         /**
          * Called when the event is successfully created.
-         * @param eventRef Reference to the created event document in Firestore.
+         * @param createdEvent the created Event
          */
-        void onSuccess(DocumentReference eventRef);
+        void onSuccess(Event createdEvent);
 
         /**
          * Called when the event creation fails.
@@ -102,12 +100,13 @@ public class DatabaseManager {
         event.setEventId(docRef.getId());
         String posterId = "EventPosters/" + docRef.getId() + ".jpg";
         event.setPoster(posterId);
+        event.setEventId(docRef.getId());
 
         // Add the event to Firestore with the generated ID
         docRef.set(event)
                 .addOnSuccessListener(aVoid -> {
                     // Pass the DocumentReference to the callback onSuccess method
-                    callback.onSuccess(docRef);
+                    callback.onSuccess(event);
                 })
                 .addOnFailureListener(callback::onFailure);
 
@@ -574,8 +573,6 @@ public class DatabaseManager {
                 });
     }
 
-
-
     // ---------------------------------------------------------------------------------------------
 
     /**
@@ -630,16 +627,32 @@ public class DatabaseManager {
                 });
     }
 
-
-    //--------------------------------------------------------------------------------------------------------
-    // TODO: Determine if this function is needed or not depending on how the lottery is implemented
-
+    /**
+     * Callback interface for joinEventWaitingList
+     */
     public interface joinWaitingListCallback {
+        /**
+         * Called when waiting list is successfully joined
+         */
         void onSuccess();
+
+        /**
+         * Called when failed to join waiting list
+         * @param e the exception that occurred
+         */
         void onFailure(Exception e);
     }
 
 
+    /**
+     * Adds user to the waiting list of an event
+     * Adds event into user's pendingEvents array
+     * Stores user location in event if geolocation was required
+     * @param userId the id of the user joining the waiting list
+     * @param userLocation the location of the user, null if geolocation wasn't required
+     * @param eventId the id of the event
+     * @param callback the callback to handle success or failure of the operation
+     */
     public void joinEventWaitingList(String userId, UserLocation userLocation, String eventId, joinWaitingListCallback callback) {
         // Add the user to the event's waiting list
         database.collection("events")
@@ -676,11 +689,28 @@ public class DatabaseManager {
                 .addOnFailureListener(callback::onFailure);
     }
 
+    /**
+     * Callback interface for retrieving user locations stored in an event
+     */
     public interface getUserLocationsCallback {
+        /**
+         * Called when locations are successfully retrieved
+         * @param locations the array of UserLocation objects
+         */
         void onSuccess(ArrayList<UserLocation> locations);
+
+        /**
+         * Called when failure occurs while retrieving locations
+         * @param e the exception that occurred
+         */
         void onFailure(Exception e);
     }
 
+    /**
+     * Obtains the locations of entrants of an event
+     * @param eventId the ID of the event to retrieve locations for
+     * @param callback the callback to handle success or failure
+     */
     public void getUserLocations(String eventId, getUserLocationsCallback callback) {
         database.collection("events")
                 .document(eventId)
@@ -695,7 +725,6 @@ public class DatabaseManager {
 
                             // Iterate through the map and create UserLocation objects
                             for (Map.Entry<String, Object> entry : entrantLocationsMap.entrySet()) {
-                                // Cast the value of each entry to a Map that represents latitude and longitude
                                 Map<String, Object> locationData = (Map<String, Object>) entry.getValue();
 
                                 double latitude = (Double) locationData.get("latitude");
@@ -717,11 +746,6 @@ public class DatabaseManager {
                 })
                 .addOnFailureListener(callback::onFailure);
     }
-
-
-
-    //--------------------------------------------------------------------------------------------------------
-
 
     /**
      * Adds Id of entree to entrants field of event
