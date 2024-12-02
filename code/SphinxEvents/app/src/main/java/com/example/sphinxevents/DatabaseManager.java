@@ -574,6 +574,11 @@ public class DatabaseManager {
                                 event.setEntrants(new ArrayList<>());  // Initialize waitingList if null
                             }
 
+                            // Ensure that the confirmedlist is initialized
+                            if (event != null && event.getConfirmed() == null) {
+                                event.setConfirmed(new ArrayList<>());  // Initialize waitingList if null
+                            }
+
                             callback.onSuccess(event);
                         } else {
                             callback.onFailure(new Exception("Event does not exist."));

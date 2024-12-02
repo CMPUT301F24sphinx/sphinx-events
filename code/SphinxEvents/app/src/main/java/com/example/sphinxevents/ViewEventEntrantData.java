@@ -65,41 +65,24 @@ public class ViewEventEntrantData extends AppCompatActivity {
             finish();
         });
 
-//        // Create the EventListener and start listening for updates to the event
-//        eventListener = new EventListener(eventId, new EventListener.EventUpdateCallback() {
-//            @Override
-//            public void onEventUpdated(Event updatedEvent) {
-//                event = updatedEvent;
-//            }
-//
-//            @Override
-//            public void onFailure(Exception e) {
-//                Toast.makeText(getApplicationContext(), "Error updating event. Scan QR code again.", Toast.LENGTH_SHORT).show();
-//                finish();
-//            }
-//        });
-//        eventListener.startListening();  // Start listening for changes to event
-
-        databaseManager.getEvent(eventId, new DatabaseManager.eventRetrievalCallback() {
+        // Create the EventListener and start listening for updates to the event
+        eventListener = new EventListener(eventId, new EventListener.EventUpdateCallback() {
             @Override
-            public void onSuccess(Event event) {
-                Log.d("Aniket", event.getName());
-                currEvent = event;
+            public void onEventUpdated(Event updatedEvent) {
+                currEvent = updatedEvent;
+                updateExpandableLists();
             }
 
             @Override
             public void onFailure(Exception e) {
-                Log.d("Aniket", "Failed");
-                finish(); // exit activity
+                Toast.makeText(getApplicationContext(), "Error updating event. Scan QR code again.", Toast.LENGTH_SHORT).show();
+                finish();
             }
         });
-
-        updateExpandableLists();
+        eventListener.startListening();  // Start listening for changes to event
     }
 
     public void updateExpandableLists() {
-        Entrant currentUser = userManager.getCurrentUser();
-
         headers = new ArrayList<>();
         entrantList = new HashMap<>();
 
@@ -139,7 +122,5 @@ public class ViewEventEntrantData extends AppCompatActivity {
 
         listAdapter = new EntrantExListAdapter(ViewEventEntrantData.this, headers, entrantList);
         expandableListView.setAdapter(listAdapter);
-
     }
-
 }
