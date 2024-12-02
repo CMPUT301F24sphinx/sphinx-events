@@ -9,19 +9,12 @@
  */
 package com.example.sphinxevents;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.Environment;
 import android.util.Log;
 
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -142,60 +135,6 @@ public class UserManager {
         if (userListener != null) {
             userListener.remove(); // Remove the listener
         }
-    }
-
-    /**
-     * Saves a bitmap to local storage and returns the file path.
-     *
-     * @param context The application context.
-     * @param bitmap  The bitmap to save.
-     * @param userId  The user ID to create a unique file name.
-     * @return The path of the saved image file.
-     */
-    public String saveBitmapToLocalStorage(Context context, Bitmap bitmap, String userId) {
-        String filePath = null;
-        FileOutputStream outputStream = null;
-
-        try {
-            // Create a directory for storing profile pictures
-            File directory = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "profile_pics");
-            if (!directory.exists()) {
-                directory.mkdirs(); // Create the directory if it doesn't exist
-            }
-
-            // Create a unique file name for the bitmap using userId
-            File file = new File(directory, userId + "_profile_picture.png");
-            outputStream = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream); // Save the bitmap as PNG
-
-            filePath = file.getAbsolutePath(); // Get the absolute path of the saved file
-        } catch (IOException e) {
-            Log.e("UserManager", "Error saving profile picture: " + e.getMessage());
-        } finally {
-            if (outputStream != null) {
-                try {
-                    outputStream.close();
-                } catch (IOException e) {
-                    Log.e("UserManager", "Error closing output stream: " + e.getMessage());
-                }
-            }
-        }
-
-        return filePath; // Return the path of the saved image file
-    }
-
-    /**
-     * Loads a bitmap from local storage using a file path.
-     *
-     * @param path The path of the image file.
-     * @return The Bitmap object if the file exists, otherwise null.
-     */
-    public Bitmap loadBitmapFromLocalStorage(String path) {
-        File imgFile = new File(path);
-        if (imgFile.exists()) {
-            return BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-        }
-        return null;
     }
 
     /**

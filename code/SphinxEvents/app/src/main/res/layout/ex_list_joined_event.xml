@@ -5,7 +5,7 @@
     android:padding="8dp"
     android:orientation="vertical"
     android:id="@+id/event_layout"
-    android:background="@drawable/list_created_event_background">
+    android:background="@drawable/list_joined_event_background">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,10 +27,12 @@
             android:id="@+id/lottery_timer_linear_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:gravity="center"
             android:paddingHorizontal="15dp"
             android:paddingVertical="5dp"
-            android:background="@drawable/red_rounded_border">
+            android:background="@drawable/red_rounded_border"
+            android:layout_marginStart="8dp">
 
             <ImageView
                 android:id="@+id/clock_image_view"
@@ -44,7 +46,6 @@
                 android:id="@+id/lottery_time_remaining_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="@string/days_until_lottery"
                 android:textSize="18sp"
                 android:textStyle="bold"

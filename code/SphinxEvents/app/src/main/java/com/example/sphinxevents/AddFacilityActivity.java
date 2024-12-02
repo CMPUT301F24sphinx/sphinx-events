@@ -149,7 +149,7 @@ public class AddFacilityActivity extends AppCompatActivity {
             @Override
             public void onSuccess() {
                     user = new Organizer(user.getDeviceId(), user.getName(), user.getEmail(),
-                            user.getPhoneNumber(), user.getDefaultPfpPath(), user.getCustomPfpUrl(),
+                            user.getPhoneNumber(), user.getProfilePictureUrl(), user.isCustomPfp(),
                             user.isOrgNotificationsEnabled(), user.isAdminNotificationsEnabled(),
                             user.getJoinedEvents(), user.getPendingEvents(),
                             newFacility, new ArrayList<>());

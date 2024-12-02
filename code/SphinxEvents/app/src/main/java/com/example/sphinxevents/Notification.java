@@ -1,3 +1,13 @@
+/*
+ * Class Name: Notification
+ * Date: 2024-11-06
+ *
+ * Copyright (c) 2024
+ * All rights reserved.
+ *
+ */
+
+
 package com.example.sphinxevents;
 
 /**
@@ -21,8 +31,6 @@ public class Notification {
         this.message = message;
         this.channelID = channelID;
     }
-
-    // Getters and Setters
 
     /**
      * Gets the title of the notification.
