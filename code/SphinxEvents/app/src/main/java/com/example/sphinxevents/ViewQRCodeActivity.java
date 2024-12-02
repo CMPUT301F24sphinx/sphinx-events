@@ -52,7 +52,7 @@ public class ViewQRCodeActivity extends AppCompatActivity {
      * Obtains QR code from database and displays it
      */
     private void displayQRCode() {
-        String qrCodePath = "qr_codes/" + eventId + "QRCode.jpg";
+        String qrCodePath = "qr_codes/" + eventId + ".jpg";
         StorageReference qrCodeRef = FirebaseStorage.getInstance().getReference(qrCodePath);
 
         // Load the QR code image into the ImageView
