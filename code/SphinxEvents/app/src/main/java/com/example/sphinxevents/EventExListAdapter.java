@@ -95,23 +95,15 @@ public class EventExListAdapter extends ExListAdapter {
         TextView lotteryTimeRemainingTextView = view.findViewById(R.id.lottery_time_remaining_text_view);
         ImageView clockImage = view.findViewById(R.id.clock_image_view);
 
-        // Sets lottery time remaining to proper display
-        if (event.getLotteryWasDrawn()) {
-            lotteryTimeRemainingTextView.setText(R.string.lottery_drawn);
+        Date lotteryEndDate = event.getLotteryEndDate();
+        Date currentDate = new Date();
+        if (event.canLotteryBeDrawn() || event.getLotteryWasDrawn()) {  // Waiting for organizer to initiate lottery
             clockImage.setVisibility(View.GONE);
-            lotteryTimerLinearLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.green_rounded_border));
+            lotteryTimeRemainingTextView.setText(R.string.lottery_ongoing);
         }
-        else {
-            Date lotteryEndDate = event.getLotteryEndDate();
-            Date currentDate = new Date();
-            if (event.canLotteryBeDrawn()) {  // Waiting for organizer to initiate lottery
-                lotteryTimeRemainingTextView.setText(R.string.awaiting_lottery);
-                clockImage.setVisibility(View.GONE);
-            }
-            else {  // Still time remaining until lottery
-                long differenceInDays = (lotteryEndDate.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24);
-                lotteryTimeRemainingTextView.setText(context.getString(R.string.days_until_lottery, differenceInDays));
-            }
+        else {  // Still time remaining until lottery
+            long differenceInDays = (lotteryEndDate.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24);
+            lotteryTimeRemainingTextView.setText(context.getString(R.string.days_until_lottery, differenceInDays));
         }
     }
 }

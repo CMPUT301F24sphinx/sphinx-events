@@ -11,8 +11,7 @@
     <string name="days_until_lottery">%d Days</string>
     <string name="number_of_entrants">Number of Entrants: %d</string>
     <string name="entrant_limit">/ %d</string>
-    <string name="lottery_drawn">Lottery Drawn!</string>
-    <string name="awaiting_lottery">Awaiting Lottery</string>
+    <string name="lottery_ongoing">Lottery Ongoing</string>
     <string name="join">Join</string>
     <string name="entrants_and_limit">%d / %d</string>
     <string name="entrants_and_no_limit">%d / No Limit</string>
