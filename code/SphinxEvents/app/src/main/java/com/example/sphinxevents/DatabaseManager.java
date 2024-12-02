@@ -11,7 +11,14 @@
 
 package com.example.sphinxevents;
 
+import static android.content.ContentValues.TAG;
+
+import android.content.Context;
+import android.location.Location;
+
+
 import android.net.Uri;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -353,7 +360,7 @@ public class DatabaseManager {
                         public void onSuccess(Entrant user) {
                             // Updates user to be an Entrant
                             Entrant updatedUser = new Entrant(user.getDeviceId(), user.getName(), user.getEmail(),
-                                    user.getPhoneNumber(), user.getDefaultPfpPath(), user.getCustomPfpUrl(),
+                                    user.getPhoneNumber(), user.getProfilePictureUrl(), user.isCustomPfp(),
                                     user.isOrgNotificationsEnabled(), user.isAdminNotificationsEnabled(),
                                     user.getJoinedEvents(), user.getPendingEvents());
                             saveUser(updatedUser, new UserCreationCallback() {
@@ -514,7 +521,8 @@ public class DatabaseManager {
     }
 
     /**
-     * Deletes a profile picture from Firebase Storage.
+     * Deletes a profile picture from Firebase Storage and updates the user's profilePictureUrl to an empty string.
+     *
      * @param deviceId The device ID of the user whose profile picture is being deleted.
      * @param callback Callback to handle success or failure of the deletion.
      */
@@ -526,14 +534,27 @@ public class DatabaseManager {
         // Delete the profile picture
         profilePicRef.delete()
                 .addOnSuccessListener(aVoid -> {
-                    // Call the callback on success
-                    callback.onSuccess();
+                    // Update the user's profilePictureUrl to an empty string in the Firestore database
+                    FirebaseFirestore.getInstance()
+                            .collection("users")
+                            .document(deviceId)
+                            .update("profilePictureUrl", "")
+                            .addOnSuccessListener(unused -> {
+                                // Call the callback on success
+                                callback.onSuccess();
+                            })
+                            .addOnFailureListener(e -> {
+                                // Call the callback on failure to update Firestore
+                                callback.onFailure();
+                            });
                 })
                 .addOnFailureListener(e -> {
-                    // Call the callback on failure
+                    // Call the callback on failure to delete the profile picture
                     callback.onFailure();
                 });
     }
+
+
 
     // ---------------------------------------------------------------------------------------------
 
@@ -1125,7 +1146,7 @@ public class DatabaseManager {
     }
 
     /**
-     * Adds notification object to "notification" collection in the database.
+     * Adds notification to the "notifications" sub-collection of recipients.
      *
      * @param notification The notification object being uploaded.
      * @param recipients   The recipients of the notification.
@@ -1301,6 +1322,97 @@ public class DatabaseManager {
                 .addOnFailureListener(callback::onFailure);  // Notify failure
 
     }
+  
+    //---------------------------------------------------------------------------------------------
+    //Admin events search handling:
+
+    /**
+     * Callback interface for events search
+     */
+    public interface EventsSearchCallback {
+        /**
+         * Called when event search is successful
+         * @param events array of events that match query
+         */
+        void onSuccess(ArrayList<Event> events);
+
+        /**
+         * Called when error occurs during events search
+         * @param e the exception that occurred
+         */
+        void onFailure(Exception e);
+    }
+
+    /**
+     * Searches database for events that match name
+     * @param query the event name to find in database
+     * @param callback Callback to handle success or failure of searching database
+     */
+    public void searchEvents(String query, EventsSearchCallback callback) {
+        // Ensure the query is not case-sensitive and add a termination character to simulate a "contains" query
+        String endQuery = query + "\uf8ff"; // \uf8ff is a high Unicode character
+
+        // Query the users collection for documents with names containing the query
+        database.collection("events")
+                .whereGreaterThanOrEqualTo("name", query)
+                .whereLessThanOrEqualTo("name", endQuery)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        ArrayList<Event> events = new ArrayList<>();
+                        for (DocumentSnapshot document : task.getResult()) {
+                            Event event = document.toObject(Event.class);
+                            events.add(event);
+                        }
+                        callback.onSuccess(events);
+                    } else {
+                        callback.onFailure(task.getException());
+                    }
+                });
+    }
+
+    /**
+     * Callback interface for event deletion
+     */
+    public interface EventRemovalCallback {
+        /**
+         * Called when event is successfully removed
+         */
+        void onSuccess();
+
+        /**
+         * Called when error occurs during event deletion
+         * @param e the exception that occurred
+         */
+        void onFailure(Exception e);
+    }
+
+    /**
+     * Removes an event from database
+     * @param name key for event
+     * @param callback Callback to handle success or failure of event deletion
+     */
+    public void removeEvent(String name, EventRemovalCallback callback) {
+        // event name:
+        String event_name = name;
+
+        // deleting event based on if the parameter 'name' matches the field name
+        database.collection("events")
+                .whereEqualTo("name", event_name)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (DocumentSnapshot document : task.getResult()) {
+                            document.getReference().delete()
+                                    .addOnSuccessListener(aVoid -> {
+                                        // Notify success via callback
+                                        callback.onSuccess();
+                                    })
+                                    .addOnFailureListener(callback::onFailure);
+                        }
+                    }
+                });
+    }
 
     /**
      * Callback interface for entrant cancellation for an event.
@@ -1343,11 +1455,18 @@ public class DatabaseManager {
                 throw new FirebaseFirestoreException("User not found", FirebaseFirestoreException.Code.NOT_FOUND);
             }
 
-            // Update the "entrants" list in the event document
-            ArrayList<String> entrants = (ArrayList<String>) eventSnapshot.get("waitingList");
-            if (entrants != null && entrants.contains(userId)) {
-                entrants.remove(userId);
-                transaction.update(eventDocRef, "entrants", entrants);
+            // Update the "lotteryWinners" list in the event document
+            ArrayList<String> lotteryWinners = (ArrayList<String>) eventSnapshot.get("lotteryWinners");
+            if (lotteryWinners != null && lotteryWinners.contains(userId)) {
+                lotteryWinners.remove(userId);
+                transaction.update(eventDocRef, "lotteryWinners", lotteryWinners);
+            }
+
+            // Update the "cancelled" list in the event document
+            ArrayList<String> cancelled = (ArrayList<String>) eventSnapshot.get("cancelled");
+            if (cancelled != null && cancelled.contains(userId)) {
+                cancelled.add(userId);
+                transaction.update(eventDocRef, "cancelled", cancelled);
             }
 
             // Update the "pendingEvents" list in the user document

@@ -6,9 +6,11 @@
 package com.example.sphinxevents;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,11 +19,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import com.bumptech.glide.Glide;
+
+import java.io.File;
 
 public class RemoveProfileActivity extends AppCompatActivity {
 
     private Entrant entrant;
     private DatabaseManager databaseManager;
+    private UserManager userManager;
+
+    private ImageView profileImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,14 +56,28 @@ public class RemoveProfileActivity extends AppCompatActivity {
         TextView profileRoleTextView = findViewById(R.id.profile_role_textview);
         TextView profilePhoneNumberTextView = findViewById(R.id.profile_phone_number_textview);
         TextView profiledeviceIDTextView = findViewById(R.id.profile_deviceID_textview);
+        profileImageView = findViewById(R.id.profileImageView);
 
         Button removeButton = findViewById(R.id.remove_profile_button);
+        Button removePfpImageButton = findViewById(R.id.remove_profileImage_button);
 
         // Sets display
         profileNameTextView.setText(entrant.getName());
         profileRoleTextView.setText(entrant.getRole());
         profilePhoneNumberTextView.setText(entrant.getPhoneNumber());
         profiledeviceIDTextView.setText(entrant.getDeviceId());
+
+        //Setting profile Image Display:
+        String profilePictureUrl = entrant.getProfilePictureUrl();
+        if(!profilePictureUrl.isEmpty()){
+            // Load image using Glide
+            Glide.with(this)
+                    .load(profilePictureUrl)
+                    .centerCrop()
+                    .into(profileImageView);
+        } else {
+            profileImageView.setImageResource(android.R.color.transparent);
+        }
 
         // Set onClickListener for backButton
         backButton.setOnClickListener(v -> {
@@ -67,19 +89,28 @@ public class RemoveProfileActivity extends AppCompatActivity {
             if (entrant.getRole().equals("Organizer")) {
                 removeUserFacility();
             }
-            if (!entrant.getCustomPfpUrl().isEmpty()) {
-                deleteCustomPfp();
+            if (!entrant.getProfilePictureUrl().isEmpty()) {
+                deleteUserPfp();
             }
             removeProfile();
 
         });
 
+        // Sets onClickListener for removeButton
+        removePfpImageButton.setOnClickListener(v -> {
+            if (!profilePictureUrl.isEmpty()) {
+                deleteUserPfp();
+            }
+        });
+
     }
 
-    private void deleteCustomPfp() {
+    private void deleteUserPfp() {
         databaseManager.deleteProfilePicture(entrant.getDeviceId(), new DatabaseManager.DeleteProfilePictureCallback() {
             @Override
             public void onSuccess() {
+                Toast.makeText(RemoveProfileActivity.this, "Profile picture successfully removed.", Toast.LENGTH_SHORT).show();
+                profileImageView.setImageResource(android.R.color.transparent);
             }
 
             @Override
@@ -116,4 +147,6 @@ public class RemoveProfileActivity extends AppCompatActivity {
             }
         });
     }
+
 }
+

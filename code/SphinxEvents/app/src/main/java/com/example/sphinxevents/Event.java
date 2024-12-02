@@ -1,6 +1,8 @@
 
 package com.example.sphinxevents;
 
+import com.google.firebase.firestore.auth.User;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,9 +27,8 @@ public class Event implements Serializable {
     private ArrayList<String> cancelled; // The list of entrants who won the lottery and cancelled
     private boolean lotteryWasDrawn = false;  // Boolean indicating if lottery has been drawn
 
-    // Empty Constructor
-    public Event() {
-    }
+    // No-argument constructor
+    public Event() {}
 
     /**
      * Constructs an Event with the specified attributes.
@@ -51,9 +52,9 @@ public class Event implements Serializable {
         this.geolocationReq = geolocationReq;
         this.entrants = joinedUsers;
         this.facilityLocation = facilityLocation;
-        this.lotteryWinners = new ArrayList<String>();
-        this.confirmed = new ArrayList<String>();
-        this.cancelled = new ArrayList<String>();
+        this.lotteryWinners = new ArrayList<>();
+        this.confirmed = new ArrayList<>();
+        this.cancelled = new ArrayList<>();
         this.lotteryWasDrawn = false;
         this.redrawUserCount = 0;
     }

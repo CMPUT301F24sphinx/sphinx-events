@@ -18,8 +18,6 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -38,7 +36,6 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.splashscreen.SplashScreen;
 import androidx.core.view.GravityCompat;
@@ -347,6 +344,75 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
     }
 
     /**
+     * Updates the expandable lists with current user data
+     */
+    public void updateExpandableLists2() {
+        Entrant currentUser = userManager.getCurrentUser();
+
+        expandableListView = findViewById(R.id.main_screen_expandable_listview);
+
+        headers = new ArrayList<>();
+        events = new HashMap<>();
+
+        headers.add(getString(R.string.joined_events_header, currentUser.getJoinedEvents().size()));
+        headers.add(getString(R.string.pending_events_header, currentUser.getPendingEvents().size()));
+
+        // Displays joined events
+        databaseManager.retrieveEventList(currentUser.getJoinedEvents(), new DatabaseManager.retrieveEventListCallback() {
+            @Override
+            public void onSuccess(List<Event> joinedEvents) {
+                events.put(headers.get(0), joinedEvents);
+
+                // Displays pending events
+                databaseManager.retrieveEventList(currentUser.getPendingEvents(), new DatabaseManager.retrieveEventListCallback() {
+                    @Override
+                    public void onSuccess(List<Event> pendingEvents) {
+                        events.put(headers.get(1), pendingEvents);
+
+                        updateExpandableListView(headers, events);
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        Toast.makeText(MainActivity.this, "Error Displaying Pending Events",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(MainActivity.this, "Error Displaying Joined Events",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Get created events if user is an organizer
+        if (currentUser.getRole().equals("Organizer")) {
+            Organizer organizer = (Organizer) currentUser;
+
+            if (headers.size() < 3) {
+                headers.add(getString(R.string.created_events_header, organizer.getCreatedEvents().size()));
+            }
+
+            databaseManager.retrieveEventList(organizer.getCreatedEvents(), new DatabaseManager.retrieveEventListCallback() {
+                @Override
+                public void onSuccess(List<Event> createdEvents) {
+                    headers.set(2, getString(R.string.created_events_header, createdEvents.size()));
+                    events.put(headers.get(2), createdEvents);
+                    updateExpandableListView(headers, events);
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    Toast.makeText(MainActivity.this, "Error Displaying Created Events",
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    /**
      * Updates the ExpandableListView with the provided headers and events data.
      * Configures the adapter and sets an OnChildClickListener for handling child item clicks.
      *
@@ -377,55 +443,65 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         });
     }
 
+
+
     /**
-     * Updates the user profile picture to custom or default profile picture
+     * Updates the user profile picture, generating a default one if needed.
      */
     public void updateProfilePicture() {
         Entrant currentUser = userManager.getCurrentUser();
-        String customPfpUrl = currentUser.getCustomPfpUrl();
-        if (customPfpUrl != null && customPfpUrl.isEmpty()) {
-            loadDefaultPfp();
-        } else {  // Load in custom profile picture using Glide
+        String profilePictureUrl = currentUser.getProfilePictureUrl();
+
+        if (profilePictureUrl == null || profilePictureUrl.isEmpty()) {
+            // Generate and upload deterministic profile picture
+            ProfilePictureHelper.generateAndUploadDefaultProfilePicture(this, currentUser, new DatabaseManager.UploadProfilePictureCallback() {
+                @Override
+                public void onSuccess(String profilePictureUrl) {
+                    // Once uploaded, update the profile picture in UI
+                    Glide.with(MainActivity.this)
+                            .load(profilePictureUrl)
+                            .centerCrop()
+                            .into(profilePicBtn);
+
+                    Glide.with(MainActivity.this)
+                            .load(profilePictureUrl)
+                            .centerCrop()
+                            .into(profilePicDrawerView);
+                }
+
+                @Override
+                public void onFailure() {
+                    Toast.makeText(MainActivity.this, "Failed to upload default profile picture.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            // Load custom profile picture using Glide
             Glide.with(this)
-                    .load(customPfpUrl)
+                    .load(profilePictureUrl)
                     .centerCrop()
+                    .error(Glide.with(this)
+                            .load(generateTemporaryDefaultPfp(currentUser))
+                            .centerCrop())
                     .into(profilePicBtn);
+
             Glide.with(this)
-                    .load(customPfpUrl)
+                    .load(profilePictureUrl)
                     .centerCrop()
+                    .error(Glide.with(this)
+                            .load(generateTemporaryDefaultPfp(currentUser))
+                            .centerCrop())
                     .into(profilePicDrawerView);
         }
     }
 
     /**
-     * Loads the default deterministic pfp of user from storage
+     * Generates a temporary default profile picture in case the user doesn't have one.
+     * This will be used as a fallback image in Glide error handling.
      */
-    public void loadDefaultPfp() {
-        Entrant currentUser = userManager.getCurrentUser();
-        String userName = currentUser.getName();
-        String path = currentUser.getDefaultPfpPath();
-
-        // Check if the profile picture path is not empty
-        if (path != null && !path.isEmpty()) {
-            // Load the bitmap from local storage
-            Bitmap profileBitmap = userManager.loadBitmapFromLocalStorage(path);
-
-            // Set the bitmap as the image drawable for the buttons
-            profilePicBtn.setImageBitmap(profileBitmap);
-            profilePicDrawerView.setImageBitmap(profileBitmap);
-
-        } else {
-            // Generate a deterministic profile picture if no path is found
-            Drawable textDrawable = TextDrawable.createTextDrawable(
-                    this,
-                    String.valueOf(userName.charAt(0)),
-                    Color.WHITE,
-                    140
-            );
-            profilePicBtn.setImageDrawable(textDrawable);
-            profilePicDrawerView.setImageDrawable(textDrawable);
-        }
+    private Drawable generateTemporaryDefaultPfp(Entrant currentUser) {
+        return ProfilePictureHelper.generateDefaultProfilePicture(this, currentUser);
     }
+
 
     /**
      * Allows user to access admin functionalities if they are admin
@@ -451,7 +527,11 @@ public class MainActivity extends AppCompatActivity implements UserManager.UserU
         // Update UI elements based on the new currentUser data
         updateProfilePicture();
         updateDrawer();
-        updateExpandableLists();
+        if(deviceId.equals("053f398454114aed")){
+            updateExpandableLists2();
+        } else {
+            updateExpandableLists();
+        }
     }
 
     /**

@@ -1,11 +1,18 @@
+/*
+ * Class Name: NotificationListener
+ * Date: 2024-11-06
+ *
+ * Copyright (c) 2024
+ * All rights reserved.
+ *
+ */
+
 
 package com.example.sphinxevents;
 
-import android.app.Notification;
-import android.app.NotificationManager;
+
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.os.Bundle;
 import android.util.Log;
 
 import androidx.core.app.ActivityCompat;

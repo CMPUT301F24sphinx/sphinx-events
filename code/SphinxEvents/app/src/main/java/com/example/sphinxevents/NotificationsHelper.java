@@ -1,8 +1,20 @@
+/*
+ * Class Name: NotificationsHelper
+ * Date: 2024-11-06
+ *
+ * Copyright (c) 2024
+ * All rights reserved.
+ *
+ */
 
 package com.example.sphinxevents;
 
-import java.util.ArrayList;
+ import java.util.ArrayList;
 
+/**
+ * A helper class for sending notifications to users. Defines the channel IDs for consistency.
+ * Implements multiple methods that act as a template for certain automated notifications.
+ */
 public class NotificationsHelper {
 
     public static final String ORGANIZER_CHANNEL_ID = "organizer_notifications";

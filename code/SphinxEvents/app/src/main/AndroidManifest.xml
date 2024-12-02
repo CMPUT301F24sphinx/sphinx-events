@@ -62,6 +62,12 @@
             android:name=".ProfilesSearchActivity"
             android:exported="false" />
         <activity
+            android:name=".EventsSearchActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RemoveEventsActivity"
+            android:exported="false" />
+        <activity
             android:name=".RemoveProfileActivity"
             android:exported="false" />
         <activity
