@@ -78,7 +78,7 @@ public class qrCodeActivity extends AppCompatActivity {
      * @param eventId   The ID to encode in the QR code.
      * @param qrCodeBox  The ImageView where the QR code will be displayed.
      */
-    private void generateQRCode(String eventId, ImageView qrCodeBox) {
+    public void generateQRCode(String eventId, ImageView qrCodeBox) {
         MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
         try {
             // Create QR code bit matrix with specified dimensions
@@ -102,7 +102,7 @@ public class qrCodeActivity extends AppCompatActivity {
      * Uploads the generated QR code bitmap to Firebase Storage.
      * The QR code is stored as a JPEG file in the "qr_codes" folder with the poster ID as the file name.
      */
-    private void uploadQRCodeToStorage() {
+    public void uploadQRCodeToStorage() {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference storageReference = storage.getReference();
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
