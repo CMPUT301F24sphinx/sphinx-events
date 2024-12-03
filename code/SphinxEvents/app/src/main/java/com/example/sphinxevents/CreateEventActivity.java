@@ -120,7 +120,7 @@ public class CreateEventActivity extends AppCompatActivity {
     /**
      * Displays a date picker dialog and sets the selected date to the EditText.
      */
-    private void showDatePicker() {
+    public void showDatePicker() {
         final Calendar date = Calendar.getInstance();
         int year = date.get(Calendar.YEAR);
         int month = date.get(Calendar.MONTH);
@@ -143,7 +143,7 @@ public class CreateEventActivity extends AppCompatActivity {
     /**
      * Opens the image picker to select an image as the event poster.
      */
-    private void selectImage() {
+    public void selectImage() {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -153,7 +153,7 @@ public class CreateEventActivity extends AppCompatActivity {
     /**
      * Creates a new event using the input fields and uploads the poster image if selected.
      */
-    private void createEvent() {
+    public void createEvent() {
         // Obtains user input
         String eventName = eventNameEditText.getText().toString().trim();
         String eventDesc = eventDescriptionEditText.getText().toString().trim();
@@ -231,7 +231,7 @@ public class CreateEventActivity extends AppCompatActivity {
      *
      * @param posterId The Firebase Storage path for the poster.
      */
-    private void uploadPosterImage(String posterId) {
+    public void uploadPosterImage(String posterId) {
         if (posterUri != null) {
             StorageReference storageReference = FirebaseStorage.getInstance().getReference(posterId);
             storageReference.putFile(posterUri)
@@ -245,7 +245,7 @@ public class CreateEventActivity extends AppCompatActivity {
      *
      * @param eventId ID for the event, passed to the QR code activity.
      */
-    private void startQrCodeActivity(String eventId) {
+    public void startQrCodeActivity(String eventId) {
         Intent qrEventIntent = new Intent(CreateEventActivity.this, qrCodeActivity.class);
         qrEventIntent.putExtra("eventId", eventId);
         startActivity(qrEventIntent);
