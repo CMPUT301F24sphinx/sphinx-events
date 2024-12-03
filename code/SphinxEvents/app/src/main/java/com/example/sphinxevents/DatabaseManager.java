@@ -348,7 +348,6 @@ public class DatabaseManager {
      * @param callback Callback to handle success or failure of the facility removal process.
      */
     public void removeFacility(String deviceId, FacilityRemovalCallback callback) {
-        FirebaseStorage storage = FirebaseStorage.getInstance();
 
         // Retrieve the user's document to access the "createdEvents" array
         database.collection("users")

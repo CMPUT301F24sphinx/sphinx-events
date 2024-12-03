@@ -97,12 +97,11 @@ public class RemoveProfileActivity extends AppCompatActivity {
         // Sets onClickListener for removeButton
         removeButton.setOnClickListener(v -> {
             if (entrant.getRole().equals("Organizer")) {
-                removeUserFacility();
+                removeOrganizer();
             }
-            if (!entrant.getProfilePictureUrl().isEmpty()) {
-                deleteUserPfp();
+            else {
+                removeEntrant();
             }
-            removeProfile();
         });
 
         // Sets onClickListener for remove profile image button
@@ -112,6 +111,51 @@ public class RemoveProfileActivity extends AppCompatActivity {
             }
         });
     }
+
+
+    private void removeOrganizer() {
+        databaseManager.removeFacility(entrant.getDeviceId(), new DatabaseManager.FacilityRemovalCallback() {
+            @Override
+            public void onSuccess(Entrant updatedUser) {
+                Toast.makeText(RemoveProfileActivity.this, "Facility successfully removed.", Toast.LENGTH_SHORT).show();
+                removeEntrant();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(getApplicationContext(), "Error removing user's facility", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void removeEntrant() {
+        databaseManager.deleteProfilePicture(entrant.getDeviceId(), new DatabaseManager.DeleteProfilePictureCallback() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(RemoveProfileActivity.this, "Profile picture successfully removed.", Toast.LENGTH_SHORT).show();
+                profileImageView.setImageResource(android.R.color.transparent);
+                databaseManager.removeProfile(entrant.getDeviceId(), new DatabaseManager.ProfileRemovalCallback() {
+                    @Override
+                    public void onSuccess() {
+                        setResult(ProfilesSearchActivity.PROFILES_REMOVED);
+                        Toast.makeText(getApplicationContext(), "Profile removed!", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        Toast.makeText(getApplicationContext(), "Error removing profile from database", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure() {
+                Toast.makeText(getApplicationContext(), "Error removing user's profile picture", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 
     /**
      * Deletes the user's profile picture from the database and updates the UI.
@@ -138,6 +182,7 @@ public class RemoveProfileActivity extends AppCompatActivity {
         databaseManager.removeFacility(entrant.getDeviceId(), new DatabaseManager.FacilityRemovalCallback() {
             @Override
             public void onSuccess(Entrant updatedUser) {
+                Toast.makeText(RemoveProfileActivity.this, "Facility successfully removed.", Toast.LENGTH_SHORT).show();
             }
 
             @Override
