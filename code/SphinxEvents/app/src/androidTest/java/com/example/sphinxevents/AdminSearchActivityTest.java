@@ -1,0 +1,89 @@
+/*
+ * Class Name: AdminSearchActivityTest
+ * Date: 2024-12-02
+ *
+ * Description:
+ * AdminSearchActivityTest is a test class designed to verify the functionality of the
+ * AdminSearchActivity. It ensures that the activity behaves as expected when users interact with
+ * it, including verifying navigation and state changes within the activity.
+ */
+
+package com.example.sphinxevents;
+
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.intent.Intents.intended;
+import static androidx.test.espresso.intent.Intents.release;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+
+import androidx.test.core.app.ActivityScenario;
+import androidx.test.ext.junit.rules.ActivityScenarioRule;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.LargeTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import androidx.test.espresso.intent.Intents;
+
+
+/**
+ * Test class for verifying behaviour of AdminSearchActivity
+ */
+@RunWith(AndroidJUnit4.class)
+@LargeTest
+public class AdminSearchActivityTest {
+    @Rule
+    public ActivityScenarioRule<MainActivity> scenario =
+            new ActivityScenarioRule<>(MainActivity.class);
+
+    @Before
+    public void setUp() {
+        // Initialize Intents before the test starts
+        Intents.init();
+    }
+
+    @After
+    public void tearDown() {
+        // Release Intents after the test completes
+        Intents.release();
+    }
+
+    /**
+     * Tests whether AdminSearchActivity is triggered by clicking the "Administrator" button.
+     */
+    @Test
+    public void testActivitySwitch() {
+
+        // Perform click on profile picture to open the drawer
+        onView(withId(R.id.profile_pic_button)).perform(click());
+
+        // Perform click on "Administrator" button
+        onView(withId(R.id.drawer_administrator_btn)).perform(click());
+
+        // Check if ManageProfileActivity was launched
+        intended(hasComponent(AdminSearchActivity.class.getName()));
+    }
+
+    /**
+     * Tests whether the back arrow in AdminSearchActivity finishes the activity.
+     */
+    @Test
+    public void testCancelButton() {
+        // Perform click on profile picture to open the drawer
+        onView(withId(R.id.profile_pic_button)).perform(click());
+
+        // Perform click on "Administrator" button
+        onView(withId(R.id.drawer_administrator_btn)).perform(click());
+
+        //Perform click on
+        onView(withId(R.id.admin_search_back_button)).perform(click());
+
+        // Check if MainActivity is now displayed
+        onView(withId(R.id.drawer_layout)).check(matches(isDisplayed()));
+    }
+}
